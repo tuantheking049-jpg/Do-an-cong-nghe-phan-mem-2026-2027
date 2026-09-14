@@ -1,1 +1,22 @@
+# Visual Studio Code
+.vscode/
 
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# .NET
+bin/
+obj/
+
+# Logs
+*.log
+
+# Environment / secrets
+.env
+appsettings.Development.json
+
+# OS
+.DS_Store
+Thumbs.db
