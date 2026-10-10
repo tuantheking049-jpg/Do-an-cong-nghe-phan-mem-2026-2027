@@ -1,3 +1,4 @@
+-- Dùng để vẽ ERD trong ssms thôi, hoặc coi ảnh ERD trong ThanhVien2_Tuan1.docx
 CREATE TABLE [Roles] (
   [RoleID] int PRIMARY KEY,
   [RoleName] nvarchar
