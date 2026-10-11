@@ -20,3 +20,8 @@ appsettings.Development.json
 # OS
 .DS_Store
 Thumbs.db
+
+Backend-Legacy/bin/
+Backend-Legacy/obj/
+Backend-Legacy/net8.0/
+Backend/startup-error.txt
