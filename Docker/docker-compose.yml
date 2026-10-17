@@ -1,16 +1,15 @@
 name: doan-backend
 
 services:
-  # 1) SQL Server
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     platform: linux/amd64
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_PID: Developer
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-Doan_Dev_123!}
+      MSSQL_SA_PASSWORD: Doan_Dev_123!
     ports:
-      - "${DB_PORT:-1433}:1433"
+      - "1433:1433"
     volumes:
       - sqldata:/var/opt/mssql
     healthcheck:
@@ -19,9 +18,7 @@ services:
       timeout: 5s
       retries: 12
       start_period: 20s
-    restart: unless-stopped
 
-  # 2) Chạy 1 lần: tạo database, bảng và dữ liệu mẫu (chạy lại nhiều lần vẫn an toàn)
   db-init:
     image: mcr.microsoft.com/mssql/server:2022-latest
     platform: linux/amd64
@@ -29,7 +26,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-Doan_Dev_123!}
+      MSSQL_SA_PASSWORD: Doan_Dev_123!
     volumes:
       - ./init:/init:ro
     entrypoint: ["/bin/bash", "-c"]
@@ -37,7 +34,6 @@ services:
       - /opt/mssql-tools18/bin/sqlcmd -C -S db -U sa -P "$$MSSQL_SA_PASSWORD" -f 65001 -b -i /init/init.sql
     restart: "no"
 
-  # 3) Backend Spring Boot
   backend:
     build:
       context: ..
@@ -48,10 +44,10 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:sqlserver://db:1433;databaseName=HuongDanDuLichQ4;encrypt=true;trustServerCertificate=true
       SPRING_DATASOURCE_USERNAME: sa
-      SPRING_DATASOURCE_PASSWORD: ${MSSQL_SA_PASSWORD:-Doan_Dev_123!}
+      SPRING_DATASOURCE_PASSWORD: Doan_Dev_123!
       SPRING_JPA_SHOW_SQL: "false"
     ports:
-      - "${BACKEND_PORT:-8080}:8080"
+      - "8080:8080"
     restart: on-failure
 
 volumes:
