@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Hướng dẫn Du lịch - Admin</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+        
+        /* Layout Configuration */
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        #sidebar {
+            min-width: 260px;
+            max-width: 260px;
+            background-color: #212529; /* Dark Sidebar */
+            color: #fff;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #1a1e21;
+            border-bottom: 1px solid #343a40;
+        }
+
+        #sidebar ul.components {
+            padding: 10px 0;
+            flex-grow: 1;
+        }
+
+        #sidebar ul li a {
+            padding: 12px 20px;
+            font-size: 1.05em;
+            display: block;
+            color: #adb5bd;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        #sidebar ul li a:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        #sidebar ul li a.active {
+            color: #fff;
+            background: #0d6efd; /* Primary Color */
+            border-left: 4px solid #fff;
+        }
+        
+        #sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 1.1em;
+        }
+
+        /* Main Content Styling */
+        #content {
+            width: 100%;
+            padding: 0;
+            min-height: 100vh;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff; /* Clean white background */
+        }
+        
+        .top-navbar {
+            background: #fff;
+            padding: 15px 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .main-container {
+            padding: 30px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f8f9fa; /* Slightly off-white for depth */
+        }
+        
+        /* Table Styling */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+        }
+        
+        .table > :not(caption) > * > * {
+            padding: 1rem 1rem;
+            vertical-align: middle;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: -260px;
+                position: fixed;
+                height: 100vh;
+                z-index: 999;
+            }
+            #sidebar.active {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h5 class="mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi bi-geo-alt-fill text-primary me-2"></i> AudioGuide Admin
+                </h5>
+            </div>
+
+            <ul class="list-unstyled components flex-column h-100 d-flex">
+                <li>
+                    <a href="#" class="sidebar-link active" data-target="pois" data-title="Quản lý địa điểm">
+                        <i class="bi bi-pin-map"></i> Quản lý địa điểm
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Biên soạn thuyết minh">
+                        <i class="bi bi-file-earmark-text"></i> Biên soạn thuyết minh
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Cấu hình ngôn ngữ">
+                        <i class="bi bi-globe2"></i> Cấu hình ngôn ngữ
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Quản lý bản dịch">
+                        <i class="bi bi-translate"></i> Quản lý bản dịch
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Quản lý giọng đọc">
+                        <i class="bi bi-megaphone"></i> Quản lý giọng đọc
+                    </a>
+                </li>
+                <li class="mt-auto">
+                    <a href="#" class="text-danger" onclick="confirmLogout()">
+                        <i class="bi bi-box-arrow-left"></i> Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div id="content">
+            <!-- Top Navbar for Mobile Toggle & User Info -->
+            <div class="top-navbar">
+                <button type="button" id="sidebarCollapse" class="btn btn-outline-primary d-md-none">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h4 class="mb-0 fw-bold" id="page-title">Quản lý địa điểm</h4>
+                <div class="user-profile d-flex align-items-center">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=0d6efd&color=fff" alt="Admin" class="rounded-circle" width="35">
+                    <span class="ms-2 fw-medium d-none d-sm-inline">Quản trị viên</span>
+                </div>
+            </div>
+
+            <!-- Main Dynamic Content Container -->
+            <div class="main-container">
+                
+                <!-- SECTION: Quản lý địa điểm (POIs) -->
+                <div id="pois-section" class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <p class="text-muted mb-0">Quản lý danh sách các điểm tham quan tại Sóc Trăng.</p>
+                        <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#poiModal" onclick="prepareAddModal()">
+                            <i class="bi bi-plus-lg me-1"></i> Thêm địa điểm
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" class="ps-4">ID</th>
+                                            <th scope="col">Tên địa điểm</th>
+                                            <th scope="col">Tọa độ (Vĩ độ, Kinh độ ảo)</th>
+                                            <th scope="col">Trạng thái</th>
+                                            <th scope="col" class="text-center">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row" class="ps-4">1</th>
+                                            <td class="fw-medium">Tân Huê Viên</td>
+                                            <td>9.6133, 105.9922</td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td class="text-center">
+                                                <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditModal(1, 'Tân Huê Viên', 9.6133, 105.9922, 'Hoạt động')" title="Sửa">
+                                                    <i class="bi bi-pencil-square"></i> Sửa
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="confirmDelete('Tân Huê Viên')" title="Xóa">
+                                                    <i class="bi bi-trash"></i> Xóa
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="ps-4">2</th>
+                                            <td class="fw-medium">Chợ nổi ngã 5</td>
+                                            <td>9.5761, 105.8117</td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td class="text-center">
+                                                <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditModal(2, 'Chợ nổi ngã 5', 9.5761, 105.8117, 'Hoạt động')" title="Sửa">
+                                                    <i class="bi bi-pencil-square"></i> Sửa
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="confirmDelete('Chợ nổi ngã 5')" title="Xóa">
+                                                    <i class="bi bi-trash"></i> Xóa
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="ps-4">3</th>
+                                            <td class="fw-medium">Chùa Phật Học 2</td>
+                                            <td>9.6056, 105.9754</td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td class="text-center">
+                                                <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditModal(3, 'Chùa Phật Học 2', 9.6056, 105.9754, 'Hoạt động')" title="Sửa">
+                                                    <i class="bi bi-pencil-square"></i> Sửa
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="confirmDelete('Chùa Phật Học 2')" title="Xóa">
+                                                    <i class="bi bi-trash"></i> Xóa
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="ps-4">4</th>
+                                            <td class="fw-medium">Chùa La Hán</td>
+                                            <td>9.6080, 105.9860</td>
+                                            <td><span class="badge bg-secondary">Bảo trì</span></td>
+                                            <td class="text-center">
+                                                <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditModal(4, 'Chùa La Hán', 9.6080, 105.9860, 'Bảo trì')" title="Sửa">
+                                                    <i class="bi bi-pencil-square"></i> Sửa
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="confirmDelete('Chùa La Hán')" title="Xóa">
+                                                    <i class="bi bi-trash"></i> Xóa
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="ps-4">5</th>
+                                            <td class="fw-medium">Khu căn cứ tỉnh ủy Sóc Trăng</td>
+                                            <td>9.5397, 105.9768</td>
+                                            <td><span class="badge bg-success">Hoạt động</span></td>
+                                            <td class="text-center">
+                                                <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditModal(5, 'Khu căn cứ tỉnh ủy Sóc Trăng', 9.5397, 105.9768, 'Hoạt động')" title="Sửa">
+                                                    <i class="bi bi-pencil-square"></i> Sửa
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="confirmDelete('Khu căn cứ tỉnh ủy Sóc Trăng')" title="Xóa">
+                                                    <i class="bi bi-trash"></i> Xóa
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Placeholder (For other menus) -->
+                <div id="placeholder-section" class="content-section d-none h-100 d-flex flex-column align-items-center justify-content-center text-muted" style="min-height: 60vh;">
+                    <i class="bi bi-tools" style="font-size: 4rem; opacity: 0.3;"></i>
+                    <h4 class="mt-3 fw-light">Nội dung đang cập nhật...</h4>
+                    <p>Chức năng này đang trong quá trình phát triển.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Modal for Add/Edit POI -->
+    <div class="modal fade" id="poiModal" tabindex="-1" aria-labelledby="poiModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="poiModalLabel">Thêm địa điểm mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="poiForm">
+                        <input type="hidden" id="poiId">
+                        <div class="mb-3">
+                            <label for="poiName" class="form-label fw-medium">Tên địa điểm <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="poiName" placeholder="VD: Chùa Dơi..." required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="poiLat" class="form-label fw-medium">Vĩ độ (Latitude)</label>
+                                <input type="number" step="any" class="form-control" id="poiLat" placeholder="VD: 9.5960">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="poiLng" class="form-label fw-medium">Kinh độ (Longitude)</label>
+                                <input type="number" step="any" class="form-control" id="poiLng" placeholder="VD: 105.9754">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="poiStatus" class="form-label fw-medium">Trạng thái</label>
+                            <select class="form-select" id="poiStatus">
+                                <option value="Hoạt động">Hoạt động</option>
+                                <option value="Bảo trì">Đang bảo trì</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="button" class="btn btn-primary" onclick="savePOI()">Lưu thông tin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle (with Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom Interactions -->
+    <script>
+        // Sidebar Toggle for Mobile
+        document.getElementById('sidebarCollapse').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Navigation Logic
+        const navLinks = document.querySelectorAll('.sidebar-link');
+        const pageTitle = document.getElementById('page-title');
+        const poisSection = document.getElementById('pois-section');
+        const placeholderSection = document.getElementById('placeholder-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links
+                navLinks.forEach(l => l.classList.remove('active'));
+                
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Update Page Title
+                const title = this.getAttribute('data-title');
+                pageTitle.innerText = title;
+
+                // Handle Content Switching
+                const target = this.getAttribute('data-target');
+                if(target === 'pois') {
+                    poisSection.classList.remove('d-none');
+                    placeholderSection.classList.add('d-none');
+                } else {
+                    poisSection.classList.add('d-none');
+                    placeholderSection.classList.remove('d-none');
+                }
+
+                // Close sidebar on mobile after clicking
+                if(window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('active');
+                }
+            });
+        });
+
+        // Modal Logic
+        const poiModal = new bootstrap.Modal(document.getElementById('poiModal'));
+
+        function prepareAddModal() {
+            document.getElementById('poiModalLabel').innerText = "Thêm địa điểm mới";
+            document.getElementById('poiForm').reset();
+            document.getElementById('poiId').value = "";
+        }
+
+        function openEditModal(id, name, lat, lng, status) {
+            document.getElementById('poiModalLabel').innerText = "Cập nhật địa điểm";
+            document.getElementById('poiId').value = id;
+            document.getElementById('poiName').value = name;
+            document.getElementById('poiLat').value = lat;
+            document.getElementById('poiLng').value = lng;
+            document.getElementById('poiStatus').value = status;
+            poiModal.show();
+        }
+
+        function savePOI() {
+            const form = document.getElementById('poiForm');
+            if(!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // Theo yêu cầu của thành viên:
+            alert("Giả lập: Đã lưu thành công!");
+            poiModal.hide();
+        }
+
+        function confirmDelete(name) {
+            if(confirm(`Bạn có chắc chắn muốn xóa địa điểm "${name}" không?`)) {
+                // Theo yêu cầu của thành viên:
+                alert("Giả lập: Đã xóa!");
+            }
+        }
+
+        function confirmLogout() {
+            if(confirm("Bạn có muốn đăng xuất khỏi hệ thống?")) {
+                alert("Đã đăng xuất! Chuyển hướng...");
+            }
+        }
+    </script>
+</body>
+</html>
