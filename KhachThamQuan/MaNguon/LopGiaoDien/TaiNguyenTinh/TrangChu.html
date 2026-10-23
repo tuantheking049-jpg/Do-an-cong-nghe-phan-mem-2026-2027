@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f7f7f3" />
+    <meta name="description" content="Khám phá các điểm tham quan Sóc Trăng với thuyết minh tự động đa ngôn ngữ." />
+    <title>Đi & Kể — Khám phá Sóc Trăng</title>
+    <link rel="preconnect" href="https://images.vietnamtourism.gov.vn" />
+    <link rel="preconnect" href="https://upload.wikimedia.org" />
+    <link rel="stylesheet" href="/GiaoDien.css?v=2" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Đi & Kể, trang chủ">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5c-4.4 0-8 3.4-8 7.7 0 5.7 8 17.3 8 17.3s8-11.6 8-17.3c0-4.3-3.6-7.7-8-7.7Z"/><circle cx="16" cy="11.2" r="2.8"/></svg></span>
+        <span class="brand-name">đi & kể<span>.</span></span>
+      </a>
+      <nav class="main-nav" aria-label="Điều hướng chính">
+        <a class="nav-link active" href="#kham-pha">Khám phá</a>
+        <a class="nav-link" href="#diem-den">Điểm đến</a>
+        <a class="nav-link" href="#cach-hoat-dong">Cách hoạt động</a>
+      </nav>
+      <div class="header-actions">
+        <label class="language-picker" aria-label="Chọn ngôn ngữ" id="language-picker">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18m0-18a14 14 0 0 0 0 18"/></svg>
+          <select id="language-select">
+            <option value="vi">Tiếng Việt</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+          </select>
+          <span class="chevron" aria-hidden="true">⌄</span>
+        </label>
+        <button class="avatar-button" id="saved-button" aria-label="Địa điểm yêu thích">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 4.5-8.8 10-8.8 10s-8.8-5.5-8.8-10A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="kham-pha">
+        <div class="hero-photo" role="img" aria-label="Ảnh minh họa hành trình khám phá Sóc Trăng"></div>
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <div class="eyebrow hero-eyebrow"><span class="eyebrow-dot"></span><span data-i18n="heroEyebrow">HÀNH TRÌNH CỦA RIÊNG BẠN BẮT ĐẦU TỪ ĐÂY</span></div>
+          <h1 data-i18n="heroTitle">Khám phá Sóc Trăng<br />qua những <em>câu chuyện.</em></h1>
+          <p class="hero-copy" data-i18n="heroCopy">Lắng nghe chuyện kể về những ngôi chùa Khmer, nhịp sống chợ nổi và nét văn hóa đặc sắc của Sóc Trăng.</p>
+          <a class="hero-cta" href="#diem-den"><span data-i18n="heroCta">Khám phá Sóc Trăng</span><span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="hero-caption"><span class="caption-line"></span><span data-i18n="heroCaption">MIỀN SÔNG NƯỚC SÓC TRĂNG</span></div>
+        <div class="hero-count"><span>01</span><span class="count-slash">/</span><span>06</span><span class="count-progress"></span></div>
+      </section>
+
+      <section class="intro-row page-shell" id="diem-den">
+        <div class="intro-heading">
+          <span class="eyebrow"><span class="eyebrow-dot"></span><span data-i18n="collectionLabel">SÁU ĐIỂM ĐẾN TẠI SÓC TRĂNG</span></span>
+          <h2 data-i18n="collectionTitle">Sóc Trăng có<br />điều hay để kể.</h2>
+        </div>
+        <div class="intro-aside">
+          <p data-i18n="collectionCopy">Từ chợ nổi Ngã Năm đến những ngôi chùa Khmer và Hoa, chọn điểm đến để khám phá câu chuyện vùng đất này.</p>
+          <div class="mini-stat"><span class="stat-number">06</span><span data-i18n="placesLabel">điểm đến được tuyển chọn</span><span class="stat-divider"></span><span class="stat-number">03</span><span data-i18n="languagesLabel">ngôn ngữ thuyết minh</span></div>
+        </div>
+      </section>
+
+      <section class="explore page-shell" aria-label="Danh sách địa điểm">
+        <div class="explore-toolbar">
+          <div class="filter-tabs" role="group" aria-label="Lọc theo chủ đề">
+            <button class="filter-chip selected" data-category="" data-i18n="filterAll">Tất cả <span>06</span></button>
+            <button class="filter-chip" data-category="Văn hóa" data-i18n="filterCulture">Văn hóa</button>
+            <button class="filter-chip" data-category="Ẩm thực" data-i18n="filterFood">Ẩm thực</button>
+            <button class="filter-chip" data-category="Lịch sử" data-i18n="filterHistory">Lịch sử</button>
+            <button class="filter-chip" data-category="Kiến trúc" data-i18n="filterArchitecture">Kiến trúc</button>
+          </div>
+          <label class="search-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+            <input id="search-input" type="search" placeholder="Tìm địa điểm..." data-i18n-placeholder="searchPlaceholder" />
+            <span class="search-shortcut">⌘ K</span>
+          </label>
+        </div>
+        <div class="results-caption"><span id="results-count">06 địa điểm</span><span class="sort-label" data-i18n="sortLabel">Sắp xếp: <strong>Được yêu thích</strong> <span aria-hidden="true">⌄</span></span></div>
+        <div class="places-grid" id="places-grid" aria-live="polite"></div>
+        <div class="empty-state" id="empty-state" hidden>
+          <span class="empty-icon">⌕</span>
+          <h3 data-i18n="emptyTitle">Chưa tìm thấy câu chuyện này</h3>
+          <p data-i18n="emptyCopy">Thử một từ khóa hoặc chủ đề khác nhé.</p>
+        </div>
+      </section>
+
+      <section class="story-banner page-shell" id="cach-hoat-dong">
+        <div class="story-image" role="img" aria-label="Khám phá những con đường di sản"></div>
+        <div class="story-panel">
+          <span class="eyebrow light-eyebrow"><span class="eyebrow-dot"></span><span data-i18n="storyLabel">ĐI CHẬM, NGHE SÂU</span></span>
+          <h2 data-i18n="storyTitle">Không cần hướng dẫn viên.<br />Câu chuyện luôn bên bạn.</h2>
+          <p data-i18n="storyCopy">Chọn điểm đến, chọn ngôn ngữ, nhấn nghe. Một hành trình tự do — theo nhịp của riêng bạn.</p>
+          <a href="#diem-den" class="text-link"><span data-i18n="storyLink">Bắt đầu khám phá</span><span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="story-index"><span>02</span><span>/</span><span>03</span></div>
+      </section>
+    </main>
+
+    <footer class="site-footer page-shell">
+      <a class="brand footer-brand" href="/"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5c-4.4 0-8 3.4-8 7.7 0 5.7 8 17.3 8 17.3s8-11.6 8-17.3c0-4.3-3.6-7.7-8-7.7Z"/><circle cx="16" cy="11.2" r="2.8"/></svg></span><span class="brand-name">đi & kể<span>.</span></span></a>
+      <span data-i18n="footerNote">Những câu chuyện Việt Nam, kể theo cách của bạn.</span>
+      <span class="footer-credit">MADE FOR THE CURIOUS <span>✳</span></span>
+    </footer>
+
+    <aside class="audio-player" id="audio-player" aria-live="polite" hidden>
+      <div class="player-art" id="player-art"></div>
+      <div class="player-meta"><span class="player-kicker" data-i18n="nowPlaying">ĐANG THUYẾT MINH</span><strong id="player-title"></strong><span id="player-language"></span></div>
+      <div class="player-controls"><span class="audio-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><button id="play-toggle" class="play-toggle" aria-label="Tạm dừng">Ⅱ</button><span class="player-time" data-i18n="audioLabel">Âm thanh tự động</span></div>
+      <button class="player-close" id="player-close" aria-label="Đóng trình phát">×</button>
+    </aside>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/TuongTac.js?v=2" defer></script>
+  </body>
+</html>

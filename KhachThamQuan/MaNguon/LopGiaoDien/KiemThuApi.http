@@ -1,0 +1,6 @@
+@DiaChiApi = http://localhost:5200
+
+GET {{DiaChiApi}}/api/landmarks?language=vi
+Accept: application/json
+
+###

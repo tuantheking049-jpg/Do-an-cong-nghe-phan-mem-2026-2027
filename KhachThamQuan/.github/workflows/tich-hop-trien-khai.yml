@@ -1,0 +1,56 @@
+name: Tich hop va trien khai ung dung thuyet minh
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: 8.0.x
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Restore
+        run: dotnet restore GiaiPhapThuyetMinh.sln
+      - name: Build
+        run: dotnet build GiaiPhapThuyetMinh.sln --configuration Release --no-restore
+      - name: Test
+        run: dotnet test GiaiPhapThuyetMinh.sln --configuration Release --no-build --logger "trx;LogFileName=tests.trx"
+      - name: Publish web application
+        run: dotnet publish MaNguon/LopGiaoDien/LopGiaoDien.csproj --configuration Release --no-build --output ./publish
+      - uses: actions/upload-artifact@v4
+        with:
+          name: visitor-guide
+          path: publish/
+          if-no-files-found: error
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: visitor-guide
+          path: publish
+      - name: Deploy to Azure App Service
+        if: env.AZURE_WEBAPP_NAME != '' && env.AZURE_WEBAPP_PUBLISH_PROFILE != ''
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: publish
