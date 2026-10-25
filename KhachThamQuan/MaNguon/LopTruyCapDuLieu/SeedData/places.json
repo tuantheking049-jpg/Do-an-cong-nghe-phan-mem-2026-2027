@@ -1,0 +1,150 @@
+[
+  {
+    "id": "tan-hue-vien",
+    "name": "Tân Huê Viên",
+    "category": "Ẩm thực",
+    "province": "Sóc Trăng",
+    "durationMinutes": 7,
+    "rating": 4.8,
+    "reviewCount": 320,
+    "imageUrl": "https://www.dacsanbanhpia.com/wp-content/uploads/2015/05/banh-pia-tan-hue-vien.jpg",
+    "imageSourceUrl": "https://www.dacsanbanhpia.com/wp-content/uploads/2015/05/banh-pia-tan-hue-vien.jpg",
+    "imagePosition": "center 55%",
+    "highlights": ["Đặc sản Sóc Trăng", "Bánh pía", "Ẩm thực địa phương"],
+    "descriptions": {
+      "vi": "Tân Huê Viên là điểm dừng chân gắn với đặc sản Sóc Trăng, đặc biệt là bánh pía. Ghé thăm để tìm hiểu thêm về món bánh nhiều lớp nhân đậu xanh, sầu riêng và trứng muối, một hương vị quen thuộc của miền Tây.",
+      "en": "Tân Huê Viên is a popular stop associated with Sóc Trăng's local specialties, especially bánh pía. Discover this flaky pastry traditionally filled with mung bean, durian and salted egg yolk, a familiar taste of the Mekong Delta.",
+      "fr": "Tân Huê Viên est une étape réputée pour les spécialités de Sóc Trăng, notamment le bánh pía. Découvrez cette pâtisserie feuilletée traditionnellement garnie de haricot mungo, de durian et de jaune d'œuf salé."
+    },
+    "galleryPhotos": [
+      {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Khu_B%E1%BA%A3o_Th%C3%A1p_Li%C3%AAn_Hoa_-_T%C3%A2n_Hu%C3%AA_Vi%C3%AAn.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Khu_B%E1%BA%A3o_Th%C3%A1p_Li%C3%AAn_Hoa_-_T%C3%A2n_Hu%C3%AA_Vi%C3%AAn.jpg",
+        "caption": "Khu Bảo Tháp Liên Hoa"
+      }
+    ]
+  },
+  {
+    "id": "cho-noi-nga-nam",
+    "name": "Chợ nổi Ngã Năm",
+    "category": "Văn hóa",
+    "province": "Sóc Trăng",
+    "durationMinutes": 8,
+    "rating": 4.8,
+    "reviewCount": 280,
+    "imageUrl": "https://images.vietnamtourism.gov.vn/vn/images/2014/AnhInternet/chonoinga5.jpg",
+    "imageSourceUrl": "https://images.vietnamtourism.gov.vn/vn/images/2014/AnhInternet/chonoinga5.jpg",
+    "imagePosition": "center 50%",
+    "highlights": ["Chợ nổi miền Tây", "Giao thương đường thủy", "Bình minh"],
+    "descriptions": {
+      "vi": "Chợ nổi Ngã Năm họp tại nơi năm nhánh sông gặp nhau, tạo nên khung cảnh mua bán tấp nập trên ghe thuyền. Hãy đến từ sáng sớm để cảm nhận nhịp sống sông nước và nét giao thương đặc trưng của miền Tây.",
+      "en": "Ngã Năm Floating Market gathers where five waterways meet, with boats bringing local produce and goods to trade. Visit early in the morning to experience the river life and trading traditions of the Mekong Delta.",
+      "fr": "Le marché flottant de Ngã Năm se tient au confluent de cinq voies d'eau, où les bateaux viennent échanger produits et marchandises. Venez tôt le matin pour découvrir la vie fluviale du delta du Mékong."
+    },
+    "galleryPhotos": [
+      {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Ch%E1%BB%A3_n%E1%BB%95i_Ng%C3%A3_N%C4%83m%2C_S%C3%B3c_Tr%C4%83ng.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%E1%BB%A3_n%E1%BB%95i_Ng%C3%A3_N%C4%83m,_S%C3%B3c_Tr%C4%83ng.jpg",
+        "caption": "Ghe thuyền tại chợ nổi Ngã Năm"
+      }
+    ]
+  },
+  {
+    "id": "chua-doi",
+    "name": "Chùa Dơi",
+    "category": "Kiến trúc",
+    "province": "Sóc Trăng",
+    "durationMinutes": 8,
+    "rating": 4.8,
+    "reviewCount": 410,
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Ch%C3%B9a_D%C6%A1i_S%C3%B3c_Tr%C4%83ng_%2840553739771%29.jpg/960px-Ch%C3%B9a_D%C6%A1i_S%C3%B3c_Tr%C4%83ng_%2840553739771%29.jpg",
+    "imageSourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%B9a_D%C6%A1i_S%C3%B3c_Tr%C4%83ng_(40553739771).jpg",
+    "imagePosition": "center 55%",
+    "highlights": ["Chùa Khmer", "Kiến trúc Phật giáo", "Vườn cây"],
+    "descriptions": {
+      "vi": "Chùa Dơi, còn được biết đến với tên chùa Mahatup, là ngôi chùa Khmer Nam tông nổi tiếng ở Sóc Trăng. Ngôi chùa gây ấn tượng bởi kiến trúc Khmer và khuôn viên nhiều cây xanh, nơi đàn dơi thường trú ngụ trên những tán cây.",
+      "en": "Chùa Dơi, also known as Mahatup Pagoda, is a well-known Khmer Theravada Buddhist temple in Sóc Trăng. Its Khmer architecture and leafy grounds are home to colonies of fruit bats roosting in the trees.",
+      "fr": "La pagode des Chauves-souris, également appelée Mahatup, est un temple bouddhiste theravāda khmer réputé de Sóc Trăng. Son architecture khmère et ses jardins ombragés accueillent des colonies de chauves-souris."
+    },
+    "galleryPhotos": [
+      {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Ch%C3%A1nh_%C4%91i%E1%BB%87n_ch%C3%B9a_D%C6%A1i_-_S%C3%B3c_Tr%C4%83ng.jpg/960px-Ch%C3%A1nh_%C4%91i%E1%BB%87n_ch%C3%B9a_D%C6%A1i_-_S%C3%B3c_Tr%C4%83ng.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%A1nh_%C4%91i%E1%BB%87n_ch%C3%B9a_D%C6%A1i_-_S%C3%B3c_Tr%C4%83ng.jpg",
+        "caption": "Chánh điện chùa Dơi"
+      },
+      {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Ch%C3%B9a_D%C6%A1i%2C_c%E1%BB%95ng_ch%C3%ADnh.JPG/960px-Ch%C3%B9a_D%C6%A1i%2C_c%E1%BB%95ng_ch%C3%ADnh.JPG",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%B9a_D%C6%A1i,_c%E1%BB%95ng_ch%C3%ADnh.JPG",
+        "caption": "Cổng chính chùa Dơi"
+      }
+    ]
+  },
+  {
+    "id": "chua-phat-hoc-2",
+    "name": "Chùa Phật Học 2",
+    "category": "Kiến trúc",
+    "province": "Sóc Trăng",
+    "durationMinutes": 8,
+    "rating": 4.8,
+    "reviewCount": 365,
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Ch%C3%B9a_Ph%E1%BA%ADt_h%E1%BB%8Dc_2_-_S%C3%B3c_Tr%C4%83ng.jpg/960px-Ch%C3%B9a_Ph%E1%BA%ADt_h%E1%BB%8Dc_2_-_S%C3%B3c_Tr%C4%83ng.jpg",
+    "imageSourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%B9a_Ph%E1%BA%ADt_h%E1%BB%8Dc_2_-_S%C3%B3c_Tr%C4%83ng.jpg",
+    "imagePosition": "center 50%",
+    "highlights": ["Không gian thanh tịnh", "Kiến trúc Phật giáo", "Vườn tượng"],
+    "descriptions": {
+      "vi": "Chùa Phật Học 2 là điểm đến tâm linh được nhiều người ghé thăm tại thành phố Sóc Trăng. Dành chút thời gian dạo quanh khuôn viên rộng rãi, chiêm ngưỡng các công trình Phật giáo và tìm một khoảng lặng giữa hành trình.",
+      "en": "Chùa Phật Học 2 is a popular spiritual destination in Sóc Trăng city. Take time to explore its spacious grounds, view the Buddhist structures and enjoy a quiet pause during your visit.",
+      "fr": "La pagode Phật Học 2 est un lieu spirituel très visité dans la ville de Sóc Trăng. Prenez le temps de parcourir son vaste espace, d'admirer ses édifices bouddhistes et de profiter d'un moment de calme."
+    },
+    "galleryPhotos": []
+  },
+  {
+    "id": "chua-la-han",
+    "name": "Chùa La Hán",
+    "category": "Kiến trúc",
+    "province": "Sóc Trăng",
+    "durationMinutes": 7,
+    "rating": 4.7,
+    "reviewCount": 230,
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng.jpg/960px-Ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng.jpg",
+    "imageSourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng.jpg",
+    "imagePosition": "center 58%",
+    "highlights": ["Văn hóa người Hoa", "Kiến trúc chùa", "Không gian thanh tịnh"],
+    "descriptions": {
+      "vi": "Chùa La Hán là ngôi chùa gắn với cộng đồng người Hoa ở Sóc Trăng. Ghé thăm để khám phá những chi tiết kiến trúc nhiều màu sắc, không gian thờ tự trang nghiêm và dấu ấn giao thoa văn hóa của vùng đất này.",
+      "en": "Chùa La Hán is a temple closely associated with Sóc Trăng's Chinese community. Discover its colorful architectural details, serene worship spaces and the cultural influences that shape this region.",
+      "fr": "La pagode La Hán est étroitement liée à la communauté chinoise de Sóc Trăng. Découvrez ses détails architecturaux colorés, ses espaces de culte paisibles et les influences culturelles de la région."
+    },
+    "galleryPhotos": [
+      {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Ch%C3%B9a_La_H%C3%A1n_-_TP_S%C3%B3c_Tr%C4%83ng.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%B9a_La_H%C3%A1n_-_TP_S%C3%B3c_Tr%C4%83ng.jpg",
+        "caption": "Toàn cảnh chùa La Hán"
+      },
+      {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/H%E1%BB%93_sen_ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng.jpg",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:H%E1%BB%93_sen_ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng.jpg",
+        "caption": "Hồ sen chùa La Hán"
+      }
+    ]
+  },
+  {
+    "id": "khu-can-cu-tinh-uy-soc-trang",
+    "name": "Khu căn cứ Tỉnh ủy Sóc Trăng",
+    "category": "Lịch sử",
+    "province": "Sóc Trăng",
+    "durationMinutes": 10,
+    "rating": 4.7,
+    "reviewCount": 190,
+    "imageUrl": "https://media-cdn-v2.laodong.vn/storage/newsportal/2025/4/20/1494178/Soc-Trang-1-01.jpg",
+    "imageSourceUrl": "https://media-cdn-v2.laodong.vn/storage/newsportal/2025/4/20/1494178/Soc-Trang-1-01.jpg",
+    "imagePosition": "center 50%",
+    "highlights": ["Di tích lịch sử", "Căn cứ cách mạng", "Rừng Mỹ Phước"],
+    "descriptions": {
+      "vi": "Khu căn cứ Tỉnh ủy Sóc Trăng tại rừng Mỹ Phước gắn liền với hoạt động cách mạng của địa phương trong thời kỳ kháng chiến. Tham quan khu di tích giúp bạn tìm hiểu thêm về lịch sử đấu tranh và cuộc sống của cán bộ trong căn cứ.",
+      "en": "The Sóc Trăng Provincial Party Committee Base in Mỹ Phước Forest is associated with the local revolutionary movement during the resistance wars. A visit offers insight into the region's history and life at the wartime base.",
+      "fr": "La base du Comité provincial du Parti de Sóc Trăng, dans la forêt de Mỹ Phước, est liée au mouvement révolutionnaire local durant les guerres de résistance. La visite permet de découvrir l'histoire de la région et la vie dans cette base."
+    },
+    "galleryPhotos": []
+  }
+]

@@ -4,7 +4,7 @@ using VisitorGuide.Application;
 
 public interface IVisitorGuideService
 {
-    IReadOnlyList<LandmarkDto> GetLandmarks(string? search, string? category, string language);
+    IReadOnlyList<DiaDiemThamQuanDto> GetDanhSachDiaDiem(string? search, string? category, string language);
 
-    LandmarkDto? GetLandmark(string id, string language);
+    DiaDiemThamQuanDto? GetDiaDiem(string id, string language);
 }

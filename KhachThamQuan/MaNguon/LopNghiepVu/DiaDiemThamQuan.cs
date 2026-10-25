@@ -1,6 +1,6 @@
 namespace VisitorGuide.Application;
 
-public sealed record Landmark(
+public sealed record DiaDiemThamQuan(
     string Id,
     string Name,
     string Category,
@@ -12,9 +12,10 @@ public sealed record Landmark(
     string ImageSourceUrl,
     string ImagePosition,
     IReadOnlyList<string> Highlights,
-    IReadOnlyDictionary<string, string> Descriptions);
+    IReadOnlyDictionary<string, string> Descriptions,
+    IReadOnlyList<DiaDiemPhoto> GalleryPhotos);
 
-public sealed record LandmarkDto(
+public sealed record DiaDiemThamQuanDto(
     string Id,
     string Name,
     string Category,
@@ -27,4 +28,7 @@ public sealed record LandmarkDto(
     string ImagePosition,
     IReadOnlyList<string> Highlights,
     string Description,
-    IReadOnlyList<string> Languages);
+    IReadOnlyList<string> Languages,
+    IReadOnlyList<DiaDiemPhoto> GalleryPhotos);
+
+public sealed record DiaDiemPhoto(string Url, string SourceUrl, string Caption);

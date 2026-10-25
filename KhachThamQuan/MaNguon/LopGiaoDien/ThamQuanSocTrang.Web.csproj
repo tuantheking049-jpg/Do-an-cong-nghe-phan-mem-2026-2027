@@ -15,8 +15,4 @@
     <ProjectReference Include="..\LopTruyCapDuLieu\LopTruyCapDuLieu.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="TaiNguyenTinh\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-  </ItemGroup>
-
 </Project>

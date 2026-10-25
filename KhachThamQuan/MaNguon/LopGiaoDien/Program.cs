@@ -1,19 +1,26 @@
 using VisitorGuide.Application.Repositories;
 using VisitorGuide.Application.Services;
+using VisitorGuide.Infrastructure;
 using VisitorGuide.Infrastructure.Repositories;
 
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-{
-    Args = args,
-    WebRootPath = "TaiNguyenTinh"
-});
+var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<ILandmarkRepository, InMemoryLandmarkRepository>();
+builder.Services.AddSqlServerDataAccess(builder.Configuration);
+builder.Services.AddSingleton<ChonNgonNgu>();
+builder.Services.AddScoped<TimDiaDiem>();
+builder.Services.AddScoped<XemDiaDiem>();
+builder.Services.AddScoped<TimViTri>();
+builder.Services.AddScoped<XemChiTiet>();
+builder.Services.AddScoped<NgheNoiDung>();
+builder.Services.AddSingleton<TamDung>();
+builder.Services.AddSingleton<NgheLai>();
 builder.Services.AddScoped<IVisitorGuideService, VisitorGuideService>();
 
 var app = builder.Build();
+
+await DatabaseInitializer.InitializeAsync(app.Services);
 
 if (app.Environment.IsDevelopment())
 {
@@ -23,13 +30,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseDefaultFiles(new DefaultFilesOptions
 {
-    DefaultFileNames = { "TrangChu.html" }
+    DefaultFileNames = { "index.html" }
 });
 app.UseStaticFiles();
 app.UseAuthorization();
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
-app.MapFallbackToFile("TrangChu.html");
+app.MapFallbackToFile("index.html");
 
 app.Run();
 

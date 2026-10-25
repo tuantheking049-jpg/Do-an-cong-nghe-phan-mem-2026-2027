@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MaNguon", "MaNguon", "{2CF016A7-2427-4F17-B1C4-BA9DFC8442DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LopGiaoDien", "MaNguon\LopGiaoDien\LopGiaoDien.csproj", "{75178838-8CA9-42EF-9CC0-CDC2D2D82BDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThamQuanSocTrang.Web", "MaNguon\LopGiaoDien\ThamQuanSocTrang.Web.csproj", "{75178838-8CA9-42EF-9CC0-CDC2D2D82BDA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LopNghiepVu", "MaNguon\LopNghiepVu\LopNghiepVu.csproj", "{A59C826F-2B38-4875-9340-05D38851512F}"
 EndProject

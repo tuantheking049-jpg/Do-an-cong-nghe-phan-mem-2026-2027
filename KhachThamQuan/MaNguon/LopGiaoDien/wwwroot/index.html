@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f7f7f3" />
     <meta name="description" content="Khám phá các điểm tham quan Sóc Trăng với thuyết minh tự động đa ngôn ngữ." />
-    <title>Đi & Kể — Khám phá Sóc Trăng</title>
+    <title>TLT — Khám phá Sóc Trăng</title>
     <link rel="preconnect" href="https://images.vietnamtourism.gov.vn" />
     <link rel="preconnect" href="https://upload.wikimedia.org" />
-    <link rel="stylesheet" href="/GiaoDien.css?v=2" />
+    <link rel="stylesheet" href="/TrangThamQuan.css?v=12" />
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="/" aria-label="Đi & Kể, trang chủ">
+      <a class="brand" href="/" aria-label="TLT, trang chủ">
         <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5c-4.4 0-8 3.4-8 7.7 0 5.7 8 17.3 8 17.3s8-11.6 8-17.3c0-4.3-3.6-7.7-8-7.7Z"/><circle cx="16" cy="11.2" r="2.8"/></svg></span>
-        <span class="brand-name">đi & kể<span>.</span></span>
+        <span class="brand-name">TLT</span>
       </a>
       <nav class="main-nav" aria-label="Điều hướng chính">
         <a class="nav-link active" href="#kham-pha">Khám phá</a>
@@ -48,7 +48,6 @@
           <a class="hero-cta" href="#diem-den"><span data-i18n="heroCta">Khám phá Sóc Trăng</span><span aria-hidden="true">↗</span></a>
         </div>
         <div class="hero-caption"><span class="caption-line"></span><span data-i18n="heroCaption">MIỀN SÔNG NƯỚC SÓC TRĂNG</span></div>
-        <div class="hero-count"><span>01</span><span class="count-slash">/</span><span>06</span><span class="count-progress"></span></div>
       </section>
 
       <section class="intro-row page-shell" id="diem-den">
@@ -74,10 +73,9 @@
           <label class="search-box">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
             <input id="search-input" type="search" placeholder="Tìm địa điểm..." data-i18n-placeholder="searchPlaceholder" />
-            <span class="search-shortcut">⌘ K</span>
           </label>
         </div>
-        <div class="results-caption"><span id="results-count">06 địa điểm</span><span class="sort-label" data-i18n="sortLabel">Sắp xếp: <strong>Được yêu thích</strong> <span aria-hidden="true">⌄</span></span></div>
+        <div class="results-caption"><span id="results-count">06 địa điểm</span></div>
         <div class="places-grid" id="places-grid" aria-live="polite"></div>
         <div class="empty-state" id="empty-state" hidden>
           <span class="empty-icon">⌕</span>
@@ -94,23 +92,69 @@
           <p data-i18n="storyCopy">Chọn điểm đến, chọn ngôn ngữ, nhấn nghe. Một hành trình tự do — theo nhịp của riêng bạn.</p>
           <a href="#diem-den" class="text-link"><span data-i18n="storyLink">Bắt đầu khám phá</span><span aria-hidden="true">↗</span></a>
         </div>
-        <div class="story-index"><span>02</span><span>/</span><span>03</span></div>
       </section>
     </main>
 
     <footer class="site-footer page-shell">
-      <a class="brand footer-brand" href="/"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5c-4.4 0-8 3.4-8 7.7 0 5.7 8 17.3 8 17.3s8-11.6 8-17.3c0-4.3-3.6-7.7-8-7.7Z"/><circle cx="16" cy="11.2" r="2.8"/></svg></span><span class="brand-name">đi & kể<span>.</span></span></a>
-      <span data-i18n="footerNote">Những câu chuyện Việt Nam, kể theo cách của bạn.</span>
-      <span class="footer-credit">MADE FOR THE CURIOUS <span>✳</span></span>
+      <a class="brand footer-brand" href="/"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5c-4.4 0-8 3.4-8 7.7 0 5.7 8 17.3 8 17.3s8-11.6 8-17.3c0-4.3-3.6-7.7-8-7.7Z"/><circle cx="16" cy="11.2" r="2.8"/></svg></span><span class="brand-name">TLT</span></a>
+      <span data-i18n="footerNote">Miền Tây Sông Nước</span>
     </footer>
 
     <aside class="audio-player" id="audio-player" aria-live="polite" hidden>
       <div class="player-art" id="player-art"></div>
       <div class="player-meta"><span class="player-kicker" data-i18n="nowPlaying">ĐANG THUYẾT MINH</span><strong id="player-title"></strong><span id="player-language"></span></div>
-      <div class="player-controls"><span class="audio-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><button id="play-toggle" class="play-toggle" aria-label="Tạm dừng">Ⅱ</button><span class="player-time" data-i18n="audioLabel">Âm thanh tự động</span></div>
+      <div class="player-controls"><span class="audio-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><button id="replay-toggle" class="play-toggle replay-toggle" aria-label="Nghe lại từ đầu" data-i18n-title="replayNarration" title="Nghe lại từ đầu">↺</button><button id="play-toggle" class="play-toggle" aria-label="Tạm dừng">Ⅱ</button><span class="player-time" data-i18n="audioLabel">Âm thanh tự động</span></div>
+      <input id="narration-seek" class="narration-seek" type="range" min="0" max="1000" value="0" step="1" data-i18n-aria-label="seekNarration" aria-label="Tua nội dung thuyết minh" />
       <button class="player-close" id="player-close" aria-label="Đóng trình phát">×</button>
     </aside>
+    <dialog class="gallery-dialog" id="gallery-dialog" aria-labelledby="gallery-title">
+      <div class="gallery-header">
+        <div>
+          <span class="gallery-eyebrow" data-i18n="galleryLabel">KHUNG CẢNH ĐỊA ĐIỂM</span>
+          <h2 id="gallery-title"></h2>
+        </div>
+        <form method="dialog">
+          <button class="gallery-close" data-i18n-aria-label="closeGallery" aria-label="Đóng bộ ảnh">×</button>
+        </form>
+      </div>
+      <div class="gallery-grid" id="gallery-grid"></div>
+    </dialog>
+    <dialog class="image-view-dialog" id="image-view-dialog" aria-label="Ảnh địa điểm phóng lớn">
+      <form method="dialog">
+        <button class="image-view-close" aria-label="Đóng ảnh">×</button>
+      </form>
+      <img id="image-view-large" alt="" />
+    </dialog>
+    <dialog class="gallery-dialog details-dialog" id="details-dialog" aria-labelledby="details-title">
+      <div class="gallery-header">
+        <div>
+          <span class="gallery-eyebrow" data-i18n="detailsLabel">NỘI DUNG THUYẾT MINH</span>
+          <h2 id="details-title"></h2>
+        </div>
+        <form method="dialog">
+          <button class="gallery-close" data-i18n-aria-label="closeDetails" aria-label="Đóng nội dung">×</button>
+        </form>
+      </div>
+      <p class="narration-text" id="details-description"></p>
+    </dialog>
+    <dialog class="gallery-dialog location-dialog" id="location-dialog" aria-labelledby="location-title">
+      <div class="gallery-header">
+        <div>
+          <span class="gallery-eyebrow" data-i18n="locationLabel">VỊ TRÍ ĐỊA ĐIỂM</span>
+          <h2 id="location-title"></h2>
+        </div>
+        <form method="dialog">
+          <button class="gallery-close" data-i18n-aria-label="closeLocation" aria-label="Đóng bản đồ">×</button>
+        </form>
+      </div>
+      <iframe id="location-map" title="Bản đồ vị trí địa điểm" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      <p id="location-status" class="location-status" role="status" aria-live="polite"></p>
+      <div class="location-actions">
+        <button id="locate-me" class="view-location-button" type="button" data-i18n="useCurrentLocation">Dùng vị trí hiện tại</button>
+        <a id="directions-link" class="view-details-button directions-link" href="#" target="_blank" rel="noopener noreferrer" data-i18n="getDirections">Chỉ đường</a>
+      </div>
+    </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="/TuongTac.js?v=2" defer></script>
+    <script src="/TrangThamQuan.js?v=20" defer></script>
   </body>
 </html>

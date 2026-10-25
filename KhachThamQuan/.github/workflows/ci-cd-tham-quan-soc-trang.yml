@@ -1,4 +1,4 @@
-name: Tich hop va trien khai ung dung thuyet minh
+name: Build and deploy Soc Trang visitor guide
 
 on:
   push:
@@ -12,6 +12,10 @@ permissions:
 env:
   DOTNET_VERSION: 8.0.x
 
+defaults:
+  run:
+    working-directory: ./KhachThamQuan
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,17 +25,17 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: Restore
-        run: dotnet restore GiaiPhapThuyetMinh.sln
+        run: dotnet restore ThamQuanSocTrang.sln
       - name: Build
-        run: dotnet build GiaiPhapThuyetMinh.sln --configuration Release --no-restore
+        run: dotnet build ThamQuanSocTrang.sln --configuration Release --no-restore
       - name: Test
-        run: dotnet test GiaiPhapThuyetMinh.sln --configuration Release --no-build --logger "trx;LogFileName=tests.trx"
+        run: dotnet test ThamQuanSocTrang.sln --configuration Release --no-build --logger "trx;LogFileName=tests.trx"
       - name: Publish web application
-        run: dotnet publish MaNguon/LopGiaoDien/LopGiaoDien.csproj --configuration Release --no-build --output ./publish
+        run: dotnet publish MaNguon/LopGiaoDien/ThamQuanSocTrang.Web.csproj --configuration Release --no-build --output ./publish
       - uses: actions/upload-artifact@v4
         with:
-          name: visitor-guide
-          path: publish/
+          name: soc-trang-visitor-guide
+          path: KhachThamQuan/publish/
           if-no-files-found: error
 
   deploy:
@@ -45,7 +49,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: visitor-guide
+          name: soc-trang-visitor-guide
           path: publish
       - name: Deploy to Azure App Service
         if: env.AZURE_WEBAPP_NAME != '' && env.AZURE_WEBAPP_PUBLISH_PROFILE != ''

@@ -1,0 +1,26 @@
+@DiaChiApi = http://localhost:5200
+
+GET {{DiaChiApi}}/api/landmarks?language=vi
+Accept: application/json
+
+###
+
+POST {{DiaChiApi}}/api/landmarks/cho-noi-nga-nam/location
+Content-Type: application/json
+
+{
+  "viDo": 5.0322,
+  "kinhDo": 105.7845
+}
+
+###
+
+POST {{DiaChiApi}}/api/landmarks/cho-noi-nga-nam/location
+Content-Type: application/json
+
+{
+  "viDo": null,
+  "kinhDo": null
+}
+
+###
