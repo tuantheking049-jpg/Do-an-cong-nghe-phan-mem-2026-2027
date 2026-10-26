@@ -115,8 +115,7 @@ button { color: inherit; }
 .location-dialog iframe { display: block; width: 100%; height: min(55vh, 480px); border: 0; background: #edf0e9; }
 .location-status { min-height: 1.5em; margin: 12px 0; color: #56645a; font-size: 11px; line-height: 1.6; }
 .location-actions { display: flex; flex-wrap: wrap; gap: 9px; }
-.location-actions button, .location-actions a { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 8px 12px; font-size: 10px; }
-.directions-link { text-decoration: none; }
+.location-actions button { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 8px 12px; font-size: 10px; }
 .listen-button { display: inline-flex; align-items: center; gap: 6px; }
 .listen-button svg { width: 10px; fill: currentColor; }
 .gallery-dialog { width: min(1000px, calc(100vw - 32px)); max-width: none; max-height: min(90vh, 900px); margin: auto; padding: 26px; overflow: auto; border: 1px solid #e5e9df; background: #fbfcf8; color: var(--ink); box-shadow: 0 24px 80px rgba(10,20,14,.3); }

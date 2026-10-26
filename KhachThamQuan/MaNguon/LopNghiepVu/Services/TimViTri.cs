@@ -39,6 +39,7 @@ public sealed class TimViTri(IDiaDiemThamQuanRepository repository)
             var origin = string.Create(
                 CultureInfo.InvariantCulture,
                 $"{originLatitude:R},{originLongitude:R}");
+            mapUrl = $"https://maps.google.com/maps?saddr={Uri.EscapeDataString(origin)}&daddr={destination}&output=embed";
             directionsUrl += $"&origin={Uri.EscapeDataString(origin)}";
         }
 

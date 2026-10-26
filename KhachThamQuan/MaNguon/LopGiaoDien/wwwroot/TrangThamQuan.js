@@ -25,11 +25,10 @@ const translations = {
     viewPlace: "Xem địa điểm",
     viewLocation: "Xem vị trí",
     locationLabel: "VỊ TRÍ ĐỊA ĐIỂM",
-    useCurrentLocation: "Dùng vị trí hiện tại",
-    getDirections: "Chỉ đường",
+    useCurrentLocation: "Cập nhật vị trí & tìm đường",
     closeLocation: "Đóng bản đồ",
     locationFinding: "Đang xác định vị trí hiện tại...",
-    locationFound: "Đã xác định vị trí: {latitude}, {longitude}. Nhấn Chỉ đường để mở lộ trình.",
+    locationFound: "Đã xác định vị trí: {latitude}, {longitude}. Lộ trình đã hiển thị trên bản đồ.",
     locationUnsupported: "Trình duyệt không hỗ trợ định vị GPS.",
     locationDenied: "Bạn chưa cấp quyền truy cập vị trí. Hãy cho phép định vị để tìm đường từ vị trí hiện tại.",
     locationUnavailable: "Không thể xác định vị trí hiện tại. Vui lòng thử lại.",
@@ -89,11 +88,10 @@ const translations = {
     viewPlace: "View place",
     viewLocation: "View location",
     locationLabel: "LOCATION",
-    useCurrentLocation: "Use my current location",
-    getDirections: "Get directions",
+    useCurrentLocation: "Update location & find route",
     closeLocation: "Close map",
     locationFinding: "Finding your current location...",
-    locationFound: "Location found: {latitude}, {longitude}. Select Get directions to open the route.",
+    locationFound: "Location found: {latitude}, {longitude}. The route is shown on the map.",
     locationUnsupported: "This browser does not support GPS location.",
     locationDenied: "Location access was not granted. Allow location access to get directions from your current position.",
     locationUnavailable: "Your current location could not be determined. Please try again.",
@@ -153,11 +151,10 @@ const translations = {
     viewPlace: "Voir le lieu",
     viewLocation: "Voir l’emplacement",
     locationLabel: "EMPLACEMENT",
-    useCurrentLocation: "Utiliser ma position actuelle",
-    getDirections: "Itinéraire",
+    useCurrentLocation: "Actualiser ma position et l’itinéraire",
     closeLocation: "Fermer la carte",
     locationFinding: "Recherche de votre position actuelle...",
-    locationFound: "Position trouvée : {latitude}, {longitude}. Sélectionnez Itinéraire pour ouvrir le trajet.",
+    locationFound: "Position trouvée : {latitude}, {longitude}. L’itinéraire est affiché sur la carte.",
     locationUnsupported: "Ce navigateur ne prend pas en charge la géolocalisation GPS.",
     locationDenied: "L’accès à la position n’a pas été autorisé. Autorisez la géolocalisation pour calculer un itinéraire depuis votre position.",
     locationUnavailable: "Impossible de déterminer votre position actuelle. Veuillez réessayer.",
@@ -208,7 +205,6 @@ const detailsDialog = document.querySelector("#details-dialog");
 const locationDialog = document.querySelector("#location-dialog");
 const locationMap = document.querySelector("#location-map");
 const locationStatus = document.querySelector("#location-status");
-const directionsLink = document.querySelector("#directions-link");
 const toast = document.querySelector("#toast");
 const savedPlaces = new Set(JSON.parse(localStorage.getItem("visitor-guide-saved") || "[]"));
 let language = languageSelect.value;
@@ -218,6 +214,7 @@ let currentLandmark = null;
 let currentUtterance = null;
 let currentNarrationText = "";
 let currentNarrationLanguage = "";
+let locationRequestId = 0;
 let currentNarrationIndex = 0;
 let isSeekingNarration = false;
 let narrationStartTimeout;
@@ -478,8 +475,8 @@ async function showPlaceLocation(id) {
     locationTitle.textContent = location.tenDiaDiem;
     locationTitle.dataset.placeId = id;
     locationStatus.textContent = "";
-    directionsLink.href = location.chiDuongUrl;
     locationDialog.showModal();
+    locateCurrentPosition();
   } catch (error) {
     console.error("Failed to find the landmark location.", error);
     showToast(text("locationError"));
@@ -487,6 +484,14 @@ async function showPlaceLocation(id) {
 }
 
 function locateCurrentPosition() {
+  const locationTitle = document.querySelector("#location-title");
+  const placeId = locationTitle.dataset.placeId;
+  const requestId = ++locationRequestId;
+  const isCurrentRequest = () =>
+    requestId === locationRequestId
+    && locationTitle.dataset.placeId === placeId
+    && locationDialog.open;
+
   if (!navigator.geolocation) {
     locationStatus.textContent = text("locationUnsupported");
     return;
@@ -495,24 +500,26 @@ function locateCurrentPosition() {
   locationStatus.textContent = text("locationFinding");
   navigator.geolocation.getCurrentPosition(
     async ({ coords }) => {
+      if (!isCurrentRequest()) return;
       try {
-        const id = document.querySelector("#location-title").dataset.placeId;
-        const location = await fetchJson(`/api/landmarks/${encodeURIComponent(id)}/location`, {
+        const location = await fetchJson(`/api/landmarks/${encodeURIComponent(placeId)}/location`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ viDo: coords.latitude, kinhDo: coords.longitude })
         });
+        if (!isCurrentRequest()) return;
         locationMap.src = location.banDoUrl;
-        directionsLink.href = location.chiDuongUrl;
         locationStatus.textContent = text("locationFound")
           .replace("{latitude}", coords.latitude.toFixed(6))
           .replace("{longitude}", coords.longitude.toFixed(6));
       } catch (error) {
+        if (!isCurrentRequest()) return;
         console.error("Failed to create directions from the visitor's location.", error);
         locationStatus.textContent = text("locationUnavailable");
       }
     },
     error => {
+      if (!isCurrentRequest()) return;
       console.error("Failed to get the visitor's current location.", error);
       if (error.code === error.PERMISSION_DENIED) {
         locationStatus.textContent = text("locationDenied");

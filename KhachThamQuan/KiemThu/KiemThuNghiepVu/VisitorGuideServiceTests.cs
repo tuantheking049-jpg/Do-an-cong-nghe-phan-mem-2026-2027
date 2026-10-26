@@ -89,7 +89,9 @@ public sealed class VisitorGuideServiceTests
 
         Assert.NotNull(result);
         Assert.Equal("Chợ nổi Ngã Năm", result.TenDiaDiem);
-        Assert.Contains("maps.google.com/maps?q=", result.BanDoUrl);
+        Assert.Contains("maps.google.com/maps?saddr=5.0322%2C105.7845", result.BanDoUrl);
+        Assert.Contains("&daddr=", result.BanDoUrl);
+        Assert.Contains("&output=embed", result.BanDoUrl);
         Assert.Contains("destination=", result.ChiDuongUrl);
         Assert.Contains("origin=5.0322%2C105.7845", result.ChiDuongUrl);
     }
