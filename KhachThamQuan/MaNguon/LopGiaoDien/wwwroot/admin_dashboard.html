@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Hướng dẫn Du lịch - Admin</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+        
+        /* Layout Configuration */
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        #sidebar {
+            min-width: 260px;
+            max-width: 260px;
+            background-color: #212529; /* Dark Sidebar */
+            color: #fff;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #1a1e21;
+            border-bottom: 1px solid #343a40;
+        }
+
+        #sidebar ul.components {
+            padding: 10px 0;
+            flex-grow: 1;
+        }
+
+        #sidebar ul li a {
+            padding: 12px 20px;
+            font-size: 1.05em;
+            display: block;
+            color: #adb5bd;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        #sidebar ul li a:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        #sidebar ul li a.active {
+            color: #fff;
+            background: #0d6efd; /* Primary Color */
+            border-left: 4px solid #fff;
+        }
+        
+        #sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 1.1em;
+        }
+
+        /* Main Content Styling */
+        #content {
+            width: 100%;
+            padding: 0;
+            min-height: 100vh;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+        }
+        
+        .top-navbar {
+            background: #fff;
+            padding: 15px 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .main-container {
+            padding: 30px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+        }
+        
+        /* Card & Table Styling */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        
+        .table > :not(caption) > * > * {
+            padding: 1rem 1rem;
+            vertical-align: middle;
+        }
+
+        .live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #198754;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(25, 135, 84, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: -260px;
+                position: fixed;
+                height: 100vh;
+                z-index: 999;
+            }
+            #sidebar.active {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h5 class="mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi bi-geo-alt-fill text-primary me-2"></i> AudioGuide Admin
+                </h5>
+            </div>
+
+            <ul class="list-unstyled components flex-column h-100 d-flex">
+                <li>
+                    <a href="#" class="sidebar-link active" data-target="pois" data-title="Quản lý địa điểm">
+                        <i class="bi bi-pin-map"></i> Quản lý địa điểm
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Biên soạn thuyết minh">
+                        <i class="bi bi-file-earmark-text"></i> Biên soạn thuyết minh
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Cấu hình ngôn ngữ">
+                        <i class="bi bi-globe2"></i> Cấu hình ngôn ngữ
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Quản lý bản dịch">
+                        <i class="bi bi-translate"></i> Quản lý bản dịch
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Quản lý giọng đọc">
+                        <i class="bi bi-megaphone"></i> Quản lý giọng đọc
+                    </a>
+                </li>
+                <li class="mt-auto">
+                    <a href="#" class="text-danger" onclick="confirmLogout()">
+                        <i class="bi bi-box-arrow-left"></i> Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div id="content">
+            <!-- Top Navbar -->
+            <div class="top-navbar">
+                <div class="d-flex align-items-center">
+                    <button type="button" id="sidebarCollapse" class="btn btn-outline-primary d-md-none me-3">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h4 class="mb-0 fw-bold" id="page-title">Quản lý địa điểm</h4>
+                </div>
+                <div class="user-profile d-flex align-items-center">
+                    <span class="badge bg-light text-secondary border me-3 d-none d-md-inline" id="api-status-badge">
+                        <span class="live-dot"></span>Đang chờ đồng bộ API (.NET 8)
+                    </span>
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=0d6efd&color=fff" alt="Admin" class="rounded-circle" width="35">
+                    <span class="ms-2 fw-medium d-none d-sm-inline">Quản trị viên</span>
+                </div>
+            </div>
+
+            <!-- Main Dynamic Content Container -->
+            <div class="main-container">
+                
+                <!-- SECTION: Quản lý địa điểm (POIs) -->
+                <div id="pois-section" class="content-section">
+                    
+                    <!-- Hàng Thống Kê Real-time & Mã QR Chung -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="card h-100 p-3">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <p class="text-muted small fw-medium mb-1">KHÁCH ĐANG ONLINE (QR)</p>
+                                        <h3 class="fw-bold mb-0 text-dark" id="active-users-count">0</h3>
+                                        <small class="text-success"><span class="live-dot"></span>Đang truy cập hệ thống</small>
+                                    </div>
+                                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                                        <i class="bi bi-people-fill"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card h-100 p-3">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <p class="text-muted small fw-medium mb-1">TỔNG LƯỢT NGHE THUYẾT MINH</p>
+                                        <h3 class="fw-bold mb-0 text-dark" id="total-plays-count">178</h3>
+                                        <small class="text-muted">Cộng dồn từ tất cả địa điểm</small>
+                                    </div>
+                                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                                        <i class="bi bi-headphones"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card h-100 p-3">
+                                <div class="d-flex align-items-center justify-content-between h-100">
+                                    <div>
+                                        <p class="text-muted small fw-medium mb-1">MÃ QR DU LỊCH SÓC TRĂNG</p>
+                                        <p class="small text-muted mb-2">1 mã QR chung cho toàn bộ địa điểm</p>
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#qrModal">
+                                            <i class="bi bi-qr-code-scan me-1"></i> Hiện mã QR & Cấu hình
+                                        </button>
+                                    </div>
+                                    <div class="stat-icon bg-dark bg-opacity-10 text-dark" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#qrModal">
+                                        <i class="bi bi-qr-code"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tiêu đề bảng & Nút Thêm -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p class="text-muted mb-0">Quản lý danh sách các điểm tham quan tại Sóc Trăng.</p>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary btn-sm shadow-sm" onclick="simulateScanAndListen()" title="Dùng để test nhảy số trực tiếp">
+                                <i class="bi bi-lightning-charge me-1"></i> Test +1 Lượt quét
+                            </button>
+                            <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#poiModal" onclick="prepareAddModal()">
+                                <i class="bi bi-plus-lg me-1"></i> Thêm địa điểm
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bảng Danh Sách Địa Điểm -->
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" class="ps-4">ID</th>
+                                            <th scope="col">Tên địa điểm</th>
+                                            <th scope="col">Tọa độ (Vĩ độ, Kinh độ ảo)</th>
+                                            <th scope="col" class="text-center">Lượt nghe</th>
+                                            <th scope="col">Trạng thái</th>
+                                            <th scope="col" class="text-center">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="poi-table-body">
+                                        <!-- Dữ liệu được đổ tự động từ hàm renderPOITable() hoặc API .NET 8 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Placeholder (For other menus) -->
+                <div id="placeholder-section" class="content-section d-none h-100 d-flex flex-column align-items-center justify-content-center text-muted" style="min-height: 60vh;">
+                    <i class="bi bi-tools" style="font-size: 4rem; opacity: 0.3;"></i>
+                    <h4 class="mt-3 fw-light">Nội dung đang cập nhật...</h4>
+                    <p>Chức năng này đang trong quá trình phát triển.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Thêm / Cập nhật Địa điểm -->
+    <div class="modal fade" id="poiModal" tabindex="-1" aria-labelledby="poiModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="poiModalLabel">Thêm địa điểm mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="poiForm">
+                        <input type="hidden" id="poiId">
+                        <div class="mb-3">
+                            <label for="poiName" class="form-label fw-medium">Tên địa điểm <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="poiName" placeholder="VD: Chùa Dơi..." required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="poiLat" class="form-label fw-medium">Vĩ độ (Latitude)</label>
+                                <input type="number" step="any" class="form-control" id="poiLat" placeholder="VD: 9.5960">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="poiLng" class="form-label fw-medium">Kinh độ (Longitude)</label>
+                                <input type="number" step="any" class="form-control" id="poiLng" placeholder="VD: 105.9754">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="poiStatus" class="form-label fw-medium">Trạng thái</label>
+                            <select class="form-select" id="poiStatus">
+                                <option value="Hoạt động">Hoạt động</option>
+                                <option value="Bảo trì">Đang bảo trì</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="button" class="btn btn-primary" onclick="savePOI()">Lưu thông tin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Hiển thị Mã QR Chung & Cấu hình Link Ngrok -->
+    <div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow text-center">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-qr-code me-2 text-primary"></i>Mã QR Cổng Du Lịch Sóc Trăng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-3">Quét mã QR này bằng điện thoại để truy cập trang Khách tham quan (Định vị GPS & Nghe thuyết minh)</p>
+                    <div class="d-inline-block p-3 border rounded-3 bg-white shadow-sm mb-3">
+                        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https://scrimmage-container-gumminess.ngrok-free.dev/index.html" alt="QR Code" class="img-fluid" width="220">
+                    </div>
+                    <div class="text-start mt-2">
+                        <label class="form-label small fw-medium text-secondary">Đường dẫn trang Khách tham quan (Dán link Ngrok vào đây):</label>
+                        <div class="input-group">
+                            <input type="text" id="qrUrlInput" class="form-control" value="https://scrimmage-container-gumminess.ngrok-free.dev/index.html" placeholder="https://xxxx.ngrok-free.app">
+                            <button class="btn btn-primary" type="button" onclick="updateQRCode()">Cập nhật QR</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom Interactions & 3-Tier API Logic -->
+    <script>
+        // =========================================================================
+        // CẤU HÌNH KẾT NỐI 3 LỚP (.NET 8 API) & BIẾN CHỐNG BÀI TEST CỦA GIẢNG VIÊN
+        // =========================================================================
+        const API_BASE_URL = "https://localhost:7001/api"; // Đổi port theo máy bạn code .NET 8
+
+        // Nếu thầy yêu cầu "nhân 2 số lượng người dùng/lượt quét", chỉ cần sửa số 1 thành số 2:
+        const HE_SO_NHAN = 1; 
+
+        // Dữ liệu 5 địa điểm Sóc Trăng chuẩn theo file của nhóm
+        let poisData = [
+            { id: 1, name: 'Chợ nổi ngã 5', lat: 9.5761, lng: 105.8117, plays: 31, status: 'Hoạt động' },
+            { id: 2, name: 'Chùa Dơi', lat: 9.5847, lng: 105.9753, plays: 30, status: 'Hoạt động' },
+            { id: 3, name: 'Chùa La Hán', lat: 9.6080, lng: 105.9860, plays: 20, status: 'Bảo trì' },
+            { id: 4, name: 'Chùa Phật Học 2', lat: 9.6056, lng: 105.9754, plays: 35, status: 'Hoạt động'},
+            { id: 5, name: 'Khu căn cứ tỉnh ủy Sóc Trăng', lat: 9.5397, lng: 105.9768, plays: 30, status: 'Hoạt động' },
+            { id: 6, name: 'Tân Huê Viên', lat: 9.6133, lng: 105.9922, plays: 32, status: 'Hoạt động' }
+        ];
+
+        let activeUsers = 0;
+
+        // 1. Hàm hiển thị bảng địa điểm và cập nhật các con số thống kê
+        function renderPOITable() {
+            const tbody = document.getElementById('poi-table-body');
+            let html = '';
+            let totalPlays = 0;
+
+            poisData.forEach(poi => {
+                totalPlays += poi.plays;
+                const badgeClass = poi.status === 'Hoạt động' ? 'bg-success' : 'bg-secondary';
+                const safeName = poi.name.replace(/'/g, "\\'");
+
+                html += `
+                    <tr>
+                        <th scope="row" class="ps-4">${poi.id}</th>
+                        <td class="fw-medium">${poi.name}</td>
+                        <td>${poi.lat}, ${poi.lng}</td>
+                        <td class="text-center">
+                            <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">${poi.plays * HE_SO_NHAN} lượt</span>
+                        </td>
+                        <td><span class="badge ${badgeClass}">${poi.status}</span></td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditModal(${poi.id}, '${safeName}', ${poi.lat}, ${poi.lng}, '${poi.status}')" title="Sửa">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="confirmDelete(${poi.id}, '${safeName}')" title="Xóa">
+                                <i class="bi bi-trash"></i> Xóa
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // 2. Hàm gọi API lấy dữ liệu thống kê
+        // Gọi API lấy dữ liệu thống kê liên tục
+        function fetchStatsFromBackend() {
+            fetch('/api/thongke')
+                .then(response => response.json())
+                .then(data => {
+                    // Cập nhật cục tổng trên Dashboard
+                    document.getElementById('active-users-count').innerText = data.luotTruyCap;
+                    document.getElementById('total-plays-count').innerText = data.luotNghe;
+                    document.getElementById('api-status-badge').innerHTML = '<span class="live-dot"></span>Đã kết nối API (.NET 8)';
+                    
+                    // Cập nhật số liệu chi tiết cho 6 địa điểm trong bảng
+                    if (data.chiTietNghe && data.chiTietNghe.length === 6) {
+                        for(let i = 0; i < 6; i++) {
+                            poisData[i].plays = data.chiTietNghe[i];
+                        }
+                        renderPOITable(); // Yêu cầu bảng vẽ lại số mới
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('api-status-badge').innerHTML = '<span class="live-dot" style="background-color: #dc3545;"></span>Mất kết nối Backend';
+                });
+        }
+
+        // 3. Hàm cập nhật mã QR theo link Ngrok
+        function updateQRCode() {
+            const url = document.getElementById('qrUrlInput').value.trim();
+            if (!url) return alert("Vui lòng nhập đường dẫn hợp lệ!");
+            document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}`;
+            alert("Đã tạo mã QR mới cho đường dẫn: " + url);
+        }
+
+        // 4. Hàm test nhanh tăng số người online & lượt nghe
+        function simulateScanAndListen() {
+            activeUsers++;
+            if (poisData.length > 0) {
+                poisData[0].plays++;
+            }
+            renderPOITable();
+        }
+
+        // Sidebar Toggle for Mobile
+        document.getElementById('sidebarCollapse').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Navigation Logic
+        const navLinks = document.querySelectorAll('.sidebar-link');
+        const pageTitle = document.getElementById('page-title');
+        const poisSection = document.getElementById('pois-section');
+        const placeholderSection = document.getElementById('placeholder-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                const title = this.getAttribute('data-title');
+                pageTitle.innerText = title;
+
+                const target = this.getAttribute('data-target');
+                if(target === 'pois') {
+                    poisSection.classList.remove('d-none');
+                    placeholderSection.classList.add('d-none');
+                } else {
+                    poisSection.classList.add('d-none');
+                    placeholderSection.classList.remove('d-none');
+                }
+
+                if(window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('active');
+                }
+            });
+        });
+
+        // Modal Logic (Thêm / Sửa / Xóa)
+        const poiModal = new bootstrap.Modal(document.getElementById('poiModal'));
+
+        function prepareAddModal() {
+            document.getElementById('poiModalLabel').innerText = "Thêm địa điểm mới";
+            document.getElementById('poiForm').reset();
+            document.getElementById('poiId').value = "";
+        }
+
+        function openEditModal(id, name, lat, lng, status) {
+            document.getElementById('poiModalLabel').innerText = "Cập nhật địa điểm";
+            document.getElementById('poiId').value = id;
+            document.getElementById('poiName').value = name;
+            document.getElementById('poiLat').value = lat;
+            document.getElementById('poiLng').value = lng;
+            document.getElementById('poiStatus').value = status;
+            poiModal.show();
+        }
+
+        function savePOI() {
+            const form = document.getElementById('poiForm');
+            if(!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const id = document.getElementById('poiId').value;
+            const name = document.getElementById('poiName').value.trim();
+            const lat = parseFloat(document.getElementById('poiLat').value) || 9.6000;
+            const lng = parseFloat(document.getElementById('poiLng').value) || 105.9800;
+            const status = document.getElementById('poiStatus').value;
+
+            if (id) {
+                const index = poisData.findIndex(p => p.id == id);
+                if (index !== -1) {
+                    poisData[index].name = name;
+                    poisData[index].lat = lat;
+                    poisData[index].lng = lng;
+                    poisData[index].status = status;
+                }
+            } else {
+                const newId = poisData.length > 0 ? Math.max(...poisData.map(p => p.id)) + 1 : 1;
+                poisData.push({ id: newId, name: name, lat: lat, lng: lng, plays: 0, status: status });
+            }
+
+            renderPOITable();
+            alert("Giả lập: Đã lưu thành công!");
+            poiModal.hide();
+        }
+
+        function confirmDelete(id, name) {
+            if(confirm(`Bạn có chắc chắn muốn xóa địa điểm "${name}" không?`)) {
+                poisData = poisData.filter(p => p.id !== id);
+                renderPOITable();
+                alert("Giả lập: Đã xóa!");
+            }
+        }
+
+        function confirmLogout() {
+            if(confirm("Bạn có muốn đăng xuất khỏi hệ thống?")) {
+                alert("Đã đăng xuất! Chuyển hướng...");
+            }
+        }
+
+        // Khởi chạy lần đầu và gọi API định kỳ mỗi 2 giây
+        renderPOITable();
+        setInterval(fetchStatsFromBackend, 2000);
+    </script>
+</body>
+</html>

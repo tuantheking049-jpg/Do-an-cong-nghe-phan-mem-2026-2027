@@ -618,6 +618,8 @@ async function startNarration(id) {
   }
 
   try {
+    // Nhét id vào cuối link api để Backend biết khách đang nghe địa điểm nào
+    fetch(`/api/thongke/tang-nghe/${encodeURIComponent(id)}`, { method: 'POST' }).catch(err => console.error(err));
     const narration = await fetchJson(`/api/narration/${encodeURIComponent(id)}?language=${language}`);
     const place = narration.diaDiem;
     cancelNarrationPlayback();

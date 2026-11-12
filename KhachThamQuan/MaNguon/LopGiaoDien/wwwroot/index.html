@@ -8,7 +8,7 @@
     <title>TLT — Khám phá Sóc Trăng</title>
     <link rel="preconnect" href="https://images.vietnamtourism.gov.vn" />
     <link rel="preconnect" href="https://upload.wikimedia.org" />
-    <link rel="stylesheet" href="/TrangThamQuan.css?v=12" />
+    <link rel="stylesheet" href="/TrangThamQuan.css" />
   </head>
   <body>
     <header class="site-header">
@@ -150,10 +150,30 @@
       <iframe id="location-map" title="Bản đồ vị trí địa điểm" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
       <p id="location-status" class="location-status" role="status" aria-live="polite"></p>
       <div class="location-actions">
-        <button id="locate-me" class="view-location-button" type="button" data-i18n="useCurrentLocation">Dùng vị trí hiện tại</button>
+        <button id="locate-me" class="view-location-button" type="button" data-i18n="useCurrentLocation">Cập nhật vị trí & tìm đường</button>
+        
+        <!-- NÚT ẨN NÀY DÙNG ĐỂ CHỐNG SẬP FILE JAVASCRIPT DO NHÓM BẠN QUÊN XÓA BÊN FILE JS -->
+        <a id="directions-link" href="#" style="display: none;"></a>
       </div>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="/TrangThamQuan.js?v=21" defer></script>
+    
+    <!-- ĐÃ XÓA ĐUÔI ?v=21 ĐỂ CHỐNG KẸT CACHE -->
+    <script src="/TrangThamQuan.js" defer></script>
+    
+    <!-- MỚI THÊM: Script đếm lượt truy cập & thoát web cho Đồ án của bạn -->
+    <script>
+      // 1. Khi vừa mở web -> Báo cộng 1
+      document.addEventListener("DOMContentLoaded", function() {
+          fetch('/api/thongke/tang-truy-cap', { method: 'POST' })
+              .catch(err => console.error(err));
+      });
+
+      // 2. Khi đóng Tab, thoát trình duyệt -> Báo trừ 1
+      window.addEventListener("pagehide", function() {
+          // sendBeacon bắn tín hiệu ngầm cực nhanh kể cả khi tab đã đóng
+          navigator.sendBeacon('/api/thongke/giam-truy-cap');
+      });
+    </script>
   </body>
 </html>
