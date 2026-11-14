@@ -1,57 +1,58 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Linq; // Thư viện để dùng lệnh .Sum() cộng tổng
+using System.Collections.Concurrent;
 
-namespace VisitorGuide.Controllers
+namespace VisitorGuide.Controllers;
+
+[Route("api/thongke")]
+[ApiController]
+public class ThongKeController : ControllerBase
 {
-    [Route("api/thongke")]
-    [ApiController]
-    public class ThongKeController : ControllerBase
+    private static int _soLuotTruyCap = 0;
+
+    // Lưu số lượt nghe theo từng ID địa điểm (6 địa điểm mặc định tổng = 178)
+    public static readonly ConcurrentDictionary<string, int> LuotNgheTheoId = new(StringComparer.OrdinalIgnoreCase)
     {
-        private static int _soLuotTruyCap = 0;
-        
-        // Mảng lưu số tĩnh ban đầu (Tổng = 178)
-        // [0]Tân Huê Viên: 32, [1]Chợ Ngã Năm: 31, [2]Chùa Phật Học 2: 35, 
-        // [3]Chùa La Hán: 20, [4]Căn cứ tỉnh ủy: 30, [5]Chùa Dơi: 30
-        private static int[] _luotNgheCacDiem = new int[] { 32, 31, 35, 20, 30, 30 };
+        ["cho-noi-nga-nam"] = 32,
+        ["chua-doi"] = 31,
+        ["chua-la-han"] = 35,
+        ["chua-phat-hoc-2"] = 20,
+        ["khu-can-cu-tinh-uy-soc-trang"] = 30,
+        ["tan-hue-vien"] = 30
+    };
 
-        [HttpGet]
-        public IActionResult GetThongKe()
+    [HttpGet]
+    public IActionResult GetThongKe()
+    {
+        return Ok(new
         {
-            return Ok(new
-            {
-                luotTruyCap = _soLuotTruyCap,
-                luotNghe = _luotNgheCacDiem.Sum(), // Tự động lấy 6 số cộng lại
-                chiTietNghe = _luotNgheCacDiem     // Gửi luôn mảng 6 số xuống cho Admin
-            });
-        }
+            luotTruyCap = _soLuotTruyCap,
+            luotNghe = LuotNgheTheoId.Values.Sum(),
+            chiTietTheoId = LuotNgheTheoId
+        });
+    }
 
-        [HttpPost("tang-truy-cap")]
-        public IActionResult TangTruyCap()
-        {
-            _soLuotTruyCap++;
-            return Ok(new { luotTruyCap = _soLuotTruyCap });
-        }
+    [HttpPost("tang-truy-cap")]
+    public IActionResult TangTruyCap()
+    {
+        _soLuotTruyCap++;
+        return Ok(new { luotTruyCap = _soLuotTruyCap });
+    }
 
-        [HttpPost("giam-truy-cap")]
-        public IActionResult GiamTruyCap()
-        {
-            if (_soLuotTruyCap > 0) _soLuotTruyCap--;
-            return Ok();
-        }
+    [HttpPost("giam-truy-cap")]
+    public IActionResult GiamTruyCap()
+    {
+        if (_soLuotTruyCap > 0) _soLuotTruyCap--;
+        return Ok();
+    }
 
-        // BẮT ID TỪ WEB USER ĐỂ CỘNG ĐÚNG CHỖ
-        [HttpPost("tang-nghe/{id}")]
-        public IActionResult TangNghe(string id)
-        {
-            string lowerId = id.ToLower();
-            if (lowerId.Contains("nga-nam")) _luotNgheCacDiem[0]++;
-            else if (lowerId.Contains("doi")) _luotNgheCacDiem[1]++;
-            else if (lowerId.Contains("la-han")) _luotNgheCacDiem[2]++;
-            else if (lowerId.Contains("phat-hoc")) _luotNgheCacDiem[3]++;
-            else if (lowerId.Contains("can-cu")) _luotNgheCacDiem[4]++;
-            else if (lowerId.Contains("tan-hue")) _luotNgheCacDiem[5]++;
-            
-            return Ok();
-        }
+    [HttpPost("tang-nghe/{id}")]
+    public IActionResult TangNghe(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return BadRequest();
+
+        string key = id.Trim().ToLowerInvariant();
+        LuotNgheTheoId.AddOrUpdate(key, 1, (_, current) => current + 1);
+
+        return Ok(new { id = key, plays = LuotNgheTheoId[key] });
     }
 }

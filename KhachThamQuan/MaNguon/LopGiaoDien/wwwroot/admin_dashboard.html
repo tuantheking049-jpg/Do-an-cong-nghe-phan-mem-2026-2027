@@ -18,7 +18,6 @@
             overflow-x: hidden;
         }
         
-        /* Layout Configuration */
         .wrapper {
             display: flex;
             width: 100%;
@@ -29,7 +28,7 @@
         #sidebar {
             min-width: 260px;
             max-width: 260px;
-            background-color: #212529; /* Dark Sidebar */
+            background-color: #212529;
             color: #fff;
             transition: all 0.3s;
             display: flex;
@@ -63,7 +62,7 @@
 
         #sidebar ul li a.active {
             color: #fff;
-            background: #0d6efd; /* Primary Color */
+            background: #0d6efd;
             border-left: 4px solid #fff;
         }
         
@@ -99,7 +98,6 @@
             background-color: #f8f9fa;
         }
         
-        /* Card & Table Styling */
         .card {
             border: none;
             border-radius: 10px;
@@ -131,13 +129,29 @@
             animation: pulse 1.5s infinite;
         }
 
+        .readonly-gray {
+            background-color: #e9ecef !important;
+            color: #6c757d !important;
+            cursor: not-allowed;
+            font-family: monospace;
+        }
+
+        .narration-preview {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            max-width: 360px;
+            font-size: 0.88rem;
+            color: #495057;
+        }
+
         @keyframes pulse {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(25, 135, 84, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             #sidebar {
                 margin-left: -260px;
@@ -169,7 +183,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Biên soạn thuyết minh">
+                    <a href="#" class="sidebar-link" data-target="narrations" data-title="Biên soạn thuyết minh">
                         <i class="bi bi-file-earmark-text"></i> Biên soạn thuyết minh
                     </a>
                 </li>
@@ -218,7 +232,9 @@
             <!-- Main Dynamic Content Container -->
             <div class="main-container">
                 
-                <!-- SECTION: Quản lý địa điểm (POIs) -->
+                <!-- ========================================================= -->
+                <!-- SECTION 1 (UC12): Quản lý địa điểm (POIs)                 -->
+                <!-- ========================================================= -->
                 <div id="pois-section" class="content-section">
                     
                     <!-- Hàng Thống Kê Real-time & Mã QR Chung -->
@@ -243,7 +259,7 @@
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div>
                                         <p class="text-muted small fw-medium mb-1">TỔNG LƯỢT NGHE THUYẾT MINH</p>
-                                        <h3 class="fw-bold mb-0 text-dark" id="total-plays-count">178</h3>
+                                        <h3 class="fw-bold mb-0 text-dark" id="total-plays-count">0</h3>
                                         <small class="text-muted">Cộng dồn từ tất cả địa điểm</small>
                                     </div>
                                     <div class="stat-icon bg-success bg-opacity-10 text-success">
@@ -275,9 +291,6 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <p class="text-muted mb-0">Quản lý danh sách các điểm tham quan tại Sóc Trăng.</p>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-outline-secondary btn-sm shadow-sm" onclick="simulateScanAndListen()" title="Dùng để test nhảy số trực tiếp">
-                                <i class="bi bi-lightning-charge me-1"></i> Test +1 Lượt quét
-                            </button>
                             <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#poiModal" onclick="prepareAddModal()">
                                 <i class="bi bi-plus-lg me-1"></i> Thêm địa điểm
                             </button>
@@ -291,16 +304,16 @@
                                 <table class="table table-hover mb-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th scope="col" class="ps-4">ID</th>
+                                            <th scope="col" class="ps-4" style="width: 80px;">STT</th>
                                             <th scope="col">Tên địa điểm</th>
-                                            <th scope="col">Tọa độ (Vĩ độ, Kinh độ ảo)</th>
+                                            <th scope="col">Phân loại & Tỉnh thành</th>
                                             <th scope="col" class="text-center">Lượt nghe</th>
                                             <th scope="col">Trạng thái</th>
                                             <th scope="col" class="text-center">Hành động</th>
                                         </tr>
                                     </thead>
                                     <tbody id="poi-table-body">
-                                        <!-- Dữ liệu được đổ tự động từ hàm renderPOITable() hoặc API .NET 8 -->
+                                        <!-- Dữ liệu được đổ tự động từ Database -->
                                     </tbody>
                                 </table>
                             </div>
@@ -308,7 +321,46 @@
                     </div>
                 </div>
 
-                <!-- SECTION: Placeholder (For other menus) -->
+                <!-- ========================================================= -->
+                <!-- SECTION 2 (UC13): Biên soạn nội dung thuyết minh          -->
+                <!-- ========================================================= -->
+                <div id="narrations-section" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <p class="text-muted mb-0">Tạo mới, xem, chỉnh sửa hoặc xóa bài thuyết minh gốc (Tiếng Việt) và điểm nổi bật cho từng địa điểm tham quan.</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary shadow-sm" onclick="openCreateNarrationModal()">
+                                <i class="bi bi-plus-lg me-1"></i> Soạn bài thuyết minh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" class="ps-4" style="width: 65px;">STT</th>
+                                            <th scope="col" style="width: 190px;">Địa điểm liên quan</th>
+                                            <th scope="col">Tiêu đề & Nội dung thuyết minh gốc (Tiếng Việt)</th>
+                                            <th scope="col" style="width: 210px;">Điểm nổi bật (Tags)</th>
+                                            <th scope="col" class="text-center" style="width: 105px;">Thời lượng</th>
+                                            <th scope="col" style="width: 145px;">Trạng thái</th>
+                                            <th scope="col" class="text-center" style="width: 210px;">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="narration-table-body">
+                                        <!-- Dữ liệu bài thuyết minh đổ từ API -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: Placeholder (Cho các menu UC14, UC15, UC16 tiếp theo) -->
                 <div id="placeholder-section" class="content-section d-none h-100 d-flex flex-column align-items-center justify-content-center text-muted" style="min-height: 60vh;">
                     <i class="bi bi-tools" style="font-size: 4rem; opacity: 0.3;"></i>
                     <h4 class="mt-3 fw-light">Nội dung đang cập nhật...</h4>
@@ -319,7 +371,9 @@
         </div>
     </div>
 
-    <!-- Modal Thêm / Cập nhật Địa điểm -->
+    <!-- ========================================================= -->
+    <!-- MODAL UC12: Thêm / Cập nhật Địa điểm                      -->
+    <!-- ========================================================= -->
     <div class="modal fade" id="poiModal" tabindex="-1" aria-labelledby="poiModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
@@ -329,26 +383,39 @@
                 </div>
                 <div class="modal-body">
                     <form id="poiForm">
-                        <input type="hidden" id="poiId">
+                        <input type="hidden" id="isEditMode" value="false">
+
+                        <div class="mb-3">
+                            <label for="poiId" class="form-label fw-medium">Mã địa điểm (ID) <small class="text-muted fw-normal">- Tự động tạo & cố định</small></label>
+                            <input type="text" class="form-control readonly-gray" id="poiId" placeholder="Tự động tạo khi nhập tên..." readonly required>
+                        </div>
+                        
                         <div class="mb-3">
                             <label for="poiName" class="form-label fw-medium">Tên địa điểm <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="poiName" placeholder="VD: Chùa Dơi..." required>
+                            <input type="text" class="form-control" id="poiName" placeholder="VD: Chùa Đất Sét..." oninput="handleNameInput(this.value)" required>
                         </div>
+                        
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="poiLat" class="form-label fw-medium">Vĩ độ (Latitude)</label>
-                                <input type="number" step="any" class="form-control" id="poiLat" placeholder="VD: 9.5960">
+                                <label for="poiCategory" class="form-label fw-medium">Phân loại <span class="text-danger">*</span></label>
+                                <select class="form-select" id="poiCategory" required>
+                                    <option value="Văn hóa">Văn hóa</option>
+                                    <option value="Kiến trúc">Kiến trúc</option>
+                                    <option value="Lịch sử">Lịch sử</option>
+                                    <option value="Ẩm thực">Ẩm thực</option>
+                                </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="poiLng" class="form-label fw-medium">Kinh độ (Longitude)</label>
-                                <input type="number" step="any" class="form-control" id="poiLng" placeholder="VD: 105.9754">
+                                <label for="poiProvince" class="form-label fw-medium">Tỉnh thành <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="poiProvince" value="Sóc Trăng" required>
                             </div>
                         </div>
+
                         <div class="mb-3">
                             <label for="poiStatus" class="form-label fw-medium">Trạng thái</label>
                             <select class="form-select" id="poiStatus">
-                                <option value="Hoạt động">Hoạt động</option>
-                                <option value="Bảo trì">Đang bảo trì</option>
+                                <option value="Hoạt động">Hoạt động (Hiển thị trên trang User)</option>
+                                <option value="Bảo trì">Đang bảo trì (Ẩn khỏi trang User)</option>
                             </select>
                         </div>
                     </form>
@@ -356,6 +423,112 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
                     <button type="button" class="btn btn-primary" onclick="savePOI()">Lưu thông tin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL UC13: Biên soạn / Cập nhật Bài thuyết minh          -->
+    <!-- ========================================================= -->
+    <div class="modal fade" id="narrationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="narrationModalLabel">Biên soạn nội dung thuyết minh</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Hộp cảnh báo lỗi (Luồng phụ 5a, 6a, 7a) -->
+                    <div id="narrationErrorAlert" class="alert alert-danger d-none py-2 small" role="alert"></div>
+
+                    <form id="narrationForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="narrationPlaceSelect" class="form-label fw-medium">Địa điểm liên quan <span class="text-danger">*</span></label>
+                                <select class="form-select" id="narrationPlaceSelect" onchange="handleNarrationPlaceChange(this.value)" required>
+                                    <!-- Đổ danh sách địa điểm từ DB -->
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="narrationDuration" class="form-label fw-medium">Thời lượng (phút) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="narrationDuration" min="1" max="120" value="8" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="narrationPublishStatus" class="form-label fw-medium">Trạng thái công bố</label>
+                                <select class="form-select" id="narrationPublishStatus">
+                                    <option value="Đã công bố">Đã công bố</option>
+                                    <option value="Bản nháp">Bản nháp</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="narrationTitle" class="form-label fw-medium">Tiêu đề bài thuyết minh <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="narrationTitle" placeholder="VD: Thuyết minh tổng quan Chùa Dơi..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="narrationImageUrl" class="form-label fw-medium">Đường dẫn Hình ảnh đại diện (Image URL) <span class="text-danger">*</span></label>
+                            <input type="url" class="form-control" id="narrationImageUrl" placeholder="https://..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="narrationHighlights" class="form-label fw-medium">Điểm nổi bật / Nhãn hiển thị (Ngăn cách bằng dấu phẩy <code class="text-primary">,</code>)</label>
+                            <input type="text" class="form-control" id="narrationHighlights" placeholder="VD: Kiến trúc Khmer, Hàng ngàn dơi quạ, Di tích quốc gia">
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <label for="narrationContentVi" class="form-label fw-medium">Nội dung bài thuyết minh gốc (Tiếng Việt) <span class="text-danger">*</span></label>
+                                <small class="text-muted" id="narrationCharCount">0 ký tự</small>
+                            </div>
+                            <textarea class="form-control" id="narrationContentVi" rows="6" placeholder="Nhập nội dung bài thuyết minh chi tiết cho địa điểm này..." oninput="updateCharCount()" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="button" class="btn btn-primary" onclick="saveNarration()">
+                        <i class="bi bi-check2-circle me-1"></i> Lưu bài thuyết minh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL UC13: Xem chi tiết Bài thuyết minh                  -->
+    <!-- ========================================================= -->
+    <div class="modal fade" id="viewNarrationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="viewNarrationModalHeader">Chi tiết bài thuyết minh</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3 align-items-center">
+                        <div class="col-md-5">
+                            <img id="viewNarrationImg" src="" alt="Ảnh địa điểm" class="img-fluid rounded border shadow-sm w-100" style="max-height: 180px; object-fit: cover;">
+                        </div>
+                        <div class="col-md-7">
+                            <div class="mb-1" id="viewNarrationStatusBadge"></div>
+                            <h5 class="fw-bold mb-1 text-primary" id="viewNarrationDocTitle"></h5>
+                            <p class="text-muted small mb-2">
+                                Địa điểm: <strong class="text-dark" id="viewNarrationPlaceName"></strong>
+                                (<code id="viewNarrationPlaceId"></code>) | Phân loại: <span id="viewNarrationCategory" class="fw-medium"></span>
+                            </p>
+                            <p class="mb-2"><span class="badge bg-info text-dark" id="viewNarrationDuration"></span></p>
+                            <div id="viewNarrationTags" class="d-flex flex-wrap gap-1"></div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 class="fw-bold text-dark"><i class="bi bi-journal-text me-1 text-primary"></i>Nội dung thuyết minh gốc (Tiếng Việt):</h6>
+                    <div class="p-3 bg-light rounded border text-dark" id="viewNarrationBody" style="white-space: pre-wrap; line-height: 1.6;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>
@@ -389,53 +562,122 @@
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Custom Interactions & 3-Tier API Logic -->
     <script>
         // =========================================================================
-        // CẤU HÌNH KẾT NỐI 3 LỚP (.NET 8 API) & BIẾN CHỐNG BÀI TEST CỦA GIẢNG VIÊN
+        // 1. KIỂM TRA QUYỀN TRUY CẬP (BẢO VỆ TRANG)
         // =========================================================================
-        const API_BASE_URL = "https://localhost:7001/api"; // Đổi port theo máy bạn code .NET 8
+        if (sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
+            alert("Bạn chưa đăng nhập! Vui lòng đăng nhập để tiếp tục.");
+            window.location.href = 'admin_login.html';
+        }
 
-        // Nếu thầy yêu cầu "nhân 2 số lượng người dùng/lượt quét", chỉ cần sửa số 1 thành số 2:
-        const HE_SO_NHAN = 1; 
+        // =========================================================================
+        // 2. CẤU HÌNH API & THỨ TỰ MẶC ĐỊNH (TẠO MỚI LUÔN Ở DƯỚI CÙNG)
+        // =========================================================================
+        const API_LANDMARKS_URL = "/api/admin/landmarks";
+        const HE_SO_NHAN = 1;
+        let poisData = [];
+        let narrationsData = [];
 
-        // Dữ liệu 5 địa điểm Sóc Trăng chuẩn theo file của nhóm
-        let poisData = [
-            { id: 1, name: 'Chợ nổi ngã 5', lat: 9.5761, lng: 105.8117, plays: 31, status: 'Hoạt động' },
-            { id: 2, name: 'Chùa Dơi', lat: 9.5847, lng: 105.9753, plays: 30, status: 'Hoạt động' },
-            { id: 3, name: 'Chùa La Hán', lat: 9.6080, lng: 105.9860, plays: 20, status: 'Bảo trì' },
-            { id: 4, name: 'Chùa Phật Học 2', lat: 9.6056, lng: 105.9754, plays: 35, status: 'Hoạt động'},
-            { id: 5, name: 'Khu căn cứ tỉnh ủy Sóc Trăng', lat: 9.5397, lng: 105.9768, plays: 30, status: 'Hoạt động' },
-            { id: 6, name: 'Tân Huê Viên', lat: 9.6133, lng: 105.9922, plays: 32, status: 'Hoạt động' }
-        ];
+        // Khóa thứ tự 6 địa điểm gốc (1..6), mọi địa điểm tạo mới sẽ luôn nằm dưới cùng (7, 8...)
+        const DEFAULT_ORDER_MAP = {
+            "cho-noi-nga-nam": 1,
+            "chua-doi": 2,
+            "chua-la-han": 3,
+            "chua-phat-hoc-2": 4,
+            "khu-can-cu-tinh-uy-soc-trang": 5,
+            "tan-hue-vien": 6
+        };
 
-        let activeUsers = 0;
+        function getClientOrderIndex(item, fallbackIdx) {
+            if (item.orderIndex !== undefined && item.orderIndex !== null) {
+                return item.orderIndex;
+            }
+            const idKey = (item.id || '').toLowerCase();
+            if (DEFAULT_ORDER_MAP[idKey]) {
+                return DEFAULT_ORDER_MAP[idKey];
+            }
+            return 100 + fallbackIdx;
+        }
 
-        // 1. Hàm hiển thị bảng địa điểm và cập nhật các con số thống kê
+        function sortListByCreationOrder(list) {
+            return [...list].sort((a, b) => getClientOrderIndex(a, 0) - getClientOrderIndex(b, 0));
+        }
+
+        // =========================================================================
+        // 3. HÀM TẠO ID TỰ ĐỘNG (XÓA DẤU, VIẾT THƯỜNG, THAY SPACE BẰNG -)
+        // =========================================================================
+        function generateSlug(text) {
+            return text
+                .toString()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd')
+                .replace(/Đ/g, 'd')
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/[\s_-]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+        function handleNameInput(nameValue) {
+            const isEdit = document.getElementById('isEditMode').value === 'true';
+            if (!isEdit) {
+                document.getElementById('poiId').value = generateSlug(nameValue);
+            }
+        }
+
+        // =========================================================================
+        // 4. UC12: LẤY DỮ LIỆU ĐỊA ĐIỂM TỪ DATABASE & HIỂN THỊ BẢNG
+        // =========================================================================
+        function fetchPOIsFromDB() {
+            fetch(API_LANDMARKS_URL)
+                .then(res => {
+                    if (!res.ok) throw new Error("HTTP status " + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    poisData = sortListByCreationOrder(Array.isArray(data) ? data : []);
+                    renderPOITable();
+                    fetchStatsFromBackend();
+                })
+                .catch(err => {
+                    console.error("Lỗi lấy dữ liệu:", err);
+                    document.getElementById('api-status-badge').innerHTML = '<span class="live-dot" style="background-color: #dc3545;"></span>Mất kết nối Backend';
+                });
+        }
+
         function renderPOITable() {
             const tbody = document.getElementById('poi-table-body');
             let html = '';
-            let totalPlays = 0;
 
-            poisData.forEach(poi => {
-                totalPlays += poi.plays;
-                const badgeClass = poi.status === 'Hoạt động' ? 'bg-success' : 'bg-secondary';
-                const safeName = poi.name.replace(/'/g, "\\'");
+            poisData.forEach((poi, index) => {
+                const statusText = poi.status || 'Hoạt động';
+                const isMaintenance = statusText === 'Bảo trì' || statusText === 'Đang bảo trì';
+                const badgeClass = isMaintenance ? 'bg-secondary' : 'bg-success';
+                const displayStatus = isMaintenance ? 'Đang bảo trì' : 'Hoạt động';
+                const selectValue = isMaintenance ? 'Bảo trì' : 'Hoạt động';
+
+                const safeId = (poi.id || '').replace(/'/g, "\\'");
+                const safeName = (poi.name || '').replace(/'/g, "\\'");
+                const safeCat = (poi.category || '').replace(/'/g, "\\'");
+                const safeProv = (poi.province || '').replace(/'/g, "\\'");
 
                 html += `
                     <tr>
-                        <th scope="row" class="ps-4">${poi.id}</th>
+                        <th scope="row" class="ps-4">${index + 1}</th>
                         <td class="fw-medium">${poi.name}</td>
-                        <td>${poi.lat}, ${poi.lng}</td>
+                        <td><span class="badge bg-light text-dark border me-1">${poi.category}</span> ${poi.province}</td>
                         <td class="text-center">
-                            <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">${poi.plays * HE_SO_NHAN} lượt</span>
+                            <span id="plays-badge-${poi.id}" class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">${(poi.plays || 0) * HE_SO_NHAN} lượt</span>
                         </td>
-                        <td><span class="badge ${badgeClass}">${poi.status}</span></td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditModal(${poi.id}, '${safeName}', ${poi.lat}, ${poi.lng}, '${poi.status}')" title="Sửa">
+                        <td><span class="badge ${badgeClass}">${displayStatus}</span></td>
+                        <td class="text-center text-nowrap">
+                            <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditModal('${safeId}', '${safeName}', '${safeCat}', '${safeProv}', '${selectValue}')" title="Sửa">
                                 <i class="bi bi-pencil-square"></i> Sửa
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="confirmDelete(${poi.id}, '${safeName}')" title="Xóa">
+                            <button class="btn btn-sm btn-danger" onclick="confirmDelete('${safeId}', '${safeName}')" title="Xóa">
                                 <i class="bi bi-trash"></i> Xóa
                             </button>
                         </td>
@@ -446,31 +688,427 @@
             tbody.innerHTML = html;
         }
 
-        // 2. Hàm gọi API lấy dữ liệu thống kê
-        // Gọi API lấy dữ liệu thống kê liên tục
+        // =========================================================================
+        // 5. ĐỒNG BỘ THỐNG KÊ REAL-TIME MỖI 2 GIÂY (KHÁCH ONLINE & LƯỢT NGHE)
+        // =========================================================================
         function fetchStatsFromBackend() {
             fetch('/api/thongke')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error("Lỗi kết nối thống kê");
+                    return response.json();
+                })
                 .then(data => {
-                    // Cập nhật cục tổng trên Dashboard
-                    document.getElementById('active-users-count').innerText = data.luotTruyCap;
-                    document.getElementById('total-plays-count').innerText = data.luotNghe;
+                    document.getElementById('active-users-count').innerText = (data.luotTruyCap || 0) * HE_SO_NHAN;
+                    document.getElementById('total-plays-count').innerText = (data.luotNghe || 0) * HE_SO_NHAN;
                     document.getElementById('api-status-badge').innerHTML = '<span class="live-dot"></span>Đã kết nối API (.NET 8)';
-                    
-                    // Cập nhật số liệu chi tiết cho 6 địa điểm trong bảng
-                    if (data.chiTietNghe && data.chiTietNghe.length === 6) {
-                        for(let i = 0; i < 6; i++) {
-                            poisData[i].plays = data.chiTietNghe[i];
-                        }
-                        renderPOITable(); // Yêu cầu bảng vẽ lại số mới
+
+                    if (data.chiTietTheoId) {
+                        poisData.forEach(poi => {
+                            const key = (poi.id || '').toLowerCase();
+                            if (data.chiTietTheoId[key] !== undefined) {
+                                poi.plays = data.chiTietTheoId[key];
+                                const badgeEl = document.getElementById(`plays-badge-${poi.id}`);
+                                if (badgeEl) {
+                                    badgeEl.innerText = `${poi.plays * HE_SO_NHAN} lượt`;
+                                }
+                            }
+                        });
                     }
                 })
-                .catch(error => {
+                .catch(() => {
                     document.getElementById('api-status-badge').innerHTML = '<span class="live-dot" style="background-color: #dc3545;"></span>Mất kết nối Backend';
                 });
         }
 
-        // 3. Hàm cập nhật mã QR theo link Ngrok
+        // =========================================================================
+        // 6. UC12: THÊM MỚI / CẬP NHẬT / XÓA ĐỊA ĐIỂM
+        // =========================================================================
+        const poiModal = new bootstrap.Modal(document.getElementById('poiModal'));
+
+        function prepareAddModal() {
+            document.getElementById('poiModalLabel').innerText = "Thêm địa điểm mới";
+            document.getElementById('poiForm').reset();
+            document.getElementById('isEditMode').value = "false";
+            document.getElementById('poiId').value = "";
+            document.getElementById('poiCategory').value = "Văn hóa";
+            document.getElementById('poiProvince').value = "Sóc Trăng";
+            document.getElementById('poiStatus').value = "Hoạt động";
+        }
+
+        function openEditModal(id, name, category, province, status) {
+            document.getElementById('poiModalLabel').innerText = "Cập nhật địa điểm";
+            document.getElementById('isEditMode').value = "true";
+            document.getElementById('poiId').value = id;
+            document.getElementById('poiName').value = name;
+            document.getElementById('poiCategory').value = category || "Văn hóa";
+            document.getElementById('poiProvince').value = province;
+            document.getElementById('poiStatus').value = status;
+            poiModal.show();
+        }
+
+        function savePOI() {
+            const form = document.getElementById('poiForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const isEdit = document.getElementById('isEditMode').value === 'true';
+            const id = document.getElementById('poiId').value.trim();
+            const name = document.getElementById('poiName').value.trim();
+            const category = document.getElementById('poiCategory').value.trim();
+            const province = document.getElementById('poiProvince').value.trim();
+            const status = document.getElementById('poiStatus').value;
+
+            if (!id) {
+                alert("Tên địa điểm không hợp lệ để tạo mã ID!");
+                return;
+            }
+
+            const confirmMsg = isEdit
+                ? `Bạn có chắc chắn muốn lưu các thay đổi cho địa điểm "${name}" không?`
+                : `Bạn có chắc chắn muốn thêm địa điểm mới "${name}" vào hệ thống không?`;
+
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            const payload = {
+                id: id,
+                name: name,
+                category: category,
+                province: province,
+                status: status
+            };
+
+            const url = isEdit ? `${API_LANDMARKS_URL}/${encodeURIComponent(id)}` : API_LANDMARKS_URL;
+            const method = isEdit ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(async res => {
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    throw new Error(data.message || "Có lỗi xảy ra khi lưu vào Database!");
+                }
+                return data;
+            })
+            .then(data => {
+                alert(data.message || "Đã lưu thành công!");
+                poiModal.hide();
+                fetchPOIsFromDB();
+            })
+            .catch(err => {
+                alert("Lỗi: " + err.message);
+            });
+        }
+
+        function confirmDelete(id, name) {
+            if (confirm(`Bạn có chắc chắn muốn xóa địa điểm "${name}" (ID: ${id}) khỏi Database không?`)) {
+                fetch(`${API_LANDMARKS_URL}/${encodeURIComponent(id)}`, { method: 'DELETE' })
+                    .then(async res => {
+                        const data = await res.json().catch(() => ({}));
+                        if (!res.ok) {
+                            throw new Error(data.message || "Không thể xóa địa điểm!");
+                        }
+                        return data;
+                    })
+                    .then(data => {
+                        alert(data.message || "Đã xóa thành công!");
+                        fetchPOIsFromDB();
+                    })
+                    .catch(err => {
+                        alert("Lỗi khi xóa: " + err.message);
+                    });
+            }
+        }
+
+        // =========================================================================
+        // 7. UC13: BIÊN SOẠN NỘI DUNG THUYẾT MINH GỐC
+        // =========================================================================
+        const narrationModal = new bootstrap.Modal(document.getElementById('narrationModal'));
+        const viewNarrationModal = new bootstrap.Modal(document.getElementById('viewNarrationModal'));
+
+        function fetchNarrationsFromDB() {
+            fetch(`${API_LANDMARKS_URL}/narrations`)
+                .then(async res => {
+                    if (!res.ok) throw new Error("API narrations chưa được nạp");
+                    return res.json();
+                })
+                .then(data => {
+                    narrationsData = sortListByCreationOrder(Array.isArray(data) ? data : []);
+                    renderNarrationTable();
+                })
+                .catch(async err => {
+                    console.warn("Đang dùng dữ liệu dự phòng cho UC13:", err);
+                    try {
+                        const resFallback = await fetch('/api/landmarks?language=vi');
+                        const listFallback = await resFallback.json();
+                        const mapped = (listFallback || []).map((item, idx) => {
+                            const desc = item.description || '';
+                            const isEmpty = !desc || desc === '(Chưa có nội dung thuyết minh)';
+                            return {
+                                id: item.id,
+                                name: item.name,
+                                category: item.category,
+                                title: `Thuyết minh ${item.name}`,
+                                durationMinutes: item.durationMinutes || 5,
+                                imageUrl: item.imageUrl || '',
+                                descriptionVi: isEmpty ? '' : desc,
+                                highlights: item.highlights || [],
+                                highlightsText: (item.highlights || []).join(', '),
+                                publishStatus: isEmpty ? 'Bản nháp' : 'Đã công bố',
+                                hasContent: !isEmpty,
+                                orderIndex: getClientOrderIndex(item, idx)
+                            };
+                        });
+                        narrationsData = sortListByCreationOrder(mapped);
+                        renderNarrationTable();
+                    } catch (e) {
+                        console.error("Không thể tải dữ liệu thuyết minh:", e);
+                    }
+                });
+        }
+
+        function renderNarrationTable() {
+            const tbody = document.getElementById('narration-table-body');
+            let html = '';
+
+            narrationsData.forEach((item, index) => {
+                const isDraft = !item.hasContent || item.publishStatus === 'Bản nháp' || item.publishStatus === 'Chưa biên soạn';
+                const statusBadge = isDraft
+                    ? '<span class="badge bg-secondary">Bản nháp</span>'
+                    : '<span class="badge bg-success">Đã công bố</span>';
+
+                const docTitleHtml = item.title
+                    ? `<div class="fw-semibold text-primary mb-1"><i class="bi bi-bookmark-star me-1"></i>${item.title}</div>`
+                    : '';
+
+                const previewText = item.hasContent
+                    ? `${docTitleHtml}<div class="narration-preview">${item.descriptionVi}</div>`
+                    : '<em class="text-muted small">(Bản nháp chưa có nội dung - Bấm "Sửa" để biên soạn)</em>';
+
+                const tagsHtml = (item.highlights || [])
+                    .map(t => `<span class="badge bg-light text-secondary border me-1 mb-1">${t}</span>`)
+                    .join('');
+
+                const safeId = (item.id || '').replace(/'/g, "\\'");
+                const safeName = (item.name || '').replace(/'/g, "\\'");
+
+                html += `
+                    <tr>
+                        <th scope="row" class="ps-4">${index + 1}</th>
+                        <td>
+                            <div class="fw-medium text-dark">${item.name}</div>
+                            <small class="text-muted"><span class="badge bg-light text-dark border">${item.category}</span></small>
+                        </td>
+                        <td>${previewText}</td>
+                        <td>${tagsHtml || '<small class="text-muted">Chưa có</small>'}</td>
+                        <td class="text-center text-nowrap"><span class="badge bg-info bg-opacity-10 text-primary">${item.durationMinutes} phút</span></td>
+                        <td class="text-nowrap">${statusBadge}</td>
+                        <td class="text-center text-nowrap">
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="openViewNarration('${safeId}')" title="Xem chi tiết">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditNarrationModal('${safeId}')" title="Biên soạn / Chỉnh sửa">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="confirmDeleteNarration('${safeId}', '${safeName}')" title="Xóa bài thuyết minh">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function hideNarrationError() {
+            const alertBox = document.getElementById('narrationErrorAlert');
+            alertBox.classList.add('d-none');
+            alertBox.innerText = '';
+        }
+
+        function showNarrationError(msg) {
+            const alertBox = document.getElementById('narrationErrorAlert');
+            alertBox.innerText = msg;
+            alertBox.classList.remove('d-none');
+        }
+
+        function populatePlaceSelect(selectedId) {
+            const selectEl = document.getElementById('narrationPlaceSelect');
+            selectEl.innerHTML = narrationsData.map(item =>
+                `<option value="${item.id}" ${item.id === selectedId ? 'selected' : ''}>${item.name} (${item.id})</option>`
+            ).join('');
+        }
+
+        function handleNarrationPlaceChange(placeId) {
+            hideNarrationError();
+            const found = narrationsData.find(x => x.id === placeId);
+            if (!found) return;
+
+            const isDraft = !found.hasContent || found.publishStatus === 'Bản nháp' || found.publishStatus === 'Chưa biên soạn';
+
+            document.getElementById('narrationTitle').value = found.title || `Thuyết minh ${found.name}`;
+            document.getElementById('narrationDuration').value = found.durationMinutes || 8;
+            document.getElementById('narrationImageUrl').value = found.imageUrl || '';
+            document.getElementById('narrationHighlights').value = found.highlightsText || '';
+            document.getElementById('narrationContentVi').value = found.descriptionVi || '';
+            document.getElementById('narrationPublishStatus').value = isDraft ? 'Bản nháp' : 'Đã công bố';
+            updateCharCount();
+        }
+
+        function updateCharCount() {
+            const text = document.getElementById('narrationContentVi').value || '';
+            document.getElementById('narrationCharCount').innerText = `${text.length} ký tự`;
+        }
+
+        function openCreateNarrationModal() {
+            if (narrationsData.length === 0) {
+                alert("Chưa có địa điểm nào để biên soạn thuyết minh!");
+                return;
+            }
+            hideNarrationError();
+            document.getElementById('narrationModalLabel').innerText = "Tạo mới / Biên soạn bài thuyết minh";
+            const defaultTarget = narrationsData.find(x => !x.hasContent || x.publishStatus === 'Bản nháp') || narrationsData[0];
+            populatePlaceSelect(defaultTarget.id);
+            document.getElementById('narrationPlaceSelect').disabled = false;
+            handleNarrationPlaceChange(defaultTarget.id);
+            narrationModal.show();
+        }
+
+        function openEditNarrationModal(placeId) {
+            const found = narrationsData.find(x => x.id === placeId);
+            if (!found) return;
+            hideNarrationError();
+            document.getElementById('narrationModalLabel').innerText = `Chỉnh sửa thuyết minh: ${found.name}`;
+            populatePlaceSelect(placeId);
+            document.getElementById('narrationPlaceSelect').disabled = true;
+            handleNarrationPlaceChange(placeId);
+            narrationModal.show();
+        }
+
+        function openViewNarration(placeId) {
+            const found = narrationsData.find(x => x.id === placeId);
+            if (!found) return;
+
+            const isDraft = !found.hasContent || found.publishStatus === 'Bản nháp' || found.publishStatus === 'Chưa biên soạn';
+
+            document.getElementById('viewNarrationDocTitle').innerText =
+                found.title ? found.title : `Thuyết minh ${found.name}`;
+            document.getElementById('viewNarrationPlaceName').innerText = found.name;
+            document.getElementById('viewNarrationPlaceId').innerText = found.id;
+            document.getElementById('viewNarrationCategory').innerText = found.category;
+            document.getElementById('viewNarrationDuration').innerText = `Thời lượng đọc: ${found.durationMinutes} phút`;
+            document.getElementById('viewNarrationImg').src = found.imageUrl;
+            document.getElementById('viewNarrationBody').innerText = found.hasContent
+                ? found.descriptionVi
+                : "(Địa điểm này hiện đang ở trạng thái Bản nháp, chưa có nội dung thuyết minh)";
+
+            const statusEl = document.getElementById('viewNarrationStatusBadge');
+            statusEl.innerHTML = isDraft
+                ? '<span class="badge bg-secondary">Bản nháp</span>'
+                : '<span class="badge bg-success">Đã công bố</span>';
+
+            const tagsContainer = document.getElementById('viewNarrationTags');
+            tagsContainer.innerHTML = (found.highlights || [])
+                .map(t => `<span class="badge bg-secondary">${t}</span>`)
+                .join('');
+
+            viewNarrationModal.show();
+        }
+
+        function saveNarration() {
+            hideNarrationError();
+
+            const placeId = document.getElementById('narrationPlaceSelect').value;
+            const title = document.getElementById('narrationTitle').value.trim();
+            const durationMinutes = parseInt(document.getElementById('narrationDuration').value) || 5;
+            const imageUrl = document.getElementById('narrationImageUrl').value.trim();
+            const highlightsText = document.getElementById('narrationHighlights').value.trim();
+            const descriptionVi = document.getElementById('narrationContentVi').value.trim();
+            const publishStatus = document.getElementById('narrationPublishStatus').value;
+
+            if (!title) {
+                showNarrationError("Vui lòng nhập Tiêu đề bài thuyết minh (trường bắt buộc)!");
+                document.getElementById('narrationTitle').focus();
+                return;
+            }
+            if (!descriptionVi) {
+                showNarrationError("Nội dung bài thuyết minh không được để trống! Vui lòng bổ sung nội dung.");
+                document.getElementById('narrationContentVi').focus();
+                return;
+            }
+            if (!imageUrl) {
+                showNarrationError("Vui lòng nhập đường dẫn Hình ảnh đại diện hợp lệ!");
+                document.getElementById('narrationImageUrl').focus();
+                return;
+            }
+
+            const placeObj = narrationsData.find(x => x.id === placeId);
+            if (!placeObj) {
+                showNarrationError("Địa điểm liên quan không tồn tại! Vui lòng chọn địa điểm hợp lệ.");
+                return;
+            }
+
+            if (!confirm(`Bạn có chắc chắn muốn lưu bài thuyết minh "${title}" cho địa điểm "${placeObj.name}" với trạng thái [${publishStatus}] không?`)) {
+                return;
+            }
+
+            fetch(`${API_LANDMARKS_URL}/${encodeURIComponent(placeId)}/narration`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: title,
+                    durationMinutes: durationMinutes,
+                    imageUrl: imageUrl,
+                    descriptionVi: descriptionVi,
+                    highlightsText: highlightsText,
+                    publishStatus: publishStatus
+                })
+            })
+            .then(async res => {
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    throw new Error(data.message || "Lưu thất bại! Hãy đảm bảo bạn đã tắt và chạy lại dotnet run.");
+                }
+                return data;
+            })
+            .then(data => {
+                alert(data.message);
+                narrationModal.hide();
+                fetchNarrationsFromDB();
+            })
+            .catch(err => {
+                showNarrationError("Lưu thất bại: " + err.message + " (Dữ liệu bạn vừa nhập vẫn được giữ lại trên biểu mẫu).");
+            });
+        }
+
+        function confirmDeleteNarration(placeId, placeName) {
+            if (confirm(`Bạn có chắc chắn muốn xóa bài thuyết minh gốc của địa điểm "${placeName}" không?`)) {
+                fetch(`${API_LANDMARKS_URL}/${encodeURIComponent(placeId)}/narration`, {
+                    method: 'DELETE'
+                })
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.message || "Xóa bài thuyết minh thất bại!");
+                    return data;
+                })
+                .then(data => {
+                    alert(data.message);
+                    fetchNarrationsFromDB();
+                })
+                .catch(err => alert("Lỗi: " + err.message));
+            }
+        }
+
+        // =========================================================================
+        // 8. CÁC TÍNH NĂNG PHỤ (MÃ QR, ĐIỀU HƯỚNG MENU, ĐĂNG XUẤT)
+        // =========================================================================
         function updateQRCode() {
             const url = document.getElementById('qrUrlInput').value.trim();
             if (!url) return alert("Vui lòng nhập đường dẫn hợp lệ!");
@@ -478,24 +1116,14 @@
             alert("Đã tạo mã QR mới cho đường dẫn: " + url);
         }
 
-        // 4. Hàm test nhanh tăng số người online & lượt nghe
-        function simulateScanAndListen() {
-            activeUsers++;
-            if (poisData.length > 0) {
-                poisData[0].plays++;
-            }
-            renderPOITable();
-        }
-
-        // Sidebar Toggle for Mobile
         document.getElementById('sidebarCollapse').addEventListener('click', function () {
             document.getElementById('sidebar').classList.toggle('active');
         });
 
-        // Navigation Logic
         const navLinks = document.querySelectorAll('.sidebar-link');
         const pageTitle = document.getElementById('page-title');
         const poisSection = document.getElementById('pois-section');
+        const narrationsSection = document.getElementById('narrations-section');
         const placeholderSection = document.getElementById('placeholder-section');
 
         navLinks.forEach(link => {
@@ -504,90 +1132,42 @@
                 navLinks.forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
                 
-                const title = this.getAttribute('data-title');
-                pageTitle.innerText = title;
+                pageTitle.innerText = this.getAttribute('data-title');
 
                 const target = this.getAttribute('data-target');
-                if(target === 'pois') {
+                poisSection.classList.add('d-none');
+                narrationsSection.classList.add('d-none');
+                placeholderSection.classList.add('d-none');
+
+                if (target === 'pois') {
                     poisSection.classList.remove('d-none');
-                    placeholderSection.classList.add('d-none');
+                    fetchPOIsFromDB();
+                } else if (target === 'narrations') {
+                    narrationsSection.classList.remove('d-none');
+                    fetchNarrationsFromDB();
                 } else {
-                    poisSection.classList.add('d-none');
                     placeholderSection.classList.remove('d-none');
                 }
 
-                if(window.innerWidth <= 768) {
+                if (window.innerWidth <= 768) {
                     document.getElementById('sidebar').classList.remove('active');
                 }
             });
         });
 
-        // Modal Logic (Thêm / Sửa / Xóa)
-        const poiModal = new bootstrap.Modal(document.getElementById('poiModal'));
-
-        function prepareAddModal() {
-            document.getElementById('poiModalLabel').innerText = "Thêm địa điểm mới";
-            document.getElementById('poiForm').reset();
-            document.getElementById('poiId').value = "";
-        }
-
-        function openEditModal(id, name, lat, lng, status) {
-            document.getElementById('poiModalLabel').innerText = "Cập nhật địa điểm";
-            document.getElementById('poiId').value = id;
-            document.getElementById('poiName').value = name;
-            document.getElementById('poiLat').value = lat;
-            document.getElementById('poiLng').value = lng;
-            document.getElementById('poiStatus').value = status;
-            poiModal.show();
-        }
-
-        function savePOI() {
-            const form = document.getElementById('poiForm');
-            if(!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-            
-            const id = document.getElementById('poiId').value;
-            const name = document.getElementById('poiName').value.trim();
-            const lat = parseFloat(document.getElementById('poiLat').value) || 9.6000;
-            const lng = parseFloat(document.getElementById('poiLng').value) || 105.9800;
-            const status = document.getElementById('poiStatus').value;
-
-            if (id) {
-                const index = poisData.findIndex(p => p.id == id);
-                if (index !== -1) {
-                    poisData[index].name = name;
-                    poisData[index].lat = lat;
-                    poisData[index].lng = lng;
-                    poisData[index].status = status;
-                }
-            } else {
-                const newId = poisData.length > 0 ? Math.max(...poisData.map(p => p.id)) + 1 : 1;
-                poisData.push({ id: newId, name: name, lat: lat, lng: lng, plays: 0, status: status });
-            }
-
-            renderPOITable();
-            alert("Giả lập: Đã lưu thành công!");
-            poiModal.hide();
-        }
-
-        function confirmDelete(id, name) {
-            if(confirm(`Bạn có chắc chắn muốn xóa địa điểm "${name}" không?`)) {
-                poisData = poisData.filter(p => p.id !== id);
-                renderPOITable();
-                alert("Giả lập: Đã xóa!");
-            }
-        }
-
         function confirmLogout() {
-            if(confirm("Bạn có muốn đăng xuất khỏi hệ thống?")) {
-                alert("Đã đăng xuất! Chuyển hướng...");
+            if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?")) {
+                if (!navigator.onLine) {
+                    alert("Lỗi: Không có kết nối mạng. Hệ thống không thể đóng phiên làm việc an toàn, vui lòng thử lại!");
+                    return;
+                }
+                sessionStorage.removeItem('isAdminLoggedIn');
+                window.location.href = 'admin_login.html?logout=true';
             }
         }
 
-        // Khởi chạy lần đầu và gọi API định kỳ mỗi 2 giây
-        renderPOITable();
+        // Khởi chạy lấy danh sách từ DB và bật theo dõi thống kê mỗi 2 giây
+        fetchPOIsFromDB();
         setInterval(fetchStatsFromBackend, 2000);
     </script>
 </body>

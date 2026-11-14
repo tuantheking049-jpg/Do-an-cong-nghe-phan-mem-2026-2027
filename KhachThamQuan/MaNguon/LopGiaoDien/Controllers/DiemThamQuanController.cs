@@ -19,7 +19,13 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
     {
         try
         {
-            return Ok(guideService.GetDanhSachDiaDiem(search, category, language));
+            // Lọc bỏ các địa điểm đang "Bảo trì" VÀ xếp địa điểm mới tạo xuống cuối danh sách
+            var danhSach = guideService.GetDanhSachDiaDiem(search, category, language)
+                .Where(d => !AdminDiaDiemController.IsMaintenance(d.Id))
+                .OrderBy(d => AdminDiaDiemController.GetOrderIndex(d.Id))
+                .ToList();
+
+            return Ok(danhSach);
         }
         catch (ArgumentException)
         {
@@ -33,6 +39,11 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<DiaDiemThamQuanDto> GetById(string id, [FromQuery] string language = "vi")
     {
+        if (AdminDiaDiemController.IsMaintenance(id))
+        {
+            return NotFound();
+        }
+
         try
         {
             var diaDiem = guideService.GetDiaDiem(id, language);
@@ -53,6 +64,11 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
         [FromQuery] string language,
         [FromServices] XemChiTiet xemChiTiet)
     {
+        if (AdminDiaDiemController.IsMaintenance(id))
+        {
+            return NotFound();
+        }
+
         try
         {
             var details = xemChiTiet.ThucHien(id, language);
@@ -73,6 +89,11 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
         [FromBody] TimViTriRequest request,
         [FromServices] TimViTri timViTri)
     {
+        if (AdminDiaDiemController.IsMaintenance(id))
+        {
+            return NotFound();
+        }
+
         try
         {
             var location = timViTri.ThucHien(id, request.ViDo, request.KinhDo);
@@ -97,7 +118,6 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
             Status = StatusCodes.Status400BadRequest
         });
 
-    /// <summary>Tọa độ vị trí hiện tại của khách tham quan, nếu đã cấp quyền GPS.</summary>
     public sealed record TimViTriRequest(double? ViDo, double? KinhDo);
 }
 
