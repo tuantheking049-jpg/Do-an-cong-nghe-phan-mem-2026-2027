@@ -1,0 +1,202 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="KLvn-h5OhR7aS6vUhsTo">
+    <mxGraphModel dx="766" dy="534" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="" mermaidData="{&#xa;  &quot;data&quot;: &quot;flowchart LR\n    KH[\&quot;Khách tham quan\&quot;]\n\n    P61((\&quot;6.1&lt;br/&gt;Tiếp nhận yêu cầu nghe&lt;br/&gt;và điều khiển\&quot;))\n    P62((\&quot;6.2&lt;br/&gt;Kiểm tra và lấy&lt;br/&gt;âm thanh có sẵn\&quot;))\n    P63((\&quot;6.3&lt;br/&gt;Xử lý nội dung và tạo&lt;br/&gt;âm thanh thuyết minh\&quot;))\n    P64((\&quot;6.4&lt;br/&gt;Phát và điều khiển&lt;br/&gt;âm thanh\&quot;))\n\n    D3[/\&quot;Nội dung thuyết minh\&quot;/]\n    D5[/\&quot;Âm thanh thuyết minh\&quot;/]\n\n    KH --&gt;|\&quot;Yêu cầu nghe và điều khiển phát thuyết minh\&quot;| P61\n\n    P61 --&gt;|\&quot;Thông tin lựa chọn nội dung và ngôn ngữ\&quot;| P62\n    P61 --&gt;|\&quot;Yêu cầu điều khiển phát âm thanh\&quot;| P64\n\n    D5 --&gt;|\&quot;Tệp âm thanh thuyết minh\&quot;| P62\n    P62 --&gt;|\&quot;Âm thanh có sẵn\&quot;| P64\n    P62 --&gt;|\&quot;Yêu cầu truy xuất nội dung thuyết minh\&quot;| P63\n\n    D3 --&gt;|\&quot;Nội dung thuyết minh theo ngôn ngữ đã chọn\&quot;| P63\n    P63 --&gt;|\&quot;Âm thanh được tạo\&quot;| P64\n\n    P64 --&gt;|\&quot;Âm thanh thuyết minh, trạng thái phát và thông báo lỗi\&quot;| KH&quot;,&#xa;  &quot;config&quot;: null,&#xa;  &quot;version&quot;: &quot;12&quot;&#xa;}" id="ORMmmY9ey0VpkyDU4OOA-1">
+          <mxCell connectable="0" parent="1" style="group;transparentBounds=1;editIcon=1;lockedGroup=0;groupPadding=10;labelBorderColor=none;textShadow=0;labelBackgroundColor=default;" vertex="1">
+            <mxGeometry as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Khách tham quan" mermaidId="n:KH" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="Khách tham quan" id="ORMmmY9ey0VpkyDU4OOA-2">
+          <mxCell parent="ORMmmY9ey0VpkyDU4OOA-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;labelBackgroundColor=default;" vertex="1">
+            <mxGeometry height="45" width="152" x="1968" y="447" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tiếp nhận yêu cầu nghe&lt;br&gt;và điều khiển" mermaidId="n:P61" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="6.1&#xa;Tiếp nhận yêu cầu nghe&#xa;và điều khiển" id="ORMmmY9ey0VpkyDU4OOA-3">
+          <mxCell parent="ORMmmY9ey0VpkyDU4OOA-1" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;labelBackgroundColor=default;" vertex="1">
+            <mxGeometry height="184" width="184" x="2576" y="341" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Kiểm tra và lấy&lt;br&gt;âm thanh có sẵn" mermaidId="n:P62" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="6.2&#xa;Kiểm tra và lấy&#xa;âm thanh có sẵn" id="ORMmmY9ey0VpkyDU4OOA-4">
+          <mxCell parent="ORMmmY9ey0VpkyDU4OOA-1" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;labelBackgroundColor=default;" vertex="1">
+            <mxGeometry height="184" width="184" x="3141" y="304" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Xử lý nội dung và tạo&lt;br&gt;âm thanh thuyết minh" mermaidId="n:P63" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="6.3&#xa;Xử lý nội dung và tạo&#xa;âm thanh thuyết minh" id="ORMmmY9ey0VpkyDU4OOA-5">
+          <mxCell parent="ORMmmY9ey0VpkyDU4OOA-1" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;labelBackgroundColor=default;" vertex="1">
+            <mxGeometry height="184" width="184" x="860" y="250" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Phát và điều khiển&lt;br&gt;âm thanh" mermaidId="n:P64" mermaidBaseStyle="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fillColor=#ffffff;strokeColor=#28253D;fontColor=#28253D;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;" mermaidBaseValue="6.4&#xa;Phát và điều khiển&#xa;âm thanh" id="ORMmmY9ey0VpkyDU4OOA-6">
+          <mxCell parent="ORMmmY9ey0VpkyDU4OOA-1" style="ellipse;html=1;aspect=fixed;strokeWidth=2;whiteSpace=wrap;fontFamily=Recursive;fontSize=14;shadow=1;shadowColor=#000000;shadowOffsetX=4;shadowOffsetY=4;shadowBlur=0;shadowOpacity=6;labelWidth=120;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;labelBackgroundColor=default;" vertex="1">
+            <mxGeometry height="184" width="184" x="1254" y="318" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Yêu cầu nghe và điều khiển phát thuyết minh" mermaidId="e:KH-&gt;P61#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=1;exitY=0.51;entryX=0;entryY=0.65;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Yêu cầu nghe và điều khiển phát thuyết minh" id="ORMmmY9ey0VpkyDU4OOA-7">
+          <mxCell edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" source="ORMmmY9ey0VpkyDU4OOA-2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;html=1;fontSize=14;labelBackgroundColor=default;fontFamily=Recursive;fontColor=light-dark(#000000,#FFFFFF);exitX=1;exitY=0.51;entryX=0.033;entryY=0.701;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;entryDx=0;entryDy=0;entryPerimeter=0;" target="ORMmmY9ey0VpkyDU4OOA-3">
+            <mxGeometry relative="1" x="0.0172" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Thông tin lựa chọn nội dung và ngôn ngữ" mermaidId="e:P61-&gt;P62#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=1;exitY=0.5;entryX=0;entryY=0.59;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Thông tin lựa chọn nội dung và ngôn ngữ" id="ORMmmY9ey0VpkyDU4OOA-8">
+          <mxCell edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" source="ORMmmY9ey0VpkyDU4OOA-3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;html=1;fontSize=14;labelBackgroundColor=default;fontFamily=Recursive;fontColor=light-dark(#000000,#FFFFFF);exitX=1;exitY=0.5;entryX=0.049;entryY=0.699;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;entryDx=0;entryDy=0;entryPerimeter=0;" target="ORMmmY9ey0VpkyDU4OOA-4">
+            <mxGeometry relative="1" x="0.0358" as="geometry">
+              <Array as="points">
+                <mxPoint x="3142.4" y="433" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Yêu cầu điều khiển phát âm thanh" mermaidId="e:P61-&gt;P64#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0;exitY=0.35;entryX=1;entryY=0.5;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Yêu cầu điều khiển phát âm thanh" id="ORMmmY9ey0VpkyDU4OOA-9">
+          <mxCell edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" source="ORMmmY9ey0VpkyDU4OOA-3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;html=1;fontSize=14;labelBackgroundColor=default;fontFamily=Recursive;fontColor=light-dark(#000000,#FFFFFF);exitX=0;exitY=0.35;entryX=0.992;entryY=0.478;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;entryDx=0;entryDy=0;entryPerimeter=0;" target="ORMmmY9ey0VpkyDU4OOA-6">
+            <mxGeometry relative="1" x="0.0015" as="geometry">
+              <Array as="points">
+                <mxPoint x="2579.7" y="406" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tệp âm thanh thuyết minh" mermaidId="e:D5-&gt;P62#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=1;exitY=0.5;entryX=0;entryY=0.77;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Tệp âm thanh thuyết minh" id="ORMmmY9ey0VpkyDU4OOA-10">
+          <mxCell edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;html=1;fontSize=14;labelBackgroundColor=default;fontFamily=Recursive;fontColor=light-dark(#000000,#FFFFFF);exitX=1;exitY=0.5;entryX=0;entryY=0.77;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;" target="ORMmmY9ey0VpkyDU4OOA-4">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="3101" y="594" />
+                <mxPoint x="3101" y="446" />
+              </Array>
+              <mxPoint x="2746.6250000000005" y="594" as="sourcePoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Âm thanh có sẵn" mermaidId="e:P62-&gt;P64#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0;exitY=0.41;entryX=1;entryY=0.28;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Âm thanh có sẵn" id="ORMmmY9ey0VpkyDU4OOA-11">
+          <mxCell edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" source="ORMmmY9ey0VpkyDU4OOA-4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;html=1;fontSize=14;labelBackgroundColor=default;fontFamily=Recursive;fontColor=light-dark(#000000,#FFFFFF);exitX=0;exitY=0.41;entryX=1;entryY=0.28;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;" target="ORMmmY9ey0VpkyDU4OOA-6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="3101" y="380" />
+                <mxPoint x="3101" y="320" />
+                <mxPoint x="2941" y="320" />
+                <mxPoint x="2668" y="320" />
+                <mxPoint x="2044" y="320" />
+                <mxPoint x="1672" y="320" />
+                <mxPoint x="1458" y="320" />
+                <mxPoint x="1458" y="369" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Yêu cầu truy xuất nội dung thuyết minh" mermaidId="e:P62-&gt;P63#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=0;exitY=0.23;entryX=1;entryY=0.35;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Yêu cầu truy xuất nội dung thuyết minh" id="ORMmmY9ey0VpkyDU4OOA-12">
+          <mxCell edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" source="ORMmmY9ey0VpkyDU4OOA-4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;html=1;fontSize=14;labelBackgroundColor=default;fontFamily=Recursive;fontColor=light-dark(#000000,#FFFFFF);exitX=0;exitY=0.23;entryX=1;entryY=0.35;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;" target="ORMmmY9ey0VpkyDU4OOA-5">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="3121" y="347" />
+                <mxPoint x="3121" y="288" />
+                <mxPoint x="2941" y="288" />
+                <mxPoint x="2668" y="288" />
+                <mxPoint x="2379" y="288" />
+                <mxPoint x="1672" y="288" />
+                <mxPoint x="1346" y="288" />
+                <mxPoint x="1149" y="288" />
+                <mxPoint x="1064" y="288" />
+                <mxPoint x="1064" y="315" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Nội dung thuyết minh theo ngôn ngữ đã chọn" mermaidId="e:D3-&gt;P63#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Nội dung thuyết minh theo ngôn ngữ đã chọn" id="ORMmmY9ey0VpkyDU4OOA-13">
+          <mxCell edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;html=1;fontSize=14;labelBackgroundColor=default;fontFamily=Recursive;fontColor=light-dark(#000000,#FFFFFF);exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;" target="ORMmmY9ey0VpkyDU4OOA-5">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+              <mxPoint x="455.625" y="342" as="sourcePoint" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Âm thanh được tạo" mermaidId="e:P63-&gt;P64#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=1;exitY=0.65;entryX=0;entryY=0.5;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Âm thanh được tạo" id="ORMmmY9ey0VpkyDU4OOA-14">
+          <mxCell edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" source="ORMmmY9ey0VpkyDU4OOA-5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;html=1;fontSize=14;labelBackgroundColor=default;fontFamily=Recursive;fontColor=light-dark(#000000,#FFFFFF);exitX=1;exitY=0.65;entryX=0;entryY=0.5;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;" target="ORMmmY9ey0VpkyDU4OOA-6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1064" y="369" />
+                <mxPoint x="1064" y="410" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Âm thanh thuyết minh, trạng thái phát và thông báo lỗi" mermaidId="e:P64-&gt;KH#0" mermaidBaseStyle="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;strokeColor=#000000;html=1;fontSize=16;labelBackgroundColor=#cccccc;fontFamily=Recursive;fontColor=#28253D;exitX=1;exitY=0.72;entryX=0;entryY=0.51;strokeWidth=2;targetPerimeterSpacing=4;" mermaidBaseValue="Âm thanh thuyết minh, trạng thái phát và thông báo lỗi" id="ORMmmY9ey0VpkyDU4OOA-15">
+          <mxCell edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" source="ORMmmY9ey0VpkyDU4OOA-6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=0;startArrow=none;endArrow=block;endSize=8;jumpStyle=arc;jumpSize=12;html=1;fontSize=14;labelBackgroundColor=default;fontFamily=Recursive;fontColor=light-dark(#000000,#FFFFFF);exitX=1;exitY=0.72;entryX=0;entryY=0.51;strokeWidth=2;targetPerimeterSpacing=4;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DRecursive;labelBorderColor=none;textShadow=0;" target="ORMmmY9ey0VpkyDU4OOA-2">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1458" y="451" />
+                <mxPoint x="1458" y="470" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-16" edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" source="ORMmmY9ey0VpkyDU4OOA-3" style="endArrow=none;html=1;rounded=0;defaultLabelBackgroundColor=page;exitX=0.041;exitY=0.318;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.967;entryY=0.31;entryDx=0;entryDy=0;entryPerimeter=0;" target="ORMmmY9ey0VpkyDU4OOA-3" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="2532" y="373" as="sourcePoint" />
+            <mxPoint x="2582" y="323" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-17" parent="ORMmmY9ey0VpkyDU4OOA-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="6.1" vertex="1">
+          <mxGeometry height="30" width="60" x="2638" y="361" as="geometry" />
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-18" edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" style="endArrow=none;html=1;rounded=0;defaultLabelBackgroundColor=page;exitX=0.041;exitY=0.318;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.967;entryY=0.31;entryDx=0;entryDy=0;entryPerimeter=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="3148" y="361" as="sourcePoint" />
+            <mxPoint x="3318" y="359" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-19" parent="ORMmmY9ey0VpkyDU4OOA-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="6.2" vertex="1">
+          <mxGeometry height="30" width="60" x="3203" y="319" as="geometry" />
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-20" edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" style="endArrow=none;html=1;rounded=0;defaultLabelBackgroundColor=page;exitX=0.041;exitY=0.318;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.967;entryY=0.31;entryDx=0;entryDy=0;entryPerimeter=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="867" y="309" as="sourcePoint" />
+            <mxPoint x="1037" y="307" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-21" parent="ORMmmY9ey0VpkyDU4OOA-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="6.3" vertex="1">
+          <mxGeometry height="30" width="60" x="922" y="267" as="geometry" />
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-22" edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" style="endArrow=none;html=1;rounded=0;defaultLabelBackgroundColor=page;exitX=0.041;exitY=0.318;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.967;entryY=0.31;entryDx=0;entryDy=0;entryPerimeter=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1261" y="377" as="sourcePoint" />
+            <mxPoint x="1431" y="375" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-23" parent="ORMmmY9ey0VpkyDU4OOA-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="6.4" vertex="1">
+          <mxGeometry height="30" width="60" x="1316" y="334" as="geometry" />
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-24" edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" style="endArrow=none;html=1;rounded=0;defaultLabelBackgroundColor=page;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="260" y="311" as="sourcePoint" />
+            <mxPoint x="448.89" y="311" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-25" edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" style="endArrow=none;html=1;rounded=0;defaultLabelBackgroundColor=page;entryX=0.967;entryY=0.31;entryDx=0;entryDy=0;entryPerimeter=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="262.56" y="369" as="sourcePoint" />
+            <mxPoint x="447.45" y="369" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-26" parent="ORMmmY9ey0VpkyDU4OOA-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Nội dung thuyết minh" vertex="1">
+          <mxGeometry height="30" width="138" x="275.45" y="323" as="geometry" />
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-27" edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" style="endArrow=none;html=1;rounded=0;defaultLabelBackgroundColor=page;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="2554" y="564" as="sourcePoint" />
+            <mxPoint x="2742.89" y="564" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-28" parent="ORMmmY9ey0VpkyDU4OOA-1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;span style=&quot;font-family: Recursive; font-size: 14px; background-color: rgb(255, 255, 255);&quot;&gt;Âm thanh thuyết minh&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="164.55" x="2569.45" y="576" as="geometry" />
+        </mxCell>
+        <mxCell id="ORMmmY9ey0VpkyDU4OOA-29" edge="1" parent="ORMmmY9ey0VpkyDU4OOA-1" style="endArrow=none;html=1;rounded=0;defaultLabelBackgroundColor=page;entryX=0.967;entryY=0.31;entryDx=0;entryDy=0;entryPerimeter=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="2556.56" y="622" as="sourcePoint" />
+            <mxPoint x="2741.45" y="622" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
