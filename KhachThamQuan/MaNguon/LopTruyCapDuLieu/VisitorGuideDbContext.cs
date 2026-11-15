@@ -5,62 +5,64 @@ namespace VisitorGuide.Infrastructure;
 
 public sealed class VisitorGuideDbContext(DbContextOptions<VisitorGuideDbContext> options) : DbContext(options)
 {
-    public DbSet<DiaDiemEntity> DiaDiem => Set<DiaDiemEntity>();
-    public DbSet<DiaDiemMoTaEntity> MoTaDiaDiem => Set<DiaDiemMoTaEntity>();
-    public DbSet<DiaDiemDiemNoiBatEntity> DiemNoiBat => Set<DiaDiemDiemNoiBatEntity>();
-    public DbSet<DiaDiemAnhEntity> AnhDiaDiem => Set<DiaDiemAnhEntity>();
+    public DbSet<AdminAccountEntity> AdminAccounts => Set<AdminAccountEntity>();
+    public DbSet<LanguageEntity> Languages => Set<LanguageEntity>();
+    public DbSet<PoiEntity> Pois => Set<PoiEntity>();
+    public DbSet<NarrationEntity> Narrations => Set<NarrationEntity>();
+    public DbSet<TranslationEntity> Translations => Set<TranslationEntity>();
+    public DbSet<AudioFileEntity> AudioFiles => Set<AudioFileEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<DiaDiemEntity>(entity =>
+        modelBuilder.Entity<AdminAccountEntity>(entity =>
         {
-            entity.ToTable("DiaDiemThamQuan");
-            entity.HasKey(place => place.Id);
-            entity.Property(place => place.Id).HasMaxLength(100);
-            entity.Property(place => place.Name).HasMaxLength(250).IsRequired();
-            entity.Property(place => place.Category).HasMaxLength(100).IsRequired();
-            entity.Property(place => place.Province).HasMaxLength(150).IsRequired();
-            entity.Property(place => place.ImageUrl).HasMaxLength(2048).IsRequired();
-            entity.Property(place => place.ImageSourceUrl).HasMaxLength(2048).IsRequired();
-            entity.Property(place => place.ImagePosition).HasMaxLength(100).IsRequired();
-            entity.HasMany(place => place.Descriptions)
-                .WithOne(description => description.DiaDiem)
-                .HasForeignKey(description => description.DiaDiemId)
-                .OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(place => place.Highlights)
-                .WithOne(highlight => highlight.DiaDiem)
-                .HasForeignKey(highlight => highlight.DiaDiemId)
-                .OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(place => place.GalleryPhotos)
-                .WithOne(photo => photo.DiaDiem)
-                .HasForeignKey(photo => photo.DiaDiemId)
+            entity.ToTable("Admin_Accounts");
+            entity.HasKey(item => item.AdminID);
+            entity.Property(item => item.AdminID).ValueGeneratedOnAdd();
+        });
+
+        modelBuilder.Entity<LanguageEntity>(entity =>
+        {
+            entity.ToTable("Languages");
+            entity.HasKey(item => item.LangCode);
+        });
+
+        modelBuilder.Entity<PoiEntity>(entity =>
+        {
+            entity.ToTable("POIs");
+            entity.HasKey(item => item.PoiID);
+            entity.Property(item => item.PoiID).ValueGeneratedOnAdd();
+            entity.Property(item => item.Slug).HasMaxLength(100).IsRequired();
+            entity.Property(item => item.Name).HasMaxLength(255).IsRequired();
+            entity.HasOne(item => item.Narration)
+                .WithOne(narration => narration.Poi)
+                .HasForeignKey<NarrationEntity>(narration => narration.PoiID)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        modelBuilder.Entity<DiaDiemMoTaEntity>(entity =>
+        modelBuilder.Entity<NarrationEntity>(entity =>
         {
-            entity.ToTable("MoTaDiaDiem");
-            entity.HasKey(description => new { description.DiaDiemId, description.LanguageCode });
-            entity.Property(description => description.LanguageCode).HasMaxLength(10);
-            entity.Property(description => description.Description).IsRequired();
+            entity.ToTable("Narrations");
+            entity.HasKey(item => item.NarrationID);
+            entity.Property(item => item.NarrationID).ValueGeneratedOnAdd();
+            entity.HasMany(item => item.Translations)
+                .WithOne(translation => translation.Narration)
+                .HasForeignKey(translation => translation.NarrationID)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
-        modelBuilder.Entity<DiaDiemDiemNoiBatEntity>(entity =>
+        modelBuilder.Entity<TranslationEntity>(entity =>
         {
-            entity.ToTable("DiemNoiBatDiaDiem");
-            entity.HasKey(highlight => highlight.Id);
-            entity.HasIndex(highlight => new { highlight.DiaDiemId, highlight.Position }).IsUnique();
-            entity.Property(highlight => highlight.Text).HasMaxLength(300).IsRequired();
+            entity.ToTable("Translations");
+            entity.HasKey(item => item.TranslationID);
+            entity.Property(item => item.TranslationID).ValueGeneratedOnAdd();
         });
 
-        modelBuilder.Entity<DiaDiemAnhEntity>(entity =>
+        modelBuilder.Entity<AudioFileEntity>(entity =>
         {
-            entity.ToTable("AnhBoSungDiaDiem");
-            entity.HasKey(photo => photo.Id);
-            entity.HasIndex(photo => new { photo.DiaDiemId, photo.Position }).IsUnique();
-            entity.Property(photo => photo.Url).HasMaxLength(2048).IsRequired();
-            entity.Property(photo => photo.SourceUrl).HasMaxLength(2048).IsRequired();
-            entity.Property(photo => photo.Caption).HasMaxLength(300).IsRequired();
+            entity.ToTable("Audio_Files");
+            entity.HasKey(item => item.AudioID);
+            entity.Property(item => item.AudioID).ValueGeneratedOnAdd();
         });
     }
 }

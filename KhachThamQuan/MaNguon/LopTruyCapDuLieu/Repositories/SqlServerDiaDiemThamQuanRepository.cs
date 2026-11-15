@@ -9,43 +9,64 @@ public sealed class SqlServerDiaDiemThamQuanRepository(VisitorGuideDbContext dbC
     : IDiaDiemThamQuanRepository
 {
     public IReadOnlyCollection<DiaDiemThamQuan> GetAll() =>
-        dbContext.DiaDiem
+        dbContext.Pois
             .AsNoTracking()
-            .Include(place => place.Descriptions)
-            .Include(place => place.Highlights)
-            .Include(place => place.GalleryPhotos)
+            .Include(poi => poi.Narration)
+                .ThenInclude(narration => narration!.Translations)
             .AsSplitQuery()
+            .OrderBy(poi => poi.DisplayOrder)
             .ToArray()
             .Select(ToDomain)
             .ToArray();
 
     public DiaDiemThamQuan? GetById(string id)
     {
-        var place = dbContext.DiaDiem
+        var poi = dbContext.Pois
             .AsNoTracking()
-            .Include(item => item.Descriptions)
-            .Include(item => item.Highlights)
-            .Include(item => item.GalleryPhotos)
+            .Include(item => item.Narration)
+                .ThenInclude(narration => narration!.Translations)
             .AsSplitQuery()
-            .SingleOrDefault(item => item.Id == id);
+            .SingleOrDefault(item => item.Slug == id);
 
-        return place is null ? null : ToDomain(place);
+        return poi is null ? null : ToDomain(poi);
     }
 
-    private static DiaDiemThamQuan ToDomain(DiaDiemEntity place) => new(
-        place.Id,
-        place.Name,
-        place.Category,
-        place.Province,
-        place.DurationMinutes,
-        place.Rating,
-        place.ReviewCount,
-        place.ImageUrl,
-        place.ImageSourceUrl,
-        place.ImagePosition,
-        place.Highlights.OrderBy(item => item.Position).Select(item => item.Text).ToArray(),
-        place.Descriptions.ToDictionary(item => item.LanguageCode, item => item.Description, StringComparer.OrdinalIgnoreCase),
-        place.GalleryPhotos.OrderBy(item => item.Position)
-            .Select(item => new DiaDiemPhoto(item.Url, item.SourceUrl, item.Caption))
-            .ToArray());
+    private static DiaDiemThamQuan ToDomain(PoiEntity poi)
+    {
+        var descriptions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var narration = poi.Narration;
+        if (narration is not null)
+        {
+            descriptions[narration.SourceLang] = string.IsNullOrWhiteSpace(narration.Content)
+                ? PoiJson.EmptyNarrationPlaceholder
+                : narration.Content;
+
+            foreach (var translation in narration.Translations)
+            {
+                descriptions[translation.LangCode] = translation.TranslatedContent;
+            }
+        }
+
+        if (!descriptions.ContainsKey("vi"))
+        {
+            descriptions["vi"] = PoiJson.EmptyNarrationPlaceholder;
+        }
+
+        return new DiaDiemThamQuan(
+            poi.Slug,
+            poi.Name,
+            poi.Category ?? "",
+            poi.Province ?? "",
+            poi.DurationMinutes,
+            poi.Rating,
+            poi.ReviewCount,
+            poi.ImageUrl ?? "",
+            poi.ImageSourceUrl ?? "",
+            poi.ImagePosition ?? "center center",
+            PoiJson.ReadHighlights(poi.HighlightsJson),
+            descriptions,
+            PoiJson.ReadGallery(poi.GalleryJson)
+                .Select(photo => new DiaDiemPhoto(photo.Url, photo.SourceUrl, photo.Caption))
+                .ToArray());
+    }
 }

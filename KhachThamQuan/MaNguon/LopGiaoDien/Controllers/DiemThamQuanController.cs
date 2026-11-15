@@ -1,14 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
 using VisitorGuide.Application;
 using VisitorGuide.Application.Services;
+using Microsoft.EntityFrameworkCore;
+using VisitorGuide.Infrastructure;
 
 namespace VisitorGuide.Api.Controllers;
 
 [ApiController]
 [Route("api/landmarks")]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-public sealed class DiemThamQuanController(IVisitorGuideService guideService) : ControllerBase
+public sealed class DiemThamQuanController(
+    IVisitorGuideService guideService,
+    VisitorGuideDbContext dbContext) : ControllerBase
 {
+    private bool IsMaintenance(string id)
+    {
+        var key = id?.Trim();
+        return !string.IsNullOrWhiteSpace(key)
+            && dbContext.Pois.AsNoTracking().Any(p =>
+                p.Slug == key && (p.Status == "Bảo trì" || p.Status == "Đang bảo trì"));
+    }
+
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<DiaDiemThamQuanDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -19,10 +31,19 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
     {
         try
         {
-            // Lọc bỏ các địa điểm đang "Bảo trì" VÀ xếp địa điểm mới tạo xuống cuối danh sách
+            var poiInfo = dbContext.Pois
+                .AsNoTracking()
+                .Select(p => new { p.Slug, p.Status, p.DisplayOrder })
+                .ToList();
+            var order = poiInfo.ToDictionary(p => p.Slug, p => p.DisplayOrder, StringComparer.OrdinalIgnoreCase);
+            var hidden = poiInfo
+                .Where(p => p.Status == "Bảo trì" || p.Status == "Đang bảo trì")
+                .Select(p => p.Slug)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
             var danhSach = guideService.GetDanhSachDiaDiem(search, category, language)
-                .Where(d => !AdminDiaDiemController.IsMaintenance(d.Id))
-                .OrderBy(d => AdminDiaDiemController.GetOrderIndex(d.Id))
+                .Where(d => !hidden.Contains(d.Id))
+                .OrderBy(d => order.TryGetValue(d.Id, out var position) ? position : 9999)
                 .ToList();
 
             return Ok(danhSach);
@@ -39,7 +60,7 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<DiaDiemThamQuanDto> GetById(string id, [FromQuery] string language = "vi")
     {
-        if (AdminDiaDiemController.IsMaintenance(id))
+        if (IsMaintenance(id))
         {
             return NotFound();
         }
@@ -64,7 +85,7 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
         [FromQuery] string language,
         [FromServices] XemChiTiet xemChiTiet)
     {
-        if (AdminDiaDiemController.IsMaintenance(id))
+        if (IsMaintenance(id))
         {
             return NotFound();
         }
@@ -89,7 +110,7 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
         [FromBody] TimViTriRequest request,
         [FromServices] TimViTri timViTri)
     {
-        if (AdminDiaDiemController.IsMaintenance(id))
+        if (IsMaintenance(id))
         {
             return NotFound();
         }

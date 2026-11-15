@@ -11,7 +11,7 @@ Mỗi địa điểm có nút **Xem địa điểm** để mở bộ ảnh khung
 
 Luồng chính: trình duyệt → controllers → từng ca sử dụng trong `LopNghiepVu/Services` → `Repositories/IDiaDiemThamQuanRepository.cs` → `Repositories/SqlServerDiaDiemThamQuanRepository.cs` → SQL Server. Trình duyệt vẫn thực thi phát âm thanh bằng Web Speech API; quy tắc chọn nội dung, ngôn ngữ và vị trí tạm dừng/nghe lại được xử lý tại lớp nghiệp vụ.
 
-Khi ứng dụng khởi động, `DatabaseInitializer` tạo database/schema nếu cần và nạp `SeedData/places.json` chỉ khi bảng địa điểm đang trống. Chuỗi kết nối mặc định trong `appsettings.json` dùng SQL Server Express (`.\SQLEXPRESS`) với Windows Authentication như cấu hình SSMS trong hình. Có thể thay bằng instance SQL Server khác qua biến môi trường `ConnectionStrings__VisitorGuide`; không đưa mật khẩu thật vào source control.
+Cơ sở dữ liệu là `DuLichSocTrang`, gồm 6 bảng ứng với 6 kho dữ liệu trong DFD: `Admin_Accounts`, `Languages`, `POIs`, `Narrations`, `Translations`, `Audio_Files`. Schema và dữ liệu mẫu nằm trong `Database/database_v2.sql` (chạy script này trong SSMS trước khi chạy ứng dụng); `DatabaseInitializer` chỉ kiểm tra kết nối, không tự tạo bảng. Trang người dùng đọc `POIs` + `Narrations` (ngôn ngữ gốc) + `Translations` (các ngôn ngữ còn lại); trang Admin ghi vào chính các bảng đó và đăng nhập bằng `Admin_Accounts`. Điểm nổi bật và thư viện ảnh lưu dạng JSON trong cột `POIs.HighlightsJson` và `POIs.GalleryJson`. Chuỗi kết nối mặc định trong `appsettings.json` dùng SQL Server cục bộ với Windows Authentication; có thể thay bằng instance khác qua biến môi trường `ConnectionStrings__VisitorGuide`, không đưa mật khẩu thật vào source control. `SeedData/places.json` chỉ còn dùng cho kho dữ liệu trong bộ nhớ của dự án kiểm thử.
 
 ## Chạy ứng dụng
 
@@ -26,10 +26,10 @@ dotnet run --project .\KhachThamQuan\MaNguon\LopGiaoDien\ThamQuanSocTrang.Web.cs
 Cần cài và chạy SQL Server Express hoặc SQL Server. Nếu dùng instance khác, cấu hình `ConnectionStrings:VisitorGuide`, ví dụ trong PowerShell:
 
 ```powershell
-$env:ConnectionStrings__VisitorGuide = "Server=localhost;Database=VisitorGuideSocTrang;Trusted_Connection=True;TrustServerCertificate=True"
+$env:ConnectionStrings__VisitorGuide = "Server=localhost;Database=DuLichSocTrang;Trusted_Connection=True;TrustServerCertificate=True"
 ```
 
-Lần khởi động đầu cần quyền tạo database và bảng. Cấu trúc gồm `DiaDiemThamQuan`, `MoTaDiaDiem`, `DiemNoiBatDiaDiem` và `AnhBoSungDiaDiem`; có thể xem/chỉnh sửa dữ liệu bằng SQL Server Management Studio (SSMS).
+Trước lần chạy đầu, mở `Database/database_v2.sql` trong SSMS và chạy toàn bộ để tạo database `DuLichSocTrang`. Tài khoản admin mẫu: `admin` / `123` (mật khẩu lưu dạng SHA-256 trong `Admin_Accounts.PasswordHash`).
 
 `global.json` ở gốc repository chọn .NET SDK 8 khi chạy lệnh từ VS Code hoặc terminal ở bất kỳ thư mục con nào trong repository.
 Chọn `ThamQuanSocTrang.Web` làm startup project trong IDE. `LopNghiepVu` và `LopTruyCapDuLieu` là thư viện lớp, không thể chạy trực tiếp. Mở URL được in ra trong terminal để xem giao diện; Swagger ở `/swagger`.
