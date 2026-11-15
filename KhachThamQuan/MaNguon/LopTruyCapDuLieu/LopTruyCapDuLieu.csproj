@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.22" />
     <EmbeddedResource Include="SeedData\places.json" LogicalName="VisitorGuide.Infrastructure.SeedData.places.json" />
+    <EmbeddedResource Include="..\..\..\Database\database_v2.sql" LogicalName="VisitorGuide.Infrastructure.Database.database_v2.sql" />
   </ItemGroup>
 
   <PropertyGroup>
