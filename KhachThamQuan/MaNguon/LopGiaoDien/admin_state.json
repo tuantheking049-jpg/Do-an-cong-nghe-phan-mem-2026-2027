@@ -5,12 +5,9 @@
     "chua-doi": 2,
     "khu-can-cu-tinh-uy-soc-trang": 5,
     "chua-la-han": 3,
-    "a": 16,
     "cho-noi-nga-nam": 1
   },
-  "StatusById": {
-    "a": "Ho\u1EA1t \u0111\u1ED9ng"
-  },
+  "StatusById": {},
   "NarrationTitleById": {
     "tan-hue-vien": "Thuy\u1EBFt minh T\u00E2n Hu\u00EA Vi\u00EAn",
     "chua-la-han": "Thuy\u1EBFt minh Ch\u00F9a La H\u00E1n",
@@ -18,9 +15,33 @@
   },
   "NarrationPublishStatusById": {
     "tan-hue-vien": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-    "chua-la-han": "B\u1EA3n nh\u00E1p",
-    "a": "B\u1EA3n nh\u00E1p",
+    "chua-la-han": "\u0110\u00E3 c\u00F4ng b\u1ED1",
     "cho-noi-nga-nam": "\u0110\u00E3 c\u00F4ng b\u1ED1"
   },
-  "NextOrder": 17
+  "NextOrder": 20,
+  "Languages": [
+    {
+      "Code": "vi",
+      "Name": "Ti\u1EBFng Vi\u1EC7t",
+      "VoiceLocale": "vi-VN",
+      "Status": "\u0110ang h\u1ED7 tr\u1EE3",
+      "OrderIndex": 1
+    },
+    {
+      "Code": "en",
+      "Name": "Ti\u1EBFng Anh (English)",
+      "VoiceLocale": "en-US",
+      "Status": "\u0110ang h\u1ED7 tr\u1EE3",
+      "OrderIndex": 2
+    },
+    {
+      "Code": "fr",
+      "Name": "Ti\u1EBFng Ph\u00E1p (Fran\u00E7ais)",
+      "VoiceLocale": "fr-FR",
+      "Status": "\u0110ang h\u1ED7 tr\u1EE3",
+      "OrderIndex": 3
+    }
+  ],
+  "NextLangOrder": 8,
+  "TranslationStatusByKey": {}
 }

@@ -82,6 +82,10 @@ public sealed class AdminPersistedState
     public Dictionary<string, string> NarrationTitleById { get; set; } = new();
     public Dictionary<string, string> NarrationPublishStatusById { get; set; } = new();
     public int NextOrder { get; set; } = 7;
+    // Thêm 2 dòng này để lưu danh sách ngôn ngữ UC14 khi tắt web
+    public List<AdminLanguageItem> Languages { get; set; } = new();
+    public int NextLangOrder { get; set; } = 4;
+    public Dictionary<string, string> TranslationStatusByKey { get; set; } = new();
 }
 
 [ApiController]
@@ -146,6 +150,20 @@ public class AdminDiaDiemController : ControllerBase
             _orderById["chua-phat-hoc-2"] = 4;
             _orderById["khu-can-cu-tinh-uy-soc-trang"] = 5;
             _orderById["tan-hue-vien"] = 6;
+            if (state.Languages != null && state.Languages.Count > 0)
+            {
+                foreach (var lang in state.Languages)
+                {
+                    if (!string.IsNullOrWhiteSpace(lang.Code))
+                        _languagesByCode[lang.Code.Trim().ToLowerInvariant()] = lang;
+                }
+            }
+            if (state.NextLangOrder > _nextLangOrder) _nextLangOrder = state.NextLangOrder;
+            if (state.TranslationStatusByKey != null)
+            {
+                foreach (var kv in state.TranslationStatusByKey)
+                    _translationStatusByKey[kv.Key] = kv.Value;
+            }
         }
         catch
         {
@@ -165,7 +183,10 @@ public class AdminDiaDiemController : ControllerBase
                     StatusById = new Dictionary<string, string>(_statusById, StringComparer.OrdinalIgnoreCase),
                     NarrationTitleById = new Dictionary<string, string>(_narrationTitleById, StringComparer.OrdinalIgnoreCase),
                     NarrationPublishStatusById = new Dictionary<string, string>(_narrationPublishStatusById, StringComparer.OrdinalIgnoreCase),
-                    NextOrder = _nextOrder
+                    NextOrder = _nextOrder,
+                    Languages = _languagesByCode.Values.OrderBy(x => x.OrderIndex).ToList(),
+                    NextLangOrder = _nextLangOrder,
+                    TranslationStatusByKey = new Dictionary<string, string>(_translationStatusByKey, StringComparer.OrdinalIgnoreCase)
                 };
                 var json = JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
                 System.IO.File.WriteAllText(StateFilePath, json);
@@ -200,6 +221,56 @@ public class AdminDiaDiemController : ControllerBase
         return _statusById.TryGetValue(id.Trim(), out var status) &&
                (status.Equals("Bảo trì", StringComparison.OrdinalIgnoreCase) ||
                 status.Equals("Đang bảo trì", StringComparison.OrdinalIgnoreCase));
+    }
+
+    // Kiểm tra bài thuyết minh gốc của địa điểm có đang ở trạng thái "Bản nháp" hay không
+    public static bool IsNarrationDraft(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return false;
+        return _narrationPublishStatusById.TryGetValue(id.Trim(), out var st) &&
+               st.Equals("Bản nháp", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(5) };
+
+    // Kiểm tra bản dịch cụ thể ở UC15 có đang ở trạng thái "Bản nháp" không
+    public static bool IsTranslationDraft(string diaDiemId, string langCode)
+    {
+        if (string.IsNullOrWhiteSpace(diaDiemId) || string.IsNullOrWhiteSpace(langCode)) return false;
+        if (IsNarrationDraft(diaDiemId)) return true;
+        if (langCode.Trim().Equals("vi", StringComparison.OrdinalIgnoreCase)) return false;
+
+        string key = GetTransKey(diaDiemId, langCode);
+        return _translationStatusByKey.TryGetValue(key, out var st) &&
+               st.Equals("Bản nháp", StringComparison.OrdinalIgnoreCase);
+    }
+
+    // Tự động dịch văn bản Tiếng Việt sang bất kỳ ngôn ngữ nào qua Google Translate
+    public static async Task<string> TranslateViaGoogleAsync(string textVi, string targetLang)
+    {
+        if (string.IsNullOrWhiteSpace(textVi)) return "";
+        string tl = targetLang.Trim().ToLowerInvariant();
+        if (tl == "vi") return textVi;
+        if (tl == "jp") tl = "ja"; // Chuẩn mã ISO của tiếng Nhật trên Google Translate là 'ja'
+
+        try
+        {
+            string url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl={Uri.EscapeDataString(tl)}&dt=t&q={Uri.EscapeDataString(textVi)}";
+            var json = await _httpClient.GetStringAsync(url);
+            using var doc = JsonDocument.Parse(json);
+            var sb = new System.Text.StringBuilder();
+            foreach (var segment in doc.RootElement[0].EnumerateArray())
+            {
+                if (segment[0].ValueKind == JsonValueKind.String)
+                    sb.Append(segment[0].GetString());
+            }
+            var translated = sb.ToString().Trim();
+            return string.IsNullOrWhiteSpace(translated) ? textVi : translated;
+        }
+        catch
+        {
+            return textVi;
+        }
     }
 
     // =========================================================================
@@ -261,6 +332,28 @@ public class AdminDiaDiemController : ControllerBase
         var province = string.IsNullOrWhiteSpace(request.Province) ? "Sóc Trăng" : request.Province.Trim();
         var status = string.IsNullOrWhiteSpace(request.Status) ? "Bảo Trì" : request.Status.Trim();
 
+        const string defaultValidImage = "https://images.vietnamtourism.gov.vn/vn/images/2014/AnhInternet/chonoinga5.jpg";
+
+        // 1. Tạo danh sách mô tả và tự động dịch sang mọi ngôn ngữ đang có (Đặt TRƯỚC var entity)
+        string defaultViText = $"{name} là điểm tham quan tiêu biểu thuộc phân loại {category} tại {province}, mang đậm nét đặc trưng văn hóa và du lịch địa phương.";
+        var descriptionsList = new List<DiaDiemMoTaEntity>
+        {
+            new() { DiaDiemId = id, LanguageCode = "vi", Description = defaultViText }
+        };
+
+        foreach (var lang in _languagesByCode.Values.Where(l => !l.Code.Equals("vi", StringComparison.OrdinalIgnoreCase)))
+        {
+            string translated = await TranslateViaGoogleAsync(defaultViText, lang.Code);
+            descriptionsList.Add(new DiaDiemMoTaEntity
+            {
+                DiaDiemId = id,
+                LanguageCode = lang.Code.ToLowerInvariant(),
+                Description = translated
+            });
+            _translationStatusByKey[GetTransKey(id, lang.Code)] = "Bản nháp";
+        }
+
+        // 2. Gán descriptionsList vào trong DiaDiemEntity
         var entity = new DiaDiemEntity
         {
             Id = id,
@@ -270,15 +363,10 @@ public class AdminDiaDiemController : ControllerBase
             DurationMinutes = 5,
             Rating = 0,
             ReviewCount = 0,
-            ImageUrl = "https://images.vietnamtourism.gov.vn/vn/images/2014/Chonoinga5.jpg",
+            ImageUrl = defaultValidImage,
             ImageSourceUrl = "https://soctrang.gov.vn",
             ImagePosition = "center center",
-            Descriptions = new List<DiaDiemMoTaEntity>
-            {
-                new() { DiaDiemId = id, LanguageCode = "vi", Description = EmptyNarrationPlaceholder },
-                new() { DiaDiemId = id, LanguageCode = "en", Description = $"{name} is a featured {category} attraction located in {province}." },
-                new() { DiaDiemId = id, LanguageCode = "fr", Description = $"{name} est un site remarquable ({category}) situé à {province}." }
-            },
+            Descriptions = descriptionsList,
             Highlights = new List<DiaDiemDiemNoiBatEntity>
             {
                 new() { DiaDiemId = id, Position = 1, Text = $"Điểm tham quan {category}" },
@@ -290,7 +378,7 @@ public class AdminDiaDiemController : ControllerBase
                 {
                     DiaDiemId = id,
                     Position = 1,
-                    Url = "https://images.vietnamtourism.gov.vn/vn/images/2014/Chonoinga5.jpg",
+                    Url = defaultValidImage,
                     SourceUrl = "https://soctrang.gov.vn",
                     Caption = $"Hình ảnh {name}"
                 }
@@ -466,6 +554,14 @@ public class AdminDiaDiemController : ControllerBase
 
         _narrationTitleById[place.Id] = cleanTitle;
         _narrationPublishStatusById[place.Id] = pubStatus;
+        _narrationTitleById[place.Id] = cleanTitle;
+        _narrationPublishStatusById[place.Id] = pubStatus;
+
+        // Đồng bộ trạng thái công bố từ UC13 sang toàn bộ các bản dịch của địa điểm này ở UC15
+        foreach (var lang in _languagesByCode.Values.Where(l => !l.Code.Equals("vi", StringComparison.OrdinalIgnoreCase)))
+        {
+            _translationStatusByKey[GetTransKey(place.Id, lang.Code)] = pubStatus;
+        }
 
         var viEntity = place.Descriptions.FirstOrDefault(x => x.LanguageCode.Equals("vi", StringComparison.OrdinalIgnoreCase));
         if (viEntity != null)
@@ -526,6 +622,10 @@ public class AdminDiaDiemController : ControllerBase
         viEntity.Description = EmptyNarrationPlaceholder;
         _narrationTitleById.TryRemove(id, out _);
         _narrationPublishStatusById[id] = "Bản nháp";
+        foreach (var lang in _languagesByCode.Values.Where(l => !l.Code.Equals("vi", StringComparison.OrdinalIgnoreCase)))
+        {
+            _translationStatusByKey[GetTransKey(id, lang.Code)] = "Bản nháp";
+        }
 
         await _dbContext.SaveChangesAsync();
         SaveStateToDisk();
@@ -544,16 +644,76 @@ public class AdminDiaDiemController : ControllerBase
     };
     private static int _nextLangOrder = 4;
 
+    // Kiểm tra ngôn ngữ có tồn tại và đang ở trạng thái "Đang hỗ trợ" hay không
+    public static bool IsLanguageSupported(string? code)
+    {
+        if (string.IsNullOrWhiteSpace(code)) return false;
+        return _languagesByCode.TryGetValue(code.Trim().ToLowerInvariant(), out var lang) &&
+               lang.Status.Equals("Đang hỗ trợ", StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static AdminLanguageItem? GetLanguageInfo(string? code)
+    {
+        if (string.IsNullOrWhiteSpace(code)) return null;
+        return _languagesByCode.TryGetValue(code.Trim().ToLowerInvariant(), out var lang) ? lang : null;
+    }
+
     // 1. GET: Lấy danh sách ngôn ngữ kèm số bản dịch thực tế trong bảng MoTaDiaDiem
+    // Tự động bổ sung tên bản ngữ vào trong ngoặc đơn cho mọi ngôn ngữ: VD "Tiếng Nhật" -> "Tiếng Nhật (日本語)"
+    private static string FormatLanguageNativeName(string code, string rawName)
+    {
+        if (string.IsNullOrWhiteSpace(rawName)) return rawName;
+        string cleanName = rawName.Trim();
+        string normCode = (code ?? "").Trim().ToLowerInvariant();
+
+        if (normCode == "vi" || cleanName.Contains('(')) return cleanName;
+
+        string isoCode = normCode switch
+        {
+            "jp" => "ja",
+            "kr" => "ko",
+            "cn" => "zh",
+            _ => normCode.Split('-')[0]
+        };
+
+        try
+        {
+            var culture = new System.Globalization.CultureInfo(isoCode);
+            string native = culture.NativeName.Split('(')[0].Trim();
+            if (!string.IsNullOrWhiteSpace(native) && ! native.Equals(isoCode, StringComparison.OrdinalIgnoreCase))
+            {
+                native = char.ToUpper(native[0]) + native[1..];
+                return $"{cleanName} ({native})";
+            }
+        }
+        catch { }
+
+        return cleanName;
+    }
+
     [HttpGet("languages")]
     public async Task<IActionResult> GetAllLanguages()
     {
         var usageCounts = await _dbContext.MoTaDiaDiem
             .AsNoTracking()
-            .Where(m => m.Description != "" && m.Description != EmptyNarrationPlaceholder && m.Description != EmptyTranslationPlaceholder)
+            .Where(m => m.Description != "" &&
+                        m.Description != EmptyNarrationPlaceholder &&
+                        m.Description != EmptyTranslationPlaceholder)
             .GroupBy(m => m.LanguageCode.ToLower())
             .Select(g => new { Code = g.Key, Count = g.Count() })
             .ToDictionaryAsync(x => x.Code, x => x.Count, StringComparer.OrdinalIgnoreCase);
+
+        bool updatedNames = false;
+        foreach (var lang in _languagesByCode.Values)
+        {
+            string formatted = FormatLanguageNativeName(lang.Code, lang.Name);
+            if (lang.Name != formatted)
+            {
+                lang.Name = formatted;
+                updatedNames = true;
+            }
+        }
+        if (updatedNames) SaveStateToDisk();
 
         var result = _languagesByCode.Values
             .OrderBy(l => l.OrderIndex)
@@ -571,9 +731,8 @@ public class AdminDiaDiemController : ControllerBase
         return Ok(result);
     }
 
-    // 2. POST: Thêm ngôn ngữ mới (Xếp ở dưới cùng danh sách)
     [HttpPost("languages")]
-    public IActionResult CreateLanguage([FromBody] AdminLanguageRequest request)
+    public async Task<IActionResult> CreateLanguage([FromBody] AdminLanguageRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Code) || string.IsNullOrWhiteSpace(request.Name))
         {
@@ -586,26 +745,63 @@ public class AdminDiaDiemController : ControllerBase
             return BadRequest(new { message = $"Mã ngôn ngữ '{code}' không hợp lệ! Chỉ dùng chữ cái viết thường, VD: zh, ja, ko (Luồng 5a)." });
         }
 
-        // Luồng phụ 5a: Kiểm tra trùng mã ngôn ngữ
         if (_languagesByCode.ContainsKey(code))
         {
             return Conflict(new { message = $"Mã ngôn ngữ '{code}' đã tồn tại trong hệ thống! Vui lòng điều chỉnh (Luồng 5a)." });
         }
 
+        string defaultLocale = code switch
+        {
+            "ja" or "jp" => "ja-JP",
+            "ko" or "kr" => "ko-KR",
+            "zh" or "cn" => "zh-CN",
+            _ => $"{code}-{code.ToUpperInvariant()}"
+        };
+
         var item = new AdminLanguageItem
         {
             Code = code,
-            Name = request.Name.Trim(),
-            VoiceLocale = string.IsNullOrWhiteSpace(request.VoiceLocale) ? $"{code}-{code.ToUpperInvariant()}" : request.VoiceLocale.Trim(),
+            Name = FormatLanguageNativeName(code, request.Name),
+            VoiceLocale = string.IsNullOrWhiteSpace(request.VoiceLocale) ? defaultLocale : request.VoiceLocale.Trim(),
             Status = (!string.IsNullOrWhiteSpace(request.Status) && request.Status.Trim() == "Tạm ngưng") ? "Tạm ngưng" : "Đang hỗ trợ",
             OrderIndex = _nextLangOrder++
         };
 
         _languagesByCode[code] = item;
-        return Ok(new { message = $"Đã thêm ngôn ngữ \"{item.Name}\" ({item.Code}) thành công!" });
+
+        var places = await _dbContext.DiaDiem.Include(p => p.Descriptions).ToListAsync();
+        foreach (var place in places)
+        {
+            var viText = place.Descriptions.FirstOrDefault(d => d.LanguageCode.Equals("vi", StringComparison.OrdinalIgnoreCase))?.Description
+                         ?? $"{place.Name} là điểm tham quan tiêu biểu thuộc phân loại {place.Category} tại {place.Province}.";
+            string translated = await TranslateViaGoogleAsync(viText, code);
+
+            var existingRow = place.Descriptions.FirstOrDefault(d => d.LanguageCode.Equals(code, StringComparison.OrdinalIgnoreCase));
+            if (existingRow != null)
+            {
+                existingRow.Description = translated;
+            }
+            else
+            {
+                _dbContext.MoTaDiaDiem.Add(new DiaDiemMoTaEntity
+                {
+                    DiaDiemId = place.Id,
+                    LanguageCode = code,
+                    Description = translated
+                });
+            }
+
+            string key = GetTransKey(place.Id, code);
+            _translationStatusByKey[key] = IsNarrationDraft(place.Id) ? "Bản nháp" : "Đã công bố";
+            GetTranslationOrder(place.Id, code);
+        }
+
+        await _dbContext.SaveChangesAsync();
+        SaveStateToDisk();
+
+        return Ok(new { message = $"Đã thêm ngôn ngữ \"{item.Name}\" ({item.Code}) và tự động dịch nội dung thuyết minh!" });
     }
 
-    // 3. PUT: Cập nhật ngôn ngữ
     [HttpPut("languages/{code}")]
     public IActionResult UpdateLanguage(string code, [FromBody] AdminLanguageRequest request)
     {
@@ -620,7 +816,7 @@ public class AdminDiaDiemController : ControllerBase
             return BadRequest(new { message = "Tên ngôn ngữ không được để trống (Luồng 5a)!" });
         }
 
-        existing.Name = request.Name.Trim();
+        existing.Name = FormatLanguageNativeName(key, request.Name);
         if (!string.IsNullOrWhiteSpace(request.VoiceLocale))
         {
             existing.VoiceLocale = request.VoiceLocale.Trim();
@@ -629,10 +825,10 @@ public class AdminDiaDiemController : ControllerBase
             ? "Tạm ngưng"
             : "Đang hỗ trợ";
 
+        SaveStateToDisk();
         return Ok(new { message = $"Đã cập nhật cấu hình ngôn ngữ \"{existing.Name}\" thành công!" });
     }
 
-    // 4. DELETE: Xóa ngôn ngữ (Kiểm tra ràng buộc Luồng phụ 6a trong Database)
     [HttpDelete("languages/{code}")]
     public async Task<IActionResult> DeleteLanguage(string code)
     {
@@ -647,20 +843,31 @@ public class AdminDiaDiemController : ControllerBase
             return BadRequest(new { message = "Không thể xóa Tiếng Việt (vi) vì đây là ngôn ngữ thuyết minh gốc mặc định của hệ thống (Luồng 6a)!" });
         }
 
-        // Luồng phụ 6a: Kiểm tra xem ngôn ngữ có đang được bài thuyết minh/bản dịch sử dụng trong SQL Server không
         int usedCount = await _dbContext.MoTaDiaDiem
-            .CountAsync(m => m.LanguageCode.ToLower() == key && m.Description != "" && m.Description != EmptyNarrationPlaceholder && m.Description != EmptyTranslationPlaceholder);
+            .CountAsync(m => m.LanguageCode.ToLower() == key &&
+                             m.Description != "" &&
+                             m.Description != EmptyNarrationPlaceholder &&
+                             m.Description != EmptyTranslationPlaceholder);
 
         if (usedCount > 0)
         {
             return BadRequest(new
             {
-                message = $"Từ chối xóa (Luồng 6a): Ngôn ngữ \"{existing.Name}\" ({key}) đang được {usedCount} bài thuyết minh/bản dịch sử dụng trong Database! Bạn chỉ có thể chuyển trạng thái sang 'Tạm ngưng'."
+                message = $"Từ chối xóa (Luồng 6a): Ngôn ngữ \"{existing.Name}\" ({key}) đang được {usedCount} bản dịch sử dụng! Hãy xóa các bản dịch của ngôn ngữ này ở mục Quản lý bản dịch trước hoặc chuyển trạng thái sang 'Tạm ngưng'."
             });
         }
 
+        var dummyRows = await _dbContext.MoTaDiaDiem.Where(m => m.LanguageCode.ToLower() == key).ToListAsync();
+        if (dummyRows.Count > 0)
+        {
+            _dbContext.MoTaDiaDiem.RemoveRange(dummyRows);
+            await _dbContext.SaveChangesAsync();
+        }
+
         _languagesByCode.TryRemove(key, out _);
-        return Ok(new { message = $"Đã xóa ngôn ngữ \"{existing.Name}\" ({key}) khỏi hệ thống!" });
+        SaveStateToDisk();
+
+        return Ok(new { message = $"Đã xóa hoàn toàn ngôn ngữ \"{existing.Name}\" ({key}) khỏi hệ thống!" });
     }
 
     // =========================================================================
@@ -736,7 +943,8 @@ public class AdminDiaDiemController : ControllerBase
                     : langCode.ToUpperInvariant();
 
                 string key = GetTransKey(p.Id, langCode);
-                string status = _translationStatusByKey.TryGetValue(key, out var st) ? st : "Đã công bố";
+                string defaultStatus = IsNarrationDraft(p.Id) ? "Bản nháp" : "Đã công bố";
+                string status = _translationStatusByKey.TryGetValue(key, out var st) ? st : defaultStatus;
                 int orderIdx = GetTranslationOrder(p.Id, langCode);
 
                 items.Add(new
@@ -847,6 +1055,7 @@ public class AdminDiaDiemController : ControllerBase
         }
 
         await _dbContext.SaveChangesAsync();
+        SaveStateToDisk();
 
         return Ok(new
         {
@@ -869,21 +1078,16 @@ public class AdminDiaDiemController : ControllerBase
             return NotFound(new { message = "Không tìm thấy bản dịch cần xóa!" });
         }
 
-        // Với en và fr: Đặt chuỗi giữ chỗ để trang User không bị lỗi thiếu khóa, các ngôn ngữ khác thì xóa hẳn dòng
-        if (code == "en" || code == "fr")
-        {
-            transEntity.Description = EmptyTranslationPlaceholder;
-        }
-        else
-        {
-            _dbContext.MoTaDiaDiem.Remove(transEntity);
-        }
+        // Đặt chuỗi đánh dấu đã xóa để hệ thống không tự động tạo lại khi load trang
+        transEntity.Description = EmptyTranslationPlaceholder;
 
         string key = GetTransKey(placeId, code);
         _translationStatusByKey.TryRemove(key, out _);
         _translationOrderByKey.TryRemove(key, out _);
+        _voicesByKey.TryRemove(key, out _);
 
         await _dbContext.SaveChangesAsync();
+        SaveStateToDisk();
 
         return Ok(new { message = $"Đã xóa bản dịch ({code}) của địa điểm \"{placeId}\" thành công!" });
     }
@@ -1135,28 +1339,42 @@ public class AdminDiaDiemController : ControllerBase
 
         foreach (var place in places)
         {
-            var existingLangs = place.Descriptions.Select(d => d.LanguageCode.ToLowerInvariant()).ToHashSet();
+            // 1. Khôi phục nội dung gốc chuẩn cho Chùa La Hán nếu đang bị dính dòng chữ chờ công bố
+            var viRow = place.Descriptions.FirstOrDefault(d => d.LanguageCode.Equals("vi", StringComparison.OrdinalIgnoreCase));
+            if (viRow != null && (viRow.Description.Contains("đang chờ công bố") || viRow.Description == EmptyNarrationPlaceholder))
+            {
+                viRow.Description = place.Id.Equals("chua-la-han", StringComparison.OrdinalIgnoreCase)
+                    ? "Chùa La Hán là ngôi chùa gắn với cộng đồng người Hoa ở Sóc Trăng. Ghé thăm để khám phá những chi tiết kiến trúc nhiều màu sắc, không gian thờ tự trang nghiêm và cảnh quan thanh tịnh."
+                    : $"{place.Name} là điểm tham quan tiêu biểu thuộc nhóm {place.Category} tại {place.Province}.";
+                _narrationPublishStatusById[place.Id] = "Đã công bố";
+                hasChanges = true;
+            }
 
-            // Tự động tạo nội dung mẫu cho mọi ngôn ngữ đã khai báo trong UC14
+            var viBaseText = place.Descriptions.FirstOrDefault(d => d.LanguageCode.Equals("vi", StringComparison.OrdinalIgnoreCase))?.Description
+                             ?? $"{place.Name} là điểm tham quan tiêu biểu thuộc nhóm {place.Category} tại {place.Province}.";
+
+            // 2. Tự động dịch nội dung sang các ngôn ngữ đã khai báo trong UC14 (bỏ qua nếu đã xóa)
             foreach (var lang in _languagesByCode.Values.OrderBy(l => l.OrderIndex))
             {
                 string code = lang.Code.ToLowerInvariant();
-                if (!existingLangs.Contains(code))
-                {
-                    string sampleText = code switch
-                    {
-                        "vi" => EmptyNarrationPlaceholder,
-                        "en" => $"{place.Name} is a featured {place.Category} attraction located in {place.Province}.",
-                        "fr" => $"{place.Name} est un site remarquable ({place.Category}) situé à {place.Province}.",
-                        _ => $"[{lang.Name}] {place.Name} - {place.Category} ({place.Province})."
-                    };
+                var existingDesc = place.Descriptions.FirstOrDefault(d => d.LanguageCode.Equals(code, StringComparison.OrdinalIgnoreCase));
 
+                if (existingDesc == null)
+                {
+                    string translated = code == "vi" ? viBaseText : await TranslateViaGoogleAsync(viBaseText, code);
                     _dbContext.MoTaDiaDiem.Add(new DiaDiemMoTaEntity
                     {
                         DiaDiemId = place.Id,
                         LanguageCode = code,
-                        Description = sampleText
+                        Description = translated
                     });
+                    hasChanges = true;
+                }
+                else if (code != "vi" &&
+                         existingDesc.Description != EmptyTranslationPlaceholder &&
+                         (existingDesc.Description.StartsWith("[") || existingDesc.Description.Contains("is a featured Văn hóa")))
+                {
+                    existingDesc.Description = await TranslateViaGoogleAsync(viBaseText, code);
                     hasChanges = true;
                 }
             }
@@ -1179,7 +1397,7 @@ public class AdminDiaDiemController : ControllerBase
                     DiaDiemId = place.Id,
                     Position = 1,
                     Url = string.IsNullOrWhiteSpace(place.ImageUrl) || place.ImageUrl.Contains("placehold.co")
-                        ? "https://images.vietnamtourism.gov.vn/vn/images/2014/Chonoinga5.jpg"
+                        ? "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng_01.jpg/1280px-Ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng_01.jpg"
                         : place.ImageUrl,
                     SourceUrl = "https://soctrang.gov.vn",
                     Caption = $"Hình ảnh {place.Name}"

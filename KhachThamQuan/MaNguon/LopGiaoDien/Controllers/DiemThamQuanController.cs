@@ -7,8 +7,24 @@ namespace VisitorGuide.Api.Controllers;
 [ApiController]
 [Route("api/landmarks")]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-public sealed class DiemThamQuanController(IVisitorGuideService guideService) : ControllerBase
+public sealed class DiemThamQuanController(
+    IVisitorGuideService guideService,
+    VisitorGuide.Infrastructure.VisitorGuideDbContext dbContext) : ControllerBase
 {
+    private static bool IsBuiltInLang(string lang) =>
+        lang.Equals("vi", StringComparison.OrdinalIgnoreCase) ||
+        lang.Equals("en", StringComparison.OrdinalIgnoreCase) ||
+        lang.Equals("fr", StringComparison.OrdinalIgnoreCase);
+
+    private string GetCustomLangText(string diaDiemId, string lang, string fallbackText)
+    {
+        var row = dbContext.MoTaDiaDiem
+            .FirstOrDefault(m => m.DiaDiemId == diaDiemId && m.LanguageCode.ToLower() == lang.ToLower());
+        return (row != null && !string.IsNullOrWhiteSpace(row.Description) && row.Description != "(Chưa có bản dịch)")
+            ? row.Description
+            : fallbackText;
+    }
+
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<DiaDiemThamQuanDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -17,12 +33,27 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
         [FromQuery] string? category,
         [FromQuery] string language = "vi")
     {
+        if (!AdminDiaDiemController.IsLanguageSupported(language))
+        {
+            return UnsupportedLanguage();
+        }
+
         try
         {
-            // Lọc bỏ các địa điểm đang "Bảo trì" VÀ xếp địa điểm mới tạo xuống cuối danh sách
-            var danhSach = guideService.GetDanhSachDiaDiem(search, category, language)
+            string baseLang = IsBuiltInLang(language) ? language : "vi";
+            var danhSach = guideService.GetDanhSachDiaDiem(search, category, baseLang)
                 .Where(d => !AdminDiaDiemController.IsMaintenance(d.Id))
                 .OrderBy(d => AdminDiaDiemController.GetOrderIndex(d.Id))
+                .Select(d =>
+                {
+                    if (AdminDiaDiemController.IsTranslationDraft(d.Id, language))
+                        return d with { Description = "(Nội dung thuyết minh đang chờ công bố)" };
+
+                    if (!IsBuiltInLang(language))
+                        return d with { Description = GetCustomLangText(d.Id, language, d.Description) };
+
+                    return d;
+                })
                 .ToList();
 
             return Ok(danhSach);
@@ -39,15 +70,25 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<DiaDiemThamQuanDto> GetById(string id, [FromQuery] string language = "vi")
     {
-        if (AdminDiaDiemController.IsMaintenance(id))
-        {
-            return NotFound();
-        }
+        if (AdminDiaDiemController.IsMaintenance(id)) return NotFound();
+        if (!AdminDiaDiemController.IsLanguageSupported(language)) return UnsupportedLanguage();
 
         try
         {
-            var diaDiem = guideService.GetDiaDiem(id, language);
-            return diaDiem is null ? NotFound() : Ok(diaDiem);
+            string baseLang = IsBuiltInLang(language) ? language : "vi";
+            var diaDiem = guideService.GetDiaDiem(id, baseLang);
+            if (diaDiem is null) return NotFound();
+
+            if (AdminDiaDiemController.IsTranslationDraft(id, language))
+            {
+                diaDiem = diaDiem with { Description = "(Nội dung thuyết minh đang chờ công bố)" };
+            }
+            else if (!IsBuiltInLang(language))
+            {
+                diaDiem = diaDiem with { Description = GetCustomLangText(id, language, diaDiem.Description) };
+            }
+
+            return Ok(diaDiem);
         }
         catch (ArgumentException)
         {
@@ -64,15 +105,25 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
         [FromQuery] string language,
         [FromServices] XemChiTiet xemChiTiet)
     {
-        if (AdminDiaDiemController.IsMaintenance(id))
-        {
-            return NotFound();
-        }
+        if (AdminDiaDiemController.IsMaintenance(id)) return NotFound();
+        if (!AdminDiaDiemController.IsLanguageSupported(language)) return UnsupportedLanguage();
 
         try
         {
-            var details = xemChiTiet.ThucHien(id, language);
-            return details is null ? NotFound() : Ok(details);
+            string baseLang = IsBuiltInLang(language) ? language : "vi";
+            var details = xemChiTiet.ThucHien(id, baseLang);
+            if (details is null) return NotFound();
+
+            if (AdminDiaDiemController.IsTranslationDraft(id, language))
+            {
+                details = details with { NoiDung = "(Nội dung thuyết minh đang chờ công bố)" };
+            }
+            else if (!IsBuiltInLang(language))
+            {
+                details = details with { NoiDung = GetCustomLangText(id, language, details.NoiDung) };
+            }
+
+            return Ok(details);
         }
         catch (ArgumentException)
         {
@@ -89,10 +140,7 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
         [FromBody] TimViTriRequest request,
         [FromServices] TimViTri timViTri)
     {
-        if (AdminDiaDiemController.IsMaintenance(id))
-        {
-            return NotFound();
-        }
+        if (AdminDiaDiemController.IsMaintenance(id)) return NotFound();
 
         try
         {
@@ -113,8 +161,8 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
     private ActionResult UnsupportedLanguage() =>
         BadRequest(new ProblemDetails
         {
-            Title = "Ngôn ngữ không được hỗ trợ.",
-            Detail = "Chọn một trong các ngôn ngữ: vi, en, fr.",
+            Title = "Ngôn ngữ không được hỗ trợ hoặc đang tạm ngưng.",
+            Detail = "Vui lòng chọn một ngôn ngữ đang hoạt động.",
             Status = StatusCodes.Status400BadRequest
         });
 
@@ -127,21 +175,34 @@ public sealed class DiemThamQuanController(IVisitorGuideService guideService) : 
 public sealed class NgonNguController(ChonNgonNgu chonNgonNgu) : ControllerBase
 {
     [HttpGet("{language}")]
-    [ProducesResponseType<NgonNguThuyetMinh>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult<NgonNguThuyetMinh> Select(string language)
+    public IActionResult Select(string language)
     {
+        if (!AdminDiaDiemController.IsLanguageSupported(language))
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Ngôn ngữ không được hỗ trợ hoặc đang tạm ngưng.",
+                Detail = "Ngôn ngữ này hiện không khả dụng.",
+                Status = StatusCodes.Status400BadRequest
+            });
+        }
+
         try
         {
             return Ok(chonNgonNgu.ThucHien(language));
         }
         catch (ArgumentException)
         {
-            return BadRequest(new ProblemDetails
+            var info = AdminDiaDiemController.GetLanguageInfo(language);
+            if (info == null) return BadRequest();
+
+            return Ok(new
             {
-                Title = "Ngôn ngữ không được hỗ trợ.",
-                Detail = "Chọn một trong các ngôn ngữ: vi, en, fr.",
-                Status = StatusCodes.Status400BadRequest
+                code = info.Code,
+                language = info.Code,
+                name = info.Name,
+                displayName = info.Name,
+                voiceLocale = info.VoiceLocale
             });
         }
     }
