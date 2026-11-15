@@ -188,17 +188,17 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Cấu hình ngôn ngữ">
+                    <a href="#" class="sidebar-link" data-target="languages" data-title="Cấu hình ngôn ngữ">
                         <i class="bi bi-globe2"></i> Cấu hình ngôn ngữ
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Quản lý bản dịch">
+                    <a href="#" class="sidebar-link" data-target="translations" data-title="Quản lý bản dịch">
                         <i class="bi bi-translate"></i> Quản lý bản dịch
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="sidebar-link" data-target="placeholder" data-title="Quản lý giọng đọc">
+                    <a href="#" class="sidebar-link" data-target="voices" data-title="Quản lý giọng đọc">
                         <i class="bi bi-megaphone"></i> Quản lý giọng đọc
                     </a>
                 </li>
@@ -360,6 +360,138 @@
                     </div>
                 </div>
 
+                <!-- ========================================================= -->
+                <!-- SECTION 3 (UC14): Cấu hình ngôn ngữ hỗ trợ                -->
+                <!-- ========================================================= -->
+                <div id="languages-section" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <p class="text-muted mb-0">Khai báo và cập nhật danh sách các ngôn ngữ thuyết minh mà hệ thống hỗ trợ.</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary shadow-sm" onclick="openAddLanguageModal()">
+                                <i class="bi bi-plus-lg me-1"></i> Thêm ngôn ngữ
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" class="ps-4" style="width: 75px;">STT</th>
+                                            <th scope="col" style="width: 140px;">Mã ngôn ngữ</th>
+                                            <th scope="col">Tên ngôn ngữ</th>
+                                            <th scope="col" style="width: 170px;">Mã giọng đọc (TTS)</th>
+                                            <th scope="col" class="text-center" style="width: 170px;">Dữ liệu ràng buộc</th>
+                                            <th scope="col" style="width: 150px;">Trạng thái</th>
+                                            <th scope="col" class="text-center" style="width: 210px;">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="language-table-body">
+                                        <!-- Đổ dữ liệu ngôn ngữ từ API -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- SECTION 4 (UC15): Quản lý bản dịch (Biên dịch nội dung)   -->
+                <!-- ========================================================= -->
+                <div id="translations-section" class="content-section d-none">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                        <div>
+                            <p class="text-muted mb-0">Tạo, xem, chỉnh sửa và xóa bản dịch thuyết minh theo các ngôn ngữ đích hỗ trợ.</p>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <select class="form-select form-select-sm" id="filterTranslationLang" style="width: 190px;" onchange="renderTranslationTable()">
+                                <option value="">-- Tất cả ngôn ngữ --</option>
+                            </select>
+                            <button class="btn btn-primary shadow-sm text-nowrap" onclick="openCreateTranslationModal()">
+                                <i class="bi bi-plus-lg me-1"></i> Tạo bản dịch
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" class="ps-4" style="width: 65px;">STT</th>
+                                            <th scope="col" style="width: 200px;">Bài thuyết minh gốc</th>
+                                            <th scope="col" style="width: 180px;">Ngôn ngữ đích</th>
+                                            <th scope="col">Nội dung bản dịch</th>
+                                            <th scope="col" style="width: 130px;">Trạng thái</th>
+                                            <th scope="col" class="text-center" style="width: 200px;">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="translation-table-body">
+                                        <!-- Đổ danh sách bản dịch từ API -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- SECTION 5 (UC16): Quản lý giọng đọc thuyết minh           -->
+                <!-- ========================================================= -->
+                <div id="voices-section" class="content-section d-none">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                        <div>
+                            <p class="text-muted mb-0">Tạo, nghe thử, cập nhật và xóa âm thanh thuyết minh bằng công nghệ TTS hoặc tải tệp âm thanh lên hệ thống.</p>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <button class="btn btn-danger btn-sm d-none shadow-sm" id="btnStopGlobalAudio" onclick="stopAllVoicePlayback()">
+                                <i class="bi bi-stop-circle-fill me-1"></i> Dừng phát âm thanh
+                            </button>
+                            <select class="form-select form-select-sm" id="filterVoiceLang" style="width: 195px;" onchange="handleVoiceFilterChange()">
+                                <option value="">-- Tất cả ngôn ngữ --</option>
+                            </select>
+                            <button class="btn btn-primary shadow-sm text-nowrap" onclick="openCreateVoiceModal()">
+                                <i class="bi bi-plus-lg me-1"></i> Tạo giọng đọc / Âm thanh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" class="ps-4" style="width: 65px;">STT</th>
+                                            <th scope="col" style="width: 200px;">Bài thuyết minh</th>
+                                            <th scope="col" style="width: 165px;">Ngôn ngữ</th>
+                                            <th scope="col" style="width: 145px;">Phương thức</th>
+                                            <th scope="col">Giọng đọc & Thông số cấu hình</th>
+                                            <th scope="col" style="width: 130px;">Trạng thái</th>
+                                            <th scope="col" class="text-center" style="width: 220px;">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="voice-table-body">
+                                        <!-- Đổ danh sách âm thanh từ API -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Thanh phân trang cho UC16 -->
+                        <div class="card-footer bg-white d-flex flex-wrap justify-content-between align-items-center py-2 px-4 border-top">
+                            <small class="text-muted" id="voice-pagination-info">Hiển thị 0 mục</small>
+                            <nav aria-label="Voice table pagination">
+                                <ul class="pagination pagination-sm mb-0" id="voice-pagination-controls"></ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- SECTION: Placeholder (Cho các menu UC14, UC15, UC16 tiếp theo) -->
                 <div id="placeholder-section" class="content-section d-none h-100 d-flex flex-column align-items-center justify-content-center text-muted" style="min-height: 60vh;">
                     <i class="bi bi-tools" style="font-size: 4rem; opacity: 0.3;"></i>
@@ -423,6 +555,48 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
                     <button type="button" class="btn btn-primary" onclick="savePOI()">Lưu thông tin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL UC12: Xem chi tiết Địa điểm -->
+    <div class="modal fade" id="viewPoiModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold">Chi tiết địa điểm tham quan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Tên địa điểm:</span>
+                            <strong class="text-dark" id="viewPoiName"></strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Mã định danh (ID):</span>
+                            <code class="fw-bold" id="viewPoiId"></code>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Phân loại:</span>
+                            <span class="badge bg-light text-dark border" id="viewPoiCategory"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Tỉnh / Thành phố:</span>
+                            <span class="fw-medium" id="viewPoiProvince"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Số lượt nghe thuyết minh:</span>
+                            <span class="badge bg-primary bg-opacity-10 text-primary" id="viewPoiPlays"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Trạng thái hiển thị:</span>
+                            <span id="viewPoiStatus"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>
@@ -529,6 +703,341 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ========================================================= -->
+    <!-- MODAL UC14: Thêm / Cập nhật Ngôn ngữ hỗ trợ               -->
+    <!-- ========================================================= -->
+    <div class="modal fade" id="languageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="languageModalLabel">Thêm ngôn ngữ mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="languageErrorAlert" class="alert alert-danger d-none py-2 small" role="alert"></div>
+                    <form id="languageForm">
+                        <input type="hidden" id="isLanguageEditMode" value="false">
+
+                        <div class="mb-3">
+                            <label for="langCode" class="form-label fw-medium">Mã ngôn ngữ (ISO Code) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="langCode" placeholder="VD: zh, ja, ko, km..." required>
+                            <small class="text-muted">Ký hiệu 2-5 chữ cái viết thường (Không thể sửa sau khi tạo).</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="langName" class="form-label fw-medium">Tên ngôn ngữ hiển thị <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="langName" placeholder="VD: Tiếng Nhật (日本語)..." required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="langVoiceLocale" class="form-label fw-medium">Mã giọng đọc chuẩn (Locale)</label>
+                            <input type="text" class="form-control" id="langVoiceLocale" placeholder="VD: ja-JP, zh-CN, ko-KR...">
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="langStatus" class="form-label fw-medium">Trạng thái hỗ trợ</label>
+                            <select class="form-select" id="langStatus">
+                                <option value="Đang hỗ trợ">Đang hỗ trợ</option>
+                                <option value="Tạm ngưng">Tạm ngưng</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="button" class="btn btn-primary" onclick="saveLanguage()">Lưu ngôn ngữ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UC14: Xem chi tiết Ngôn ngữ -->
+    <div class="modal fade" id="viewLanguageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold">Chi tiết cấu hình ngôn ngữ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Tên ngôn ngữ:</span>
+                            <strong id="viewLangName"></strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Mã ngôn ngữ (Code):</span>
+                            <code class="fw-bold fs-6" id="viewLangCode"></code>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Mã giọng đọc (TTS Locale):</span>
+                            <span class="badge bg-light text-dark border" id="viewLangVoice"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Số bài thuyết minh/bản dịch đang dùng:</span>
+                            <span class="badge bg-primary" id="viewLangUsed"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Trạng thái hỗ trợ:</span>
+                            <span id="viewLangStatus"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL UC15: Tạo mới / Chỉnh sửa Bản dịch thuyết minh      -->
+    <!-- ========================================================= -->
+    <div class="modal fade" id="translationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="translationModalLabel">Tạo bản dịch thuyết minh</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="translationErrorAlert" class="alert alert-danger d-none py-2 small" role="alert"></div>
+                    <form id="translationForm">
+                        <input type="hidden" id="isTranslationEditMode" value="false">
+
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label for="transPlaceSelect" class="form-label fw-medium">Bài thuyết minh gốc (Địa điểm) <span class="text-danger">*</span></label>
+                                <select class="form-select" id="transPlaceSelect" onchange="handleTranslationSelectionChange()" required></select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="transLangSelect" class="form-label fw-medium">Ngôn ngữ đích <span class="text-danger">*</span></label>
+                                <select class="form-select" id="transLangSelect" onchange="handleTranslationSelectionChange()" required></select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="transStatusSelect" class="form-label fw-medium">Trạng thái</label>
+                                <select class="form-select" id="transStatusSelect">
+                                    <option value="Đã công bố">Đã công bố</option>
+                                    <option value="Bản nháp">Bản nháp</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Bước 5 trong Docs: Hiển thị nội dung gốc để đối chiếu -->
+                        <div class="mb-3">
+                            <label class="form-label fw-medium text-secondary">
+                                <i class="bi bi-file-earmark-text me-1"></i>Nội dung bài thuyết minh gốc (Tiếng Việt - Dùng để đối chiếu):
+                            </label>
+                            <textarea class="form-control readonly-gray" id="transOriginalVi" rows="3" readonly></textarea>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <label for="transContentInput" class="form-label fw-medium">Nội dung bản dịch <span class="text-danger">*</span></label>
+                                <small class="text-muted" id="transCharCount">0 ký tự</small>
+                            </div>
+                            <textarea class="form-control" id="transContentInput" rows="5" placeholder="Nhập nội dung bản dịch tương ứng với ngôn ngữ đích đã chọn..." oninput="updateTransCharCount()" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTranslation()">
+                        <i class="bi bi-check2-circle me-1"></i> Lưu bản dịch
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UC15: Xem chi tiết đối chiếu Bản dịch -->
+    <div class="modal fade" id="viewTranslationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold">Chi tiết đối chiếu bản dịch</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-1 text-dark" id="viewTransPlaceName"></h5>
+                            <span class="badge bg-primary me-1" id="viewTransLangBadge"></span>
+                            <span id="viewTransStatusBadge"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="fw-bold text-secondary small text-uppercase">1. Nội dung gốc (Tiếng Việt):</h6>
+                        <div class="p-3 bg-light rounded border text-secondary" id="viewTransOriginalVi" style="white-space: pre-wrap;"></div>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-primary small text-uppercase">2. Nội dung bản dịch:</h6>
+                        <div class="p-3 bg-white rounded border border-primary border-opacity-25 text-dark fw-normal" id="viewTransContent" style="white-space: pre-wrap; line-height: 1.6;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL UC16: Tạo mới / Cập nhật Giọng đọc thuyết minh      -->
+    <!-- ========================================================= -->
+    <div class="modal fade" id="voiceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="voiceModalLabel">Tạo giọng đọc thuyết minh</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="stopAllVoicePlayback()"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="voiceErrorAlert" class="alert alert-danger d-none py-2 small" role="alert"></div>
+                    <form id="voiceForm">
+                        <input type="hidden" id="isVoiceEditMode" value="false">
+
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label for="voicePlaceSelect" class="form-label fw-medium">Bài thuyết minh (Địa điểm) <span class="text-danger">*</span></label>
+                                <select class="form-select" id="voicePlaceSelect" onchange="handleVoiceSelectionChange()" required></select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="voiceLangSelect" class="form-label fw-medium">Ngôn ngữ <span class="text-danger">*</span></label>
+                                <select class="form-select" id="voiceLangSelect" onchange="handleVoiceSelectionChange()" required></select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="voiceStatusSelect" class="form-label fw-medium">Trạng thái</label>
+                                <select class="form-select" id="voiceStatusSelect">
+                                    <option value="Đã công bố">Đã công bố</option>
+                                    <option value="Bản nháp">Bản nháp</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-medium text-secondary">Văn bản thuyết minh sẽ chuyển thành giọng nói:</label>
+                            <textarea class="form-control readonly-gray" id="voiceTextPreview" rows="3" readonly></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label for="voiceSourceType" class="form-label fw-medium">Phương thức tạo âm thanh</label>
+                                <select class="form-select" id="voiceSourceType" onchange="toggleVoiceSourceFields()">
+                                    <option value="TTS">Chuyển văn bản tự động (TTS)</option>
+                                    <option value="Upload">Tải lên / Liên kết tệp (.mp3, .wav)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-7 mb-3" id="ttsVoiceNameGroup">
+                                <label for="voiceNameSelect" class="form-label fw-medium">Giọng đọc TTS</label>
+                                <select class="form-select" id="voiceNameSelect"></select>
+                            </div>
+                        </div>
+
+                        <!-- Nhóm tùy chỉnh thông số TTS -->
+                        <div class="row bg-light p-3 rounded border mx-0 mb-3" id="ttsParamsGroup">
+                            <div class="col-md-6">
+                                <label for="voiceRateInput" class="form-label fw-medium d-flex justify-content-between">
+                                    <span>Tốc độ đọc (Speed Rate):</span>
+                                    <strong class="text-primary" id="voiceRateLabel">1.0x</strong>
+                                </label>
+                                <input type="range" class="form-range" id="voiceRateInput" min="0.5" max="2.0" step="0.1" value="1.0" oninput="document.getElementById('voiceRateLabel').innerText = this.value + 'x'">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="voicePitchInput" class="form-label fw-medium d-flex justify-content-between">
+                                    <span>Cao độ giọng (Pitch):</span>
+                                    <strong class="text-primary" id="voicePitchLabel">1.0</strong>
+                                </label>
+                                <input type="range" class="form-range" id="voicePitchInput" min="0.5" max="2.0" step="0.1" value="1.0" oninput="document.getElementById('voicePitchLabel').innerText = this.value">
+                            </div>
+                        </div>
+
+                        <!-- Nhóm tải tệp âm thanh (Upload) -->
+                        <div class="mb-3 d-none" id="uploadAudioGroup">
+                            <label for="voiceAudioUrlInput" class="form-label fw-medium">Đường dẫn hoặc Tệp âm thanh (.mp3, .wav, .ogg) <span class="text-danger">*</span></label>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control" id="voiceAudioUrlInput" placeholder="VD: /audio/chua-doi-vi.mp3 hoặc chọn tệp từ máy...">
+                                <label class="btn btn-outline-secondary mb-0" for="voiceFilePicker">
+                                    <i class="bi bi-upload me-1"></i> Chọn tệp
+                                </label>
+                                <input type="file" id="voiceFilePicker" class="d-none" accept=".mp3,.wav,.ogg,audio/*" onchange="handleAudioFilePick(this)">
+                            </div>
+                            <small class="text-muted">Hệ thống kiểm tra định dạng hợp lệ (.mp3, .wav, .ogg) theo Luồng phụ 7a.</small>
+                        </div>
+
+                        <!-- Bước 5 & 6: Nghe thử và Tạo lại âm thanh trước khi lưu -->
+                        <div class="d-flex align-items-center justify-content-between p-2 bg-primary bg-opacity-10 rounded border border-primary border-opacity-25">
+                            <span class="small fw-medium text-dark">
+                                <i class="bi bi-volume-up-fill text-primary me-1"></i>Kiểm tra chất lượng âm thanh trước khi lưu (Bước 6 & Luồng 6a):
+                            </span>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="previewVoiceInModal()">
+                                    <i class="bi bi-play-fill me-1"></i> Nghe thử / Tạo lại
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="stopAllVoicePlayback()">
+                                    <i class="bi bi-stop-fill"></i> Dừng
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="stopAllVoicePlayback()">Hủy bỏ</button>
+                    <button type="button" class="btn btn-primary" onclick="saveVoiceConfig()">
+                        <i class="bi bi-check2-circle me-1"></i> Xác nhận lưu âm thanh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UC16: Xem chi tiết & Nghe thử Giọng đọc -->
+    <div class="modal fade" id="viewVoiceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold">Chi tiết cấu hình giọng đọc</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="stopAllVoicePlayback()"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Địa điểm:</span>
+                            <strong id="viewVoicePlace"></strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Ngôn ngữ:</span>
+                            <span class="badge bg-primary" id="viewVoiceLang"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Phương thức:</span>
+                            <span id="viewVoiceSource"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Giọng đọc / Tệp:</span>
+                            <strong class="text-dark" id="viewVoiceName"></strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Thông số (Tốc độ / Cao độ):</span>
+                            <span class="badge bg-light text-dark border" id="viewVoiceParams"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span class="text-muted">Trạng thái:</span>
+                            <span id="viewVoiceStatus"></span>
+                        </li>
+                    </ul>
+                    <div class="p-3 bg-light rounded border small text-secondary" id="viewVoiceText" style="max-height: 140px; overflow-y: auto; white-space: pre-wrap;"></div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-success btn-sm" id="btnPlayInViewModal">
+                        <i class="bi bi-play-circle me-1"></i> Phát nghe thử
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" onclick="stopAllVoicePlayback()">Đóng</button>
                 </div>
             </div>
         </div>
@@ -674,6 +1183,9 @@
                         </td>
                         <td><span class="badge ${badgeClass}">${displayStatus}</span></td>
                         <td class="text-center text-nowrap">
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="openViewPOI('${safeId}')" title="Xem chi tiết">
+                                <i class="bi bi-eye"></i>
+                            </button>
                             <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditModal('${safeId}', '${safeName}', '${safeCat}', '${safeProv}', '${selectValue}')" title="Sửa">
                                 <i class="bi bi-pencil-square"></i> Sửa
                             </button>
@@ -724,7 +1236,24 @@
         // 6. UC12: THÊM MỚI / CẬP NHẬT / XÓA ĐỊA ĐIỂM
         // =========================================================================
         const poiModal = new bootstrap.Modal(document.getElementById('poiModal'));
+        const viewPoiModal = new bootstrap.Modal(document.getElementById('viewPoiModal'));
 
+        function openViewPOI(id) {
+            const found = poisData.find(x => x.id === id);
+            if (!found) return;
+
+            const isMaintenance = found.status === 'Bảo trì' || found.status === 'Đang bảo trì';
+            document.getElementById('viewPoiName').innerText = found.name;
+            document.getElementById('viewPoiId').innerText = found.id;
+            document.getElementById('viewPoiCategory').innerText = found.category;
+            document.getElementById('viewPoiProvince').innerText = found.province;
+            document.getElementById('viewPoiPlays').innerText = `${(found.plays || 0) * HE_SO_NHAN} lượt`;
+            document.getElementById('viewPoiStatus').innerHTML = isMaintenance
+                ? '<span class="badge bg-secondary">Đang bảo trì (Ẩn khỏi trang User)</span>'
+                : '<span class="badge bg-success">Hoạt động (Hiển thị trên trang User)</span>';
+
+            viewPoiModal.show();
+        }
         function prepareAddModal() {
             document.getElementById('poiModalLabel').innerText = "Thêm địa điểm mới";
             document.getElementById('poiForm').reset();
@@ -732,7 +1261,7 @@
             document.getElementById('poiId').value = "";
             document.getElementById('poiCategory').value = "Văn hóa";
             document.getElementById('poiProvince').value = "Sóc Trăng";
-            document.getElementById('poiStatus').value = "Hoạt động";
+            document.getElementById('poiStatus').value = "Bảo trì";
         }
 
         function openEditModal(id, name, category, province, status) {
@@ -1107,6 +1636,1010 @@
         }
 
         // =========================================================================
+        // 7B. UC14: CẤU HÌNH NGÔN NGỮ HỖ TRỢ
+        // =========================================================================
+        let languagesData = [];
+        const languageModal = new bootstrap.Modal(document.getElementById('languageModal'));
+        const viewLanguageModal = new bootstrap.Modal(document.getElementById('viewLanguageModal'));
+
+        function fetchLanguagesFromDB() {
+            fetch(`${API_LANDMARKS_URL}/languages`)
+                .then(res => res.json())
+                .then(data => {
+                    languagesData = Array.isArray(data)
+                        ? [...data].sort((a, b) => (a.orderIndex || 99) - (b.orderIndex || 99))
+                        : [];
+                    renderLanguageTable();
+                })
+                .catch(err => console.error("Lỗi tải danh sách ngôn ngữ:", err));
+        }
+
+        function renderLanguageTable() {
+            const tbody = document.getElementById('language-table-body');
+            let html = '';
+
+            languagesData.forEach((lang, index) => {
+                const isSupported = lang.status === 'Đang hỗ trợ';
+                const badgeClass = isSupported ? 'bg-success' : 'bg-secondary';
+                const statusLabel = isSupported ? 'Đang hỗ trợ' : 'Tạm ngưng';
+
+                const safeCode = (lang.code || '').replace(/'/g, "\\'");
+                const safeName = (lang.name || '').replace(/'/g, "\\'");
+
+                html += `
+                    <tr>
+                        <th scope="row" class="ps-4">${index + 1}</th>
+                        <td><code class="fw-bold px-2 py-1 bg-light rounded border">${lang.code}</code></td>
+                        <td class="fw-medium text-dark">${lang.name}</td>
+                        <td><span class="badge bg-light text-secondary border">${lang.voiceLocale || '-'}</span></td>
+                        <td class="text-center">
+                            <span class="badge bg-info bg-opacity-10 text-primary">${lang.usedCount || 0} bản dịch</span>
+                        </td>
+                        <td class="text-nowrap"><span class="badge ${badgeClass}">${statusLabel}</span></td>
+                        <td class="text-center text-nowrap">
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="openViewLanguage('${safeCode}')" title="Xem chi tiết">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditLanguageModal('${safeCode}')" title="Chỉnh sửa">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="confirmDeleteLanguage('${safeCode}', '${safeName}')" title="Xóa">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function showLanguageError(msg) {
+            const el = document.getElementById('languageErrorAlert');
+            el.innerText = msg;
+            el.classList.remove('d-none');
+        }
+
+        function hideLanguageError() {
+            const el = document.getElementById('languageErrorAlert');
+            el.innerText = '';
+            el.classList.add('d-none');
+        }
+
+        function openAddLanguageModal() {
+            hideLanguageError();
+            document.getElementById('languageModalLabel').innerText = "Thêm ngôn ngữ hỗ trợ mới";
+            document.getElementById('languageForm').reset();
+            document.getElementById('isLanguageEditMode').value = "false";
+
+            const codeInput = document.getElementById('langCode');
+            codeInput.readOnly = false;
+            codeInput.classList.remove('readonly-gray');
+            document.getElementById('langStatus').value = "Đang hỗ trợ";
+            languageModal.show();
+        }
+
+        function openEditLanguageModal(code) {
+            const found = languagesData.find(x => x.code === code);
+            if (!found) return;
+            hideLanguageError();
+
+            document.getElementById('languageModalLabel').innerText = `Cập nhật ngôn ngữ: ${found.name}`;
+            document.getElementById('isLanguageEditMode').value = "true";
+
+            const codeInput = document.getElementById('langCode');
+            codeInput.value = found.code;
+            codeInput.readOnly = true;
+            codeInput.classList.add('readonly-gray');
+
+            document.getElementById('langName').value = found.name;
+            document.getElementById('langVoiceLocale').value = found.voiceLocale || '';
+            document.getElementById('langStatus').value = found.status === 'Tạm ngưng' ? 'Tạm ngưng' : 'Đang hỗ trợ';
+            languageModal.show();
+        }
+
+        function openViewLanguage(code) {
+            const found = languagesData.find(x => x.code === code);
+            if (!found) return;
+
+            document.getElementById('viewLangName').innerText = found.name;
+            document.getElementById('viewLangCode').innerText = found.code;
+            document.getElementById('viewLangVoice').innerText = found.voiceLocale || 'Mặc định';
+            document.getElementById('viewLangUsed').innerText = `${found.usedCount || 0} bài thuyết minh/bản dịch`;
+            document.getElementById('viewLangStatus').innerHTML = found.status === 'Tạm ngưng'
+                ? '<span class="badge bg-secondary">Tạm ngưng</span>'
+                : '<span class="badge bg-success">Đang hỗ trợ</span>';
+
+            viewLanguageModal.show();
+        }
+
+        function saveLanguage() {
+            hideLanguageError();
+            const isEdit = document.getElementById('isLanguageEditMode').value === 'true';
+            const code = document.getElementById('langCode').value.trim().toLowerCase();
+            const name = document.getElementById('langName').value.trim();
+            const voiceLocale = document.getElementById('langVoiceLocale').value.trim();
+            const status = document.getElementById('langStatus').value;
+
+            if (!code || !name) {
+                showLanguageError("Vui lòng nhập đầy đủ Mã ngôn ngữ và Tên ngôn ngữ (Luồng 5a)!");
+                return;
+            }
+
+            const confirmMsg = isEdit
+                ? `Bạn có chắc chắn muốn lưu thay đổi cho ngôn ngữ "${name}" (${code}) không?`
+                : `Bạn có chắc chắn muốn thêm ngôn ngữ mới "${name}" (${code}) vào hệ thống không?`;
+
+            if (!confirm(confirmMsg)) return;
+
+            const url = isEdit
+                ? `${API_LANDMARKS_URL}/languages/${encodeURIComponent(code)}`
+                : `${API_LANDMARKS_URL}/languages`;
+            const method = isEdit ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: code,
+                    name: name,
+                    voiceLocale: voiceLocale,
+                    status: status
+                })
+            })
+            .then(async res => {
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || "Không thể lưu cấu hình ngôn ngữ!");
+                return data;
+            })
+            .then(data => {
+                alert(data.message);
+                languageModal.hide();
+                fetchLanguagesFromDB();
+            })
+            .catch(err => {
+                showLanguageError(err.message);
+            });
+        }
+
+        function confirmDeleteLanguage(code, name) {
+            if (confirm(`Bạn có chắc chắn muốn xóa ngôn ngữ "${name}" (Mã: ${code}) không?`)) {
+                fetch(`${API_LANDMARKS_URL}/languages/${encodeURIComponent(code)}`, {
+                    method: 'DELETE'
+                })
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.message || "Không thể xóa ngôn ngữ!");
+                    return data;
+                })
+                .then(data => {
+                    alert(data.message);
+                    fetchLanguagesFromDB();
+                })
+                .catch(err => {
+                    alert(err.message);
+                });
+            }
+        }
+
+        // =========================================================================
+        // 7C. UC15: QUẢN LÝ BẢN DỊCH (BIÊN DỊCH NỘI DUNG)
+        // =========================================================================
+        let translationsData = [];
+        const translationModal = new bootstrap.Modal(document.getElementById('translationModal'));
+        const viewTranslationModal = new bootstrap.Modal(document.getElementById('viewTranslationModal'));
+
+        async function fetchTranslationsFromDB() {
+            try {
+                // Tải đồng thời danh sách thuyết minh gốc, ngôn ngữ hỗ trợ và danh sách bản dịch
+                const [resNarr, resLang, resTrans] = await Promise.all([
+                    fetch(`${API_LANDMARKS_URL}/narrations`),
+                    fetch(`${API_LANDMARKS_URL}/languages`),
+                    fetch(`${API_LANDMARKS_URL}/translations`)
+                ]);
+
+                if (resNarr.ok) {
+                    const nData = await resNarr.json();
+                    narrationsData = sortListByCreationOrder(Array.isArray(nData) ? nData : []);
+                }
+                if (resLang.ok) {
+                    const lData = await resLang.json();
+                    languagesData = Array.isArray(lData) ? lData : [];
+                }
+                if (resTrans.ok) {
+                    const tData = await resTrans.json();
+                    translationsData = Array.isArray(tData)
+                        ? [...tData].sort((a, b) => (a.orderIndex || 999) - (b.orderIndex || 999))
+                        : [];
+                }
+
+                populateFilterTranslationLang();
+                renderTranslationTable();
+            } catch (err) {
+                console.error("Lỗi tải dữ liệu bản dịch:", err);
+            }
+        }
+
+        function populateFilterTranslationLang() {
+            const filterEl = document.getElementById('filterTranslationLang');
+            const currentVal = filterEl.value;
+            const targetLangs = languagesData.filter(l => l.code !== 'vi');
+
+            filterEl.innerHTML = `<option value="">-- Tất cả ngôn ngữ --</option>` +
+                targetLangs.map(l => `<option value="${l.code}">${l.name} (${l.code})</option>`).join('');
+            filterEl.value = currentVal;
+        }
+
+        function renderTranslationTable() {
+            const tbody = document.getElementById('translation-table-body');
+            const filterLang = document.getElementById('filterTranslationLang').value;
+            let html = '';
+
+            const filtered = filterLang
+                ? translationsData.filter(t => t.languageCode === filterLang)
+                : translationsData;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Chưa có bản dịch nào phù hợp. Hãy bấm "+ Tạo bản dịch" để thêm mới!</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((item, index) => {
+                const isDraft = item.status === 'Bản nháp';
+                const badgeClass = isDraft ? 'bg-secondary' : 'bg-success';
+                const statusText = isDraft ? 'Bản nháp' : 'Đã công bố';
+
+                const safePlaceId = (item.diaDiemId || '').replace(/'/g, "\\'");
+                const safePlaceName = (item.diaDiemName || '').replace(/'/g, "\\'");
+                const safeLangCode = (item.languageCode || '').replace(/'/g, "\\'");
+                const safeLangName = (item.languageName || '').replace(/'/g, "\\'");
+
+                html += `
+                    <tr>
+                        <th scope="row" class="ps-4">${index + 1}</th>
+                        <td>
+                            <div class="fw-medium text-dark">${item.diaDiemName}</div>
+                            <small class="text-muted"><span class="badge bg-light text-dark border">${item.category}</span></small>
+                        </td>
+                        <td class="text-nowrap">
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1">
+                                <i class="bi bi-translate me-1"></i>${item.languageName} (${item.languageCode})
+                            </span>
+                        </td>
+                        <td><div class="narration-preview">${item.translatedContent}</div></td>
+                        <td class="text-nowrap"><span class="badge ${badgeClass}">${statusText}</span></td>
+                        <td class="text-center text-nowrap">
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="openViewTranslation('${safePlaceId}', '${safeLangCode}')" title="Xem đối chiếu">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditTranslationModal('${safePlaceId}', '${safeLangCode}')" title="Chỉnh sửa">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="confirmDeleteTranslation('${safePlaceId}', '${safePlaceName}', '${safeLangCode}', '${safeLangName}')" title="Xóa">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function showTranslationError(msg) {
+            const el = document.getElementById('translationErrorAlert');
+            el.innerText = msg;
+            el.classList.remove('d-none');
+        }
+
+        function hideTranslationError() {
+            const el = document.getElementById('translationErrorAlert');
+            el.innerText = '';
+            el.classList.add('d-none');
+        }
+
+        function updateTransCharCount() {
+            const text = document.getElementById('transContentInput').value || '';
+            document.getElementById('transCharCount').innerText = `${text.length} ký tự`;
+        }
+
+        function populateTranslationDropdowns(selectedPlaceId, selectedLangCode) {
+            const placeSelect = document.getElementById('transPlaceSelect');
+            const langSelect = document.getElementById('transLangSelect');
+
+            placeSelect.innerHTML = narrationsData.map(p =>
+                `<option value="${p.id}" ${p.id === selectedPlaceId ? 'selected' : ''}>${p.name} (${p.id})</option>`
+            ).join('');
+
+            const targetLangs = languagesData.filter(l => l.code !== 'vi' && l.status === 'Đang hỗ trợ');
+            langSelect.innerHTML = targetLangs.map(l =>
+                `<option value="${l.code}" ${l.code === selectedLangCode ? 'selected' : ''}>${l.name} (${l.code})</option>`
+            ).join('');
+        }
+
+        function handleTranslationSelectionChange() {
+            hideTranslationError();
+            const placeId = document.getElementById('transPlaceSelect').value;
+            const langCode = document.getElementById('transLangSelect').value;
+            const isEdit = document.getElementById('isTranslationEditMode').value === 'true';
+
+            const placeObj = narrationsData.find(x => x.id === placeId);
+            document.getElementById('transOriginalVi').value = (placeObj && placeObj.hasContent)
+                ? placeObj.descriptionVi
+                : "(Địa điểm này chưa có nội dung thuyết minh gốc Tiếng Việt - Vui lòng biên soạn ở mục Biên soạn thuyết minh trước)";
+
+            const existing = translationsData.find(t => t.diaDiemId === placeId && t.languageCode === langCode);
+            if (isEdit && existing) {
+                document.getElementById('transContentInput').value = existing.translatedContent || '';
+                document.getElementById('transStatusSelect').value = existing.status === 'Bản nháp' ? 'Bản nháp' : 'Đã công bố';
+            } else if (!isEdit) {
+                document.getElementById('transContentInput').value = existing ? existing.translatedContent : '';
+                document.getElementById('transStatusSelect').value = existing ? existing.status : 'Đã công bố';
+            }
+            updateTransCharCount();
+        }
+
+        function openCreateTranslationModal() {
+            const targetLangs = languagesData.filter(l => l.code !== 'vi' && l.status === 'Đang hỗ trợ');
+            if (narrationsData.length === 0 || targetLangs.length === 0) {
+                alert("Không tìm thấy bài thuyết minh gốc hoặc ngôn ngữ đích hỗ trợ (Luồng 3a)!");
+                return;
+            }
+            hideTranslationError();
+            document.getElementById('translationModalLabel').innerText = "Tạo bản dịch thuyết minh mới";
+            document.getElementById('isTranslationEditMode').value = "false";
+
+            // Ưu tiên chọn cặp Địa điểm + Ngôn ngữ chưa có bản dịch
+            let defaultPlace = narrationsData[0].id;
+            let defaultLang = targetLangs[0].code;
+            for (const p of narrationsData) {
+                for (const l of targetLangs) {
+                    if (!translationsData.some(t => t.diaDiemId === p.id && t.languageCode === l.code)) {
+                        defaultPlace = p.id;
+                        defaultLang = l.code;
+                        break;
+                    }
+                }
+            }
+
+            populateTranslationDropdowns(defaultPlace, defaultLang);
+            document.getElementById('transPlaceSelect').disabled = false;
+            document.getElementById('transLangSelect').disabled = false;
+            handleTranslationSelectionChange();
+            translationModal.show();
+        }
+
+        function openEditTranslationModal(diaDiemId, langCode) {
+            const found = translationsData.find(t => t.diaDiemId === diaDiemId && t.languageCode === langCode);
+            if (!found) return;
+            hideTranslationError();
+
+            document.getElementById('translationModalLabel').innerText = `Chỉnh sửa bản dịch: ${found.diaDiemName} (${found.languageName})`;
+            document.getElementById('isTranslationEditMode').value = "true";
+
+            populateTranslationDropdowns(diaDiemId, langCode);
+            document.getElementById('transPlaceSelect').disabled = true;
+            document.getElementById('transLangSelect').disabled = true;
+            handleTranslationSelectionChange();
+            translationModal.show();
+        }
+
+        function openViewTranslation(diaDiemId, langCode) {
+            const found = translationsData.find(t => t.diaDiemId === diaDiemId && t.languageCode === langCode);
+            if (!found) return;
+
+            document.getElementById('viewTransPlaceName').innerText = `Địa điểm: ${found.diaDiemName} (${found.diaDiemId})`;
+            document.getElementById('viewTransLangBadge').innerText = `Ngôn ngữ đích: ${found.languageName} (${found.languageCode})`;
+            document.getElementById('viewTransStatusBadge').innerHTML = found.status === 'Bản nháp'
+                ? '<span class="badge bg-secondary">Bản nháp</span>'
+                : '<span class="badge bg-success">Đã công bố</span>';
+            document.getElementById('viewTransOriginalVi').innerText = found.originalContentVi;
+            document.getElementById('viewTransContent').innerText = found.translatedContent;
+
+            viewTranslationModal.show();
+        }
+
+        function saveTranslation() {
+            hideTranslationError();
+            const isEdit = document.getElementById('isTranslationEditMode').value === 'true';
+            const placeId = document.getElementById('transPlaceSelect').value;
+            const langCode = document.getElementById('transLangSelect').value;
+            const status = document.getElementById('transStatusSelect').value;
+            const translatedContent = document.getElementById('transContentInput').value.trim();
+
+            // Luồng phụ 3a: Kiểm tra bài thuyết minh gốc và ngôn ngữ đích
+            const placeObj = narrationsData.find(x => x.id === placeId);
+            if (!placeObj || !placeObj.hasContent) {
+                showTranslationError("Địa điểm này chưa có bài thuyết minh gốc Tiếng Việt! Vui lòng biên soạn bài gốc trước hoặc chọn địa điểm khác (Luồng 3a).");
+                return;
+            }
+            if (!langCode) {
+                showTranslationError("Ngôn ngữ đích không tồn tại hoặc đang tạm ngưng! Vui lòng lựa chọn lại (Luồng 3a).");
+                return;
+            }
+
+            // Luồng phụ 6a: Kiểm tra nội dung bản dịch bị thiếu
+            if (!translatedContent) {
+                showTranslationError("Nội dung bản dịch đang bị trống! Vui lòng nhập nội dung bản dịch (Luồng 6a).");
+                document.getElementById('transContentInput').focus();
+                return;
+            }
+
+            const existing = translationsData.find(t => t.diaDiemId === placeId && t.languageCode === langCode);
+            let allowOverwrite = isEdit;
+
+            // Luồng phụ 7a: Bản dịch cho cùng bài và ngôn ngữ đã tồn tại khi chọn Tạo mới
+            if (!isEdit && existing) {
+                const confirmOverwrite = confirm(
+                    `Bản dịch ngôn ngữ "${existing.languageName}" cho "${placeObj.name}" đã tồn tại (Luồng 7a)!\n\nBạn có muốn cập nhật đè lên bản dịch hiện có không?`
+                );
+                if (!confirmOverwrite) return;
+                allowOverwrite = true;
+            } else {
+                const actionText = isEdit ? "lưu các chỉnh sửa bản dịch" : "tạo bản dịch mới";
+                if (!confirm(`Bạn có chắc chắn muốn ${actionText} (${langCode}) cho địa điểm "${placeObj.name}" không?`)) {
+                    return;
+                }
+            }
+
+            fetch(`${API_LANDMARKS_URL}/translations`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    diaDiemId: placeId,
+                    languageCode: langCode,
+                    translatedContent: translatedContent,
+                    status: status,
+                    allowOverwrite: allowOverwrite
+                })
+            })
+            .then(async res => {
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || "Lưu dữ liệu bản dịch thất bại (Luồng 7b)!");
+                return data;
+            })
+            .then(data => {
+                alert(data.message);
+                translationModal.hide();
+                fetchTranslationsFromDB();
+            })
+            .catch(err => {
+                // Luồng phụ 7b: Thông báo lỗi và giữ nguyên dữ liệu trên form
+                showTranslationError(err.message);
+            });
+        }
+
+        function confirmDeleteTranslation(diaDiemId, diaDiemName, langCode, langName) {
+            if (confirm(`Bạn có chắc chắn muốn xóa bản dịch [${langName}] của địa điểm "${diaDiemName}" khỏi hệ thống không?`)) {
+                fetch(`${API_LANDMARKS_URL}/translations/${encodeURIComponent(diaDiemId)}/${encodeURIComponent(langCode)}`, {
+                    method: 'DELETE'
+                })
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.message || "Không thể xóa bản dịch!");
+                    return data;
+                })
+                .then(data => {
+                    alert(data.message);
+                    fetchTranslationsFromDB();
+                })
+                .catch(err => alert("Lỗi: " + err.message));
+            }
+        }
+
+        // =========================================================================
+        // 7D. UC16: QUẢN LÝ GIỌNG ĐỌC THUYẾT MINH (TTS, LỌC NGÔN NGỮ & PHÂN TRANG)
+        // =========================================================================
+        let voicesData = [];
+        let activeAudioElement = null;
+        let currentSpeechSessionId = 0; // Khóa phiên phát để không bị mất nút Dừng đỏ khi bấm Nghe liên tiếp
+        let currentVoicePage = 1;
+        const VOICE_PAGE_SIZE = 6; // Hiển thị 6 dòng mỗi trang
+
+        const voiceModal = new bootstrap.Modal(document.getElementById('voiceModal'));
+        const viewVoiceModal = new bootstrap.Modal(document.getElementById('viewVoiceModal'));
+
+        async function fetchVoicesFromDB() {
+            try {
+                const [resNarr, resLang, resTrans, resVoices] = await Promise.all([
+                    fetch(`${API_LANDMARKS_URL}/narrations`),
+                    fetch(`${API_LANDMARKS_URL}/languages`),
+                    fetch(`${API_LANDMARKS_URL}/translations`),
+                    fetch(`${API_LANDMARKS_URL}/voices`)
+                ]);
+
+                if (resNarr.ok) narrationsData = sortListByCreationOrder(await resNarr.json());
+                if (resLang.ok) languagesData = await resLang.json();
+                if (resTrans.ok) translationsData = await resTrans.json();
+                if (resVoices.ok) {
+                    const vData = await resVoices.json();
+                    voicesData = Array.isArray(vData)
+                        ? [...vData].sort((a, b) => (a.orderIndex || 999) - (b.orderIndex || 999))
+                        : [];
+                }
+
+                populateFilterVoiceLang();
+                renderVoiceTable();
+            } catch (err) {
+                console.error("Lỗi tải danh sách giọng đọc:", err);
+            }
+        }
+
+        function populateFilterVoiceLang() {
+            const filterEl = document.getElementById('filterVoiceLang');
+            if (!filterEl) return;
+            const currentVal = filterEl.value;
+
+            filterEl.innerHTML = `<option value="">-- Tất cả ngôn ngữ --</option>` +
+                languagesData.map(l => `<option value="${l.code}">${l.name} (${l.code})</option>`).join('');
+
+            if (languagesData.some(l => l.code === currentVal)) {
+                filterEl.value = currentVal;
+            }
+        }
+
+        function handleVoiceFilterChange() {
+            currentVoicePage = 1;
+            renderVoiceTable();
+        }
+
+        function changeVoicePage(page) {
+            currentVoicePage = page;
+            renderVoiceTable();
+        }
+
+        function renderVoiceTable() {
+            const tbody = document.getElementById('voice-table-body');
+            const filterEl = document.getElementById('filterVoiceLang');
+            const filterLang = filterEl ? filterEl.value : '';
+
+            const filtered = filterLang
+                ? voicesData.filter(v => v.languageCode === filterLang)
+                : voicesData;
+
+            const totalItems = filtered.length;
+            const totalPages = Math.max(1, Math.ceil(totalItems / VOICE_PAGE_SIZE));
+            if (currentVoicePage > totalPages) currentVoicePage = totalPages;
+            if (currentVoicePage < 1) currentVoicePage = 1;
+
+            const startIndex = (currentVoicePage - 1) * VOICE_PAGE_SIZE;
+            const pageItems = filtered.slice(startIndex, startIndex + VOICE_PAGE_SIZE);
+
+            if (totalItems === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Chưa có cấu hình giọng đọc nào phù hợp. Hãy bấm "+ Tạo giọng đọc / Âm thanh" để thêm mới!</td></tr>`;
+                document.getElementById('voice-pagination-info').innerText = 'Hiển thị 0 mục';
+                document.getElementById('voice-pagination-controls').innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            pageItems.forEach((item, idx) => {
+                const stt = startIndex + idx + 1;
+                const isDraft = item.status === 'Bản nháp';
+                const statusBadge = isDraft
+                    ? '<span class="badge bg-secondary">Bản nháp</span>'
+                    : '<span class="badge bg-success">Đã công bố</span>';
+
+                const methodBadge = item.sourceType === 'Upload'
+                    ? '<span class="badge bg-warning text-dark"><i class="bi bi-file-earmark-music me-1"></i>Tệp tải lên</span>'
+                    : '<span class="badge bg-info text-dark"><i class="bi bi-soundwave me-1"></i>TTS Tự động</span>';
+
+                const configDetails = item.sourceType === 'Upload'
+                    ? `<div class="fw-medium text-dark">${item.voiceName}</div><small class="text-muted text-truncate d-block" style="max-width: 240px;">${item.audioUrl}</small>`
+                    : `<div class="fw-medium text-dark">${item.voiceName}</div><small class="text-muted">Tốc độ: <strong>${item.speechRate}x</strong> | Cao độ: <strong>${item.pitch}</strong></small>`;
+
+                const safePlaceId = (item.diaDiemId || '').replace(/'/g, "\\'");
+                const safePlaceName = (item.diaDiemName || '').replace(/'/g, "\\'");
+                const safeLangCode = (item.languageCode || '').replace(/'/g, "\\'");
+                const safeLangName = (item.languageName || '').replace(/'/g, "\\'");
+
+                html += `
+                    <tr>
+                        <th scope="row" class="ps-4">${stt}</th>
+                        <td>
+                            <div class="fw-medium text-dark">${item.diaDiemName}</div>
+                            <small class="text-muted"><span class="badge bg-light text-dark border">${item.category}</span></small>
+                        </td>
+                        <td class="text-nowrap">
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1">
+                                ${item.languageName} (${item.languageCode})
+                            </span>
+                        </td>
+                        <td class="text-nowrap">${methodBadge}</td>
+                        <td>${configDetails}</td>
+                        <td class="text-nowrap">${statusBadge}</td>
+                        <td class="text-center text-nowrap">
+                            <button class="btn btn-sm btn-success me-1" onclick="playVoiceItem('${safePlaceId}', '${safeLangCode}')" title="Nghe thử âm thanh">
+                                <i class="bi bi-play-fill"></i> Nghe
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="openViewVoice('${safePlaceId}', '${safeLangCode}')" title="Xem chi tiết">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning text-dark me-1" onclick="openEditVoiceModal('${safePlaceId}', '${safeLangCode}')" title="Cập nhật giọng đọc">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="confirmDeleteVoice('${safePlaceId}', '${safePlaceName}', '${safeLangCode}', '${safeLangName}')" title="Xóa">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+
+            // Vẽ thông tin & nút chuyển trang
+            const endItem = Math.min(startIndex + VOICE_PAGE_SIZE, totalItems);
+            document.getElementById('voice-pagination-info').innerText =
+                `Hiển thị ${startIndex + 1} - ${endItem} trên tổng số ${totalItems} giọng đọc`;
+
+            let pageHtml = '';
+            if (totalPages > 1) {
+                pageHtml += `
+                    <li class="page-item ${currentVoicePage === 1 ? 'disabled' : ''}">
+                        <button class="page-link" onclick="changeVoicePage(${currentVoicePage - 1})">&laquo;</button>
+                    </li>
+                `;
+                for (let p = 1; p <= totalPages; p++) {
+                    pageHtml += `
+                        <li class="page-item ${p === currentVoicePage ? 'active' : ''}">
+                            <button class="page-link" onclick="changeVoicePage(${p})">${p}</button>
+                        </li>
+                    `;
+                }
+                pageHtml += `
+                    <li class="page-item ${currentVoicePage === totalPages ? 'disabled' : ''}">
+                        <button class="page-link" onclick="changeVoicePage(${currentVoicePage + 1})">&raquo;</button>
+                    </li>
+                `;
+            }
+            document.getElementById('voice-pagination-controls').innerHTML = pageHtml;
+        }
+
+        function stopAllVoicePlayback() {
+            currentSpeechSessionId++; // Vô hiệu hóa mọi callback onend cũ
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            if (activeAudioElement) {
+                activeAudioElement.pause();
+                activeAudioElement.currentTime = 0;
+                activeAudioElement = null;
+            }
+            const stopBtn = document.getElementById('btnStopGlobalAudio');
+            if (stopBtn) stopBtn.classList.add('d-none');
+        }
+
+        function speakTextWithTTS(text, locale, rate, pitch) {
+            if (!('speechSynthesis' in window)) {
+                alert("Dịch vụ TTS không khả dụng trên trình duyệt này! Vui lòng thử lại hoặc dùng tệp tải lên (Luồng 5a).");
+                return;
+            }
+            if (!text || !text.trim()) {
+                alert("Chưa có nội dung văn bản thuyết minh để phát âm thanh (Luồng 4a)!");
+                return;
+            }
+
+            // Hủy câu đọc cũ và tăng mã phiên mới
+            window.speechSynthesis.cancel();
+            if (activeAudioElement) {
+                activeAudioElement.pause();
+                activeAudioElement = null;
+            }
+            const sessionId = ++currentSpeechSessionId;
+
+            const stopBtn = document.getElementById('btnStopGlobalAudio');
+            if (stopBtn) stopBtn.classList.remove('d-none');
+
+            // Đặt độ trễ 40ms sau khi cancel() để trình duyệt không nuốt sự kiện phát mới
+            setTimeout(() => {
+                if (sessionId !== currentSpeechSessionId) return;
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = locale || 'vi-VN';
+                utterance.rate = parseFloat(rate) || 1.0;
+                utterance.pitch = parseFloat(pitch) || 1.0;
+
+                utterance.onend = () => {
+                    if (sessionId === currentSpeechSessionId && stopBtn) {
+                        stopBtn.classList.add('d-none');
+                    }
+                };
+                utterance.onerror = (e) => {
+                    if (sessionId === currentSpeechSessionId && stopBtn) {
+                        stopBtn.classList.add('d-none');
+                    }
+                    if (e.error !== 'canceled' && e.error !== 'interrupted') {
+                        alert("Tạo âm thanh TTS thất bại! Vui lòng thử lại (Luồng 5a).");
+                    }
+                };
+
+                window.speechSynthesis.speak(utterance);
+            }, 40);
+        }
+
+        function playVoiceItem(diaDiemId, langCode) {
+            const found = voicesData.find(v => v.diaDiemId === diaDiemId && v.languageCode === langCode);
+            if (!found) return;
+
+            if (found.sourceType === 'Upload' && found.audioUrl && found.audioUrl.startsWith('data:audio/')) {
+                stopAllVoicePlayback();
+                const sessionId = ++currentSpeechSessionId;
+                activeAudioElement = new Audio(found.audioUrl);
+                const stopBtn = document.getElementById('btnStopGlobalAudio');
+                if (stopBtn) stopBtn.classList.remove('d-none');
+                activeAudioElement.onended = () => {
+                    if (sessionId === currentSpeechSessionId && stopBtn) stopBtn.classList.add('d-none');
+                };
+                activeAudioElement.play().catch(() => alert("Không thể phát tệp âm thanh này!"));
+            } else {
+                speakTextWithTTS(found.textContent, found.voiceLocale, found.speechRate, found.pitch);
+            }
+        }
+
+        function showVoiceError(msg) {
+            const el = document.getElementById('voiceErrorAlert');
+            el.innerText = msg;
+            el.classList.remove('d-none');
+        }
+
+        function hideVoiceError() {
+            const el = document.getElementById('voiceErrorAlert');
+            el.innerText = '';
+            el.classList.add('d-none');
+        }
+
+        function toggleVoiceSourceFields() {
+            const sourceType = document.getElementById('voiceSourceType').value;
+            const ttsNameGroup = document.getElementById('ttsVoiceNameGroup');
+            const ttsParamsGroup = document.getElementById('ttsParamsGroup');
+            const uploadGroup = document.getElementById('uploadAudioGroup');
+
+            if (sourceType === 'Upload') {
+                ttsNameGroup.classList.add('d-none');
+                ttsParamsGroup.classList.add('d-none');
+                uploadGroup.classList.remove('d-none');
+            } else {
+                ttsNameGroup.classList.remove('d-none');
+                ttsParamsGroup.classList.remove('d-none');
+                uploadGroup.classList.add('d-none');
+            }
+        }
+
+        function handleAudioFilePick(inputEl) {
+            if (!inputEl.files || inputEl.files.length === 0) return;
+            const file = inputEl.files[0];
+            document.getElementById('voiceAudioUrlInput').value = `/audio/${file.name}`;
+        }
+
+        function getTextForPlaceAndLang(placeId, langCode) {
+            if (langCode === 'vi') {
+                const p = narrationsData.find(x => x.id === placeId);
+                return (p && p.hasContent) ? p.descriptionVi : '';
+            }
+            const t = translationsData.find(x => x.diaDiemId === placeId && x.languageCode === langCode);
+            if (t && t.translatedContent) return t.translatedContent;
+
+            const v = voicesData.find(x => x.diaDiemId === placeId && x.languageCode === langCode);
+            return v ? v.textContent : '';
+        }
+
+        function populateVoiceOptionsForLang(langCode, selectedVoiceName) {
+            const voiceSelect = document.getElementById('voiceNameSelect');
+            const presets = {
+                vi: ["Google Tiếng Việt (vi-VN)", "Microsoft HoaiMy Online (Nữ)", "Microsoft NamMinh Online (Nam)"],
+                en: ["Google US English (en-US)", "Microsoft Jenny Online (en-US)", "Google UK English (en-GB)"],
+                fr: ["Google Français (fr-FR)", "Microsoft Denise Online (fr-FR)"],
+                ja: ["Google 日本語 (ja-JP)", "Microsoft Nanami Online (ja-JP)"],
+                jp: ["Google 日本語 (ja-JP)", "Microsoft Nanami Online (ja-JP)"]
+            };
+            const options = presets[langCode] || [`Google TTS (${langCode})`];
+            if (selectedVoiceName && !options.includes(selectedVoiceName)) {
+                options.unshift(selectedVoiceName);
+            }
+            voiceSelect.innerHTML = options.map(v => `<option value="${v}" ${v === selectedVoiceName ? 'selected' : ''}>${v}</option>`).join('');
+        }
+
+        function handleVoiceSelectionChange() {
+            hideVoiceError();
+            const placeId = document.getElementById('voicePlaceSelect').value;
+            const langCode = document.getElementById('voiceLangSelect').value;
+
+            const content = getTextForPlaceAndLang(placeId, langCode);
+            document.getElementById('voiceTextPreview').value = content
+                ? content
+                : "(Chưa có nội dung thuyết minh ở ngôn ngữ này! Hệ thống sẽ yêu cầu bổ sung nội dung theo Luồng 4a)";
+
+            const existing = voicesData.find(v => v.diaDiemId === placeId && v.languageCode === langCode);
+            populateVoiceOptionsForLang(langCode, existing ? existing.voiceName : null);
+
+            if (existing) {
+                document.getElementById('voiceSourceType').value = existing.sourceType || 'TTS';
+                document.getElementById('voiceRateInput').value = existing.speechRate || 1.0;
+                document.getElementById('voiceRateLabel').innerText = (existing.speechRate || 1.0) + 'x';
+                document.getElementById('voicePitchInput').value = existing.pitch || 1.0;
+                document.getElementById('voicePitchLabel').innerText = existing.pitch || 1.0;
+                document.getElementById('voiceAudioUrlInput').value = existing.audioUrl || '';
+                document.getElementById('voiceStatusSelect').value = existing.status === 'Bản nháp' ? 'Bản nháp' : 'Đã công bố';
+            } else {
+                document.getElementById('voiceSourceType').value = 'TTS';
+                document.getElementById('voiceRateInput').value = 1.0;
+                document.getElementById('voiceRateLabel').innerText = '1.0x';
+                document.getElementById('voicePitchInput').value = 1.0;
+                document.getElementById('voicePitchLabel').innerText = '1.0';
+                document.getElementById('voiceAudioUrlInput').value = '';
+                document.getElementById('voiceStatusSelect').value = 'Đã công bố';
+            }
+            toggleVoiceSourceFields();
+        }
+
+        function populateVoicePlaceAndLangDropdowns(selectedPlaceId, selectedLangCode) {
+            const placeSelect = document.getElementById('voicePlaceSelect');
+            const langSelect = document.getElementById('voiceLangSelect');
+
+            placeSelect.innerHTML = narrationsData.map(p =>
+                `<option value="${p.id}" ${p.id === selectedPlaceId ? 'selected' : ''}>${p.name} (${p.id})</option>`
+            ).join('');
+
+            const activeLangs = languagesData.filter(l => l.status === 'Đang hỗ trợ');
+            langSelect.innerHTML = activeLangs.map(l =>
+                `<option value="${l.code}" ${l.code === selectedLangCode ? 'selected' : ''}>${l.name} (${l.code})</option>`
+            ).join('');
+        }
+
+        function openCreateVoiceModal() {
+            hideVoiceError();
+            document.getElementById('voiceModalLabel').innerText = "Tạo mới / Cấu hình giọng đọc thuyết minh";
+            document.getElementById('isVoiceEditMode').value = "false";
+
+            const filterLang = document.getElementById('filterVoiceLang')?.value || 'vi';
+            const defaultPlace = narrationsData.length > 0 ? narrationsData[0].id : '';
+
+            populateVoicePlaceAndLangDropdowns(defaultPlace, filterLang);
+            document.getElementById('voicePlaceSelect').disabled = false;
+            document.getElementById('voiceLangSelect').disabled = false;
+            handleVoiceSelectionChange();
+            voiceModal.show();
+        }
+
+        function openEditVoiceModal(diaDiemId, langCode) {
+            const found = voicesData.find(v => v.diaDiemId === diaDiemId && v.languageCode === langCode);
+            if (!found) return;
+            hideVoiceError();
+
+            document.getElementById('voiceModalLabel').innerText = `Cập nhật giọng đọc: ${found.diaDiemName} (${found.languageName})`;
+            document.getElementById('isVoiceEditMode').value = "true";
+
+            populateVoicePlaceAndLangDropdowns(diaDiemId, langCode);
+            document.getElementById('voicePlaceSelect').disabled = true;
+            document.getElementById('voiceLangSelect').disabled = true;
+            handleVoiceSelectionChange();
+            voiceModal.show();
+        }
+
+        function previewVoiceInModal() {
+            hideVoiceError();
+            const placeId = document.getElementById('voicePlaceSelect').value;
+            const langCode = document.getElementById('voiceLangSelect').value;
+            const rate = parseFloat(document.getElementById('voiceRateInput').value) || 1.0;
+            const pitch = parseFloat(document.getElementById('voicePitchInput').value) || 1.0;
+
+            const text = getTextForPlaceAndLang(placeId, langCode);
+            if (!text) {
+                showVoiceError("Chưa có nội dung thuyết minh ở ngôn ngữ đã chọn! Vui lòng bổ sung nội dung trước (Luồng 4a).");
+                return;
+            }
+
+            const langObj = languagesData.find(l => l.code === langCode);
+            const locale = (langObj && langObj.voiceLocale) ? langObj.voiceLocale : langCode;
+            speakTextWithTTS(text, locale, rate, pitch);
+        }
+
+        function openViewVoice(diaDiemId, langCode) {
+            const found = voicesData.find(v => v.diaDiemId === diaDiemId && v.languageCode === langCode);
+            if (!found) return;
+
+            document.getElementById('viewVoicePlace').innerText = `${found.diaDiemName} (${found.diaDiemId})`;
+            document.getElementById('viewVoiceLang').innerText = `${found.languageName} (${found.languageCode})`;
+            document.getElementById('viewVoiceSource').innerHTML = found.sourceType === 'Upload'
+                ? '<span class="badge bg-warning text-dark">Tệp tải lên</span>'
+                : '<span class="badge bg-info text-dark">TTS Tự động</span>';
+            document.getElementById('viewVoiceName').innerText = found.sourceType === 'Upload' ? found.audioUrl : found.voiceName;
+            document.getElementById('viewVoiceParams').innerText = `Tốc độ: ${found.speechRate}x | Cao độ: ${found.pitch}`;
+            document.getElementById('viewVoiceStatus').innerHTML = found.status === 'Bản nháp'
+                ? '<span class="badge bg-secondary">Bản nháp</span>'
+                : '<span class="badge bg-success">Đã công bố</span>';
+            document.getElementById('viewVoiceText').innerText = found.textContent || "(Không có văn bản)";
+
+            document.getElementById('btnPlayInViewModal').onclick = () => playVoiceItem(diaDiemId, langCode);
+            viewVoiceModal.show();
+        }
+
+        function saveVoiceConfig() {
+            hideVoiceError();
+            stopAllVoicePlayback();
+
+            const placeId = document.getElementById('voicePlaceSelect').value;
+            const langCode = document.getElementById('voiceLangSelect').value;
+            const sourceType = document.getElementById('voiceSourceType').value;
+            const voiceName = sourceType === 'Upload'
+                ? 'Tệp âm thanh tải lên'
+                : document.getElementById('voiceNameSelect').value;
+            const rate = parseFloat(document.getElementById('voiceRateInput').value) || 1.0;
+            const pitch = parseFloat(document.getElementById('voicePitchInput').value) || 1.0;
+            const audioUrl = document.getElementById('voiceAudioUrlInput').value.trim();
+            const status = document.getElementById('voiceStatusSelect').value;
+
+            const text = getTextForPlaceAndLang(placeId, langCode);
+            if (!text) {
+                showVoiceError("Chưa có nội dung thuyết minh ở ngôn ngữ đã chọn! Vui lòng biên soạn nội dung hoặc bản dịch trước (Luồng 4a).");
+                return;
+            }
+
+            if (sourceType === 'Upload') {
+                const validExt = /\.(mp3|wav|ogg)$/i.test(audioUrl) || audioUrl.startsWith('data:audio/');
+                if (!audioUrl || !validExt) {
+                    showVoiceError("Tệp âm thanh không hợp lệ (Chỉ hỗ trợ định dạng .mp3, .wav, .ogg)! Hệ thống từ chối lưu (Luồng 7a).");
+                    return;
+                }
+            }
+
+            const placeObj = narrationsData.find(x => x.id === placeId);
+            const placeName = placeObj ? placeObj.name : placeId;
+
+            if (!confirm(`Bạn có chắc chắn muốn lưu cấu hình âm thanh (${langCode.toUpperCase()}) cho địa điểm "${placeName}" không?`)) {
+                return;
+            }
+
+            fetch(`${API_LANDMARKS_URL}/voices`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    diaDiemId: placeId,
+                    languageCode: langCode,
+                    sourceType: sourceType,
+                    voiceName: voiceName,
+                    speechRate: rate,
+                    pitch: pitch,
+                    audioUrl: audioUrl,
+                    status: status
+                })
+            })
+            .then(async res => {
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || "Lưu cấu hình âm thanh thất bại (Luồng 7a)!");
+                return data;
+            })
+            .then(data => {
+                alert(data.message);
+                voiceModal.hide();
+                fetchVoicesFromDB();
+            })
+            .catch(err => {
+                showVoiceError(err.message);
+            });
+        }
+
+        function confirmDeleteVoice(diaDiemId, diaDiemName, langCode, langName) {
+            stopAllVoicePlayback();
+            if (confirm(`Bạn có chắc chắn muốn xóa âm thanh thuyết minh [${langName}] của địa điểm "${diaDiemName}" không?`)) {
+                fetch(`${API_LANDMARKS_URL}/voices/${encodeURIComponent(diaDiemId)}/${encodeURIComponent(langCode)}`, {
+                    method: 'DELETE'
+                })
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.message || "Không thể xóa âm thanh!");
+                    return data;
+                })
+                .then(data => {
+                    alert(data.message);
+                    fetchVoicesFromDB();
+                })
+                .catch(err => alert("Lỗi: " + err.message));
+            }
+        }
+
+        // =========================================================================
         // 8. CÁC TÍNH NĂNG PHỤ (MÃ QR, ĐIỀU HƯỚNG MENU, ĐĂNG XUẤT)
         // =========================================================================
         function updateQRCode() {
@@ -1124,11 +2657,15 @@
         const pageTitle = document.getElementById('page-title');
         const poisSection = document.getElementById('pois-section');
         const narrationsSection = document.getElementById('narrations-section');
+        const languagesSection = document.getElementById('languages-section');
+        const translationsSection = document.getElementById('translations-section');
+        const voicesSection = document.getElementById('voices-section');
         const placeholderSection = document.getElementById('placeholder-section');
 
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
+                stopAllVoicePlayback();
                 navLinks.forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
                 
@@ -1137,6 +2674,9 @@
                 const target = this.getAttribute('data-target');
                 poisSection.classList.add('d-none');
                 narrationsSection.classList.add('d-none');
+                languagesSection.classList.add('d-none');
+                translationsSection.classList.add('d-none');
+                voicesSection.classList.add('d-none');
                 placeholderSection.classList.add('d-none');
 
                 if (target === 'pois') {
@@ -1145,6 +2685,15 @@
                 } else if (target === 'narrations') {
                     narrationsSection.classList.remove('d-none');
                     fetchNarrationsFromDB();
+                } else if (target === 'languages') {
+                    languagesSection.classList.remove('d-none');
+                    fetchLanguagesFromDB();
+                } else if (target === 'translations') {
+                    translationsSection.classList.remove('d-none');
+                    fetchTranslationsFromDB();
+                } else if (target === 'voices') {
+                    voicesSection.classList.remove('d-none');
+                    fetchVoicesFromDB();
                 } else {
                     placeholderSection.classList.remove('d-none');
                 }

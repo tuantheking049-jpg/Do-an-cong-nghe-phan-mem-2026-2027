@@ -5,14 +5,22 @@
     "chua-doi": 2,
     "khu-can-cu-tinh-uy-soc-trang": 5,
     "chua-la-han": 3,
+    "a": 16,
     "cho-noi-nga-nam": 1
   },
-  "StatusById": {},
+  "StatusById": {
+    "a": "Ho\u1EA1t \u0111\u1ED9ng"
+  },
   "NarrationTitleById": {
-    "tan-hue-vien": "Thuy\u1EBFt minh T\u00E2n Hu\u00EA Vi\u00EAn"
+    "tan-hue-vien": "Thuy\u1EBFt minh T\u00E2n Hu\u00EA Vi\u00EAn",
+    "chua-la-han": "Thuy\u1EBFt minh Ch\u00F9a La H\u00E1n",
+    "cho-noi-nga-nam": "Thuy\u1EBFt minh Ch\u1EE3 n\u1ED5i Ng\u00E3 N\u0103m"
   },
   "NarrationPublishStatusById": {
-    "tan-hue-vien": "B\u1EA3n nh\u00E1p"
+    "tan-hue-vien": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-la-han": "B\u1EA3n nh\u00E1p",
+    "a": "B\u1EA3n nh\u00E1p",
+    "cho-noi-nga-nam": "\u0110\u00E3 c\u00F4ng b\u1ED1"
   },
-  "NextOrder": 8
+  "NextOrder": 17
 }

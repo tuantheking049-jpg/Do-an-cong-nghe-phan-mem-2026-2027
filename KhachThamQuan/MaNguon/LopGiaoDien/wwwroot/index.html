@@ -175,5 +175,45 @@
           navigator.sendBeacon('/api/thongke/giam-truy-cap');
       });
     </script>
+    <!-- Đồng bộ cấu hình Giọng đọc (Speed, Pitch, Trạng thái) từ Admin UC16 sang trang User -->
+    <script>
+        (function () {
+            if (!('speechSynthesis' in window)) return;
+            let adminVoiceConfigs = [];
+
+            // Lấy cấu hình giọng đọc mới nhất từ Admin
+            function syncVoiceConfigs() {
+                fetch('/api/admin/landmarks/voices')
+                    .then(r => r.ok ? r.json() : [])
+                    .then(data => { if (Array.isArray(data)) adminVoiceConfigs = data; })
+                    .catch(() => {});
+            }
+            syncVoiceConfigs();
+
+            const originalSpeak = window.speechSynthesis.speak.bind(window.speechSynthesis);
+            window.speechSynthesis.speak = function (utterance) {
+                if (utterance && utterance.text && adminVoiceConfigs.length > 0) {
+                    const textNorm = utterance.text.trim();
+                    const matched = adminVoiceConfigs.find(v =>
+                        v.textContent && (textNorm.includes(v.textContent.slice(0, 40).trim()) || v.textContent.trim() === textNorm)
+                    );
+
+                    if (matched) {
+                        if (matched.status === 'Bản nháp') {
+                            alert('Âm thanh thuyết minh của địa điểm này hiện đang ở trạng thái Bản nháp (chưa công bố)!');
+                            window.speechSynthesis.cancel();
+                            return;
+                        }
+                        utterance.rate = parseFloat(matched.speechRate) || 1.0;
+                        utterance.pitch = parseFloat(matched.pitch) || 1.0;
+                    }
+                }
+                return originalSpeak(utterance);
+            };
+
+            // Tự động làm mới cấu hình mỗi khi người dùng quay lại tab
+            window.addEventListener('focus', syncVoiceConfigs);
+        })();
+    </script>
   </body>
 </html>
