@@ -29,6 +29,13 @@ CREATE TABLE [POIs] (
   [Longitude] float,
   [Status] nvarchar(30),
   [DisplayOrder] int,
+  [DurationMinutes] int,
+  [Rating] float,
+  [ReviewCount] int,
+  [ImageSourceUrl] nvarchar(2048),
+  [ImagePosition] nvarchar(100),
+  [HighlightsJson] nvarchar(max),
+  [GalleryJson] nvarchar(max),
   [CreatedBy] int
 )
 GO

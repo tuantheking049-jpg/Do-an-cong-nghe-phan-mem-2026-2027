@@ -34,6 +34,13 @@ CREATE TABLE POIs (
     Longitude    FLOAT NULL,
     Status       NVARCHAR(30) NOT NULL DEFAULT N'Hoạt động',
     DisplayOrder INT NOT NULL DEFAULT 0,
+    DurationMinutes INT NOT NULL DEFAULT 5,
+    Rating          FLOAT NOT NULL DEFAULT 0,
+    ReviewCount     INT NOT NULL DEFAULT 0,
+    ImageSourceUrl  NVARCHAR(2048) NULL,
+    ImagePosition   NVARCHAR(100) NULL,
+    HighlightsJson  NVARCHAR(MAX) NULL,
+    GalleryJson     NVARCHAR(MAX) NULL,
     CreatedBy    INT NULL REFERENCES Admin_Accounts(AdminID)
 );
 
@@ -73,7 +80,7 @@ CREATE INDEX IX_POIs_Geo  ON POIs(Latitude, Longitude);
 GO
 
 INSERT INTO Admin_Accounts (Username, FullName, Email, PasswordHash)
-VALUES (N'admin', N'Quản trị viên', N'admin@soctrang.vn', N'hash1234');
+VALUES (N'admin', N'Quản trị viên', N'admin@soctrang.vn', N'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3');
 
 INSERT INTO Languages (LangCode, LangName, IsEnabled) VALUES
 ('vi', N'Tiếng Việt', 1),
@@ -116,6 +123,12 @@ INSERT INTO Audio_Files (NarrationID, LangCode, VoiceName, SourceType, AudioURL)
 ((SELECT n.NarrationID FROM Narrations n JOIN POIs p ON p.PoiID = n.PoiID WHERE p.Slug = N'chua-phat-hoc-2'), 'vi', N'vi-VN-Standard', 'TTS', N'chuaphathoc2_vi.mp3'),
 ((SELECT n.NarrationID FROM Narrations n JOIN POIs p ON p.PoiID = n.PoiID WHERE p.Slug = N'khu-can-cu-tinh-uy-soc-trang'), 'vi', N'vi-VN-Standard', 'TTS', N'khucancu_vi.mp3'),
 ((SELECT n.NarrationID FROM Narrations n JOIN POIs p ON p.PoiID = n.PoiID WHERE p.Slug = N'tan-hue-vien'), 'vi', N'vi-VN-Standard', 'TTS', N'tanhuevien_vi.mp3');
+UPDATE POIs SET DurationMinutes = 7, Rating = 4.8, ReviewCount = 320, ImageSourceUrl = N'https://www.dacsanbanhpia.com/wp-content/uploads/2015/05/banh-pia-tan-hue-vien.jpg', ImagePosition = N'center 55%', HighlightsJson = N'["Đặc sản Sóc Trăng", "Bánh pía", "Ẩm thực địa phương"]', GalleryJson = N'[{"url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Khu_B%E1%BA%A3o_Th%C3%A1p_Li%C3%AAn_Hoa_-_T%C3%A2n_Hu%C3%AA_Vi%C3%AAn.jpg", "sourceUrl": "https://commons.wikimedia.org/wiki/File:Khu_B%E1%BA%A3o_Th%C3%A1p_Li%C3%AAn_Hoa_-_T%C3%A2n_Hu%C3%AA_Vi%C3%AAn.jpg", "caption": "Khu Bảo Tháp Liên Hoa"}]' WHERE Slug = N'tan-hue-vien';
+UPDATE POIs SET DurationMinutes = 8, Rating = 4.8, ReviewCount = 280, ImageSourceUrl = N'https://images.vietnamtourism.gov.vn/vn/images/2014/AnhInternet/chonoinga5.jpg', ImagePosition = N'center 50%', HighlightsJson = N'["Chợ nổi miền Tây", "Giao thương đường thủy", "Bình minh"]', GalleryJson = N'[{"url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Ch%E1%BB%A3_n%E1%BB%95i_Ng%C3%A3_N%C4%83m%2C_S%C3%B3c_Tr%C4%83ng.jpg", "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%E1%BB%A3_n%E1%BB%95i_Ng%C3%A3_N%C4%83m,_S%C3%B3c_Tr%C4%83ng.jpg", "caption": "Ghe thuyền tại chợ nổi Ngã Năm"}]' WHERE Slug = N'cho-noi-nga-nam';
+UPDATE POIs SET DurationMinutes = 8, Rating = 4.8, ReviewCount = 410, ImageSourceUrl = N'https://commons.wikimedia.org/wiki/File:Ch%C3%B9a_D%C6%A1i_S%C3%B3c_Tr%C4%83ng_(40553739771).jpg', ImagePosition = N'center 55%', HighlightsJson = N'["Chùa Khmer", "Kiến trúc Phật giáo", "Vườn cây"]', GalleryJson = N'[{"url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Ch%C3%A1nh_%C4%91i%E1%BB%87n_ch%C3%B9a_D%C6%A1i_-_S%C3%B3c_Tr%C4%83ng.jpg/960px-Ch%C3%A1nh_%C4%91i%E1%BB%87n_ch%C3%B9a_D%C6%A1i_-_S%C3%B3c_Tr%C4%83ng.jpg", "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%A1nh_%C4%91i%E1%BB%87n_ch%C3%B9a_D%C6%A1i_-_S%C3%B3c_Tr%C4%83ng.jpg", "caption": "Chánh điện chùa Dơi"}, {"url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Ch%C3%B9a_D%C6%A1i%2C_c%E1%BB%95ng_ch%C3%ADnh.JPG/960px-Ch%C3%B9a_D%C6%A1i%2C_c%E1%BB%95ng_ch%C3%ADnh.JPG", "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%B9a_D%C6%A1i,_c%E1%BB%95ng_ch%C3%ADnh.JPG", "caption": "Cổng chính chùa Dơi"}]' WHERE Slug = N'chua-doi';
+UPDATE POIs SET DurationMinutes = 8, Rating = 4.8, ReviewCount = 365, ImageSourceUrl = N'https://commons.wikimedia.org/wiki/File:Ch%C3%B9a_Ph%E1%BA%ADt_h%E1%BB%8Dc_2_-_S%C3%B3c_Tr%C4%83ng.jpg', ImagePosition = N'center 50%', HighlightsJson = N'["Không gian thanh tịnh", "Kiến trúc Phật giáo", "Vườn tượng"]', GalleryJson = N'[]' WHERE Slug = N'chua-phat-hoc-2';
+UPDATE POIs SET DurationMinutes = 7, Rating = 4.7, ReviewCount = 230, ImageSourceUrl = N'https://commons.wikimedia.org/wiki/File:Ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng.jpg', ImagePosition = N'center 58%', HighlightsJson = N'["Văn hóa người Hoa", "Kiến trúc chùa", "Không gian thanh tịnh"]', GalleryJson = N'[{"url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Ch%C3%B9a_La_H%C3%A1n_-_TP_S%C3%B3c_Tr%C4%83ng.jpg", "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%B9a_La_H%C3%A1n_-_TP_S%C3%B3c_Tr%C4%83ng.jpg", "caption": "Toàn cảnh chùa La Hán"}, {"url": "https://upload.wikimedia.org/wikipedia/commons/5/52/H%E1%BB%93_sen_ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng.jpg", "sourceUrl": "https://commons.wikimedia.org/wiki/File:H%E1%BB%93_sen_ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng.jpg", "caption": "Hồ sen chùa La Hán"}]' WHERE Slug = N'chua-la-han';
+UPDATE POIs SET DurationMinutes = 10, Rating = 4.7, ReviewCount = 190, ImageSourceUrl = N'https://media-cdn-v2.laodong.vn/storage/newsportal/2025/4/20/1494178/Soc-Trang-1-01.jpg', ImagePosition = N'center 50%', HighlightsJson = N'["Di tích lịch sử", "Căn cứ cách mạng", "Rừng Mỹ Phước"]', GalleryJson = N'[]' WHERE Slug = N'khu-can-cu-tinh-uy-soc-trang';
 GO
 
 SELECT * FROM Admin_Accounts;
