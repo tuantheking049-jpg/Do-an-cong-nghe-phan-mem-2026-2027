@@ -5,7 +5,7 @@ using VisitorGuide.Infrastructure.Entities;
 
 namespace VisitorGuide.Infrastructure.Repositories;
 
-public sealed class SqlServerDiaDiemThamQuanRepository(VisitorGuideDbContext dbContext)
+public sealed class EntityFrameworkDiaDiemThamQuanRepository(VisitorGuideDbContext dbContext)
     : IDiaDiemThamQuanRepository
 {
     public IReadOnlyCollection<DiaDiemThamQuan> GetAll() =>
@@ -14,9 +14,8 @@ public sealed class SqlServerDiaDiemThamQuanRepository(VisitorGuideDbContext dbC
             .Include(place => place.Descriptions)
             .Include(place => place.Highlights)
             .Include(place => place.GalleryPhotos)
-            .AsSplitQuery()
             .ToArray()
-            .Select(ToDomain)
+            .Select(MapToDomain)
             .ToArray();
 
     public DiaDiemThamQuan? GetById(string id)
@@ -26,13 +25,12 @@ public sealed class SqlServerDiaDiemThamQuanRepository(VisitorGuideDbContext dbC
             .Include(item => item.Descriptions)
             .Include(item => item.Highlights)
             .Include(item => item.GalleryPhotos)
-            .AsSplitQuery()
             .SingleOrDefault(item => item.Id == id);
 
-        return place is null ? null : ToDomain(place);
+        return place is null ? null : MapToDomain(place);
     }
 
-    private static DiaDiemThamQuan ToDomain(DiaDiemEntity place) => new(
+    private static DiaDiemThamQuan MapToDomain(DiaDiemEntity place) => new(
         place.Id,
         place.Name,
         place.Category,

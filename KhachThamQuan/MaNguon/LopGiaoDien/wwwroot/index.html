@@ -5,21 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f7f7f3" />
     <meta name="description" content="Khám phá các điểm tham quan Sóc Trăng với thuyết minh tự động đa ngôn ngữ." />
-    <title>AudioGuide — Khám phá Sóc Trăng</title>
+    <title>TLT — Khám phá Sóc Trăng</title>
     <link rel="preconnect" href="https://images.vietnamtourism.gov.vn" />
     <link rel="preconnect" href="https://upload.wikimedia.org" />
     <link rel="stylesheet" href="/TrangThamQuan.css" />
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="/" aria-label="AudioGuide, trang chủ">
+      <a class="brand" href="/" aria-label="TLT, trang chủ" data-i18n-aria-label="homeLinkLabel">
         <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5c-4.4 0-8 3.4-8 7.7 0 5.7 8 17.3 8 17.3s8-11.6 8-17.3c0-4.3-3.6-7.7-8-7.7Z"/><circle cx="16" cy="11.2" r="2.8"/></svg></span>
-        <span class="brand-name">AudioGuide</span>
+        <span class="brand-name">TLT</span>
       </a>
-      <nav class="main-nav" aria-label="Điều hướng chính">
-        <a class="nav-link active" href="#kham-pha">Khám phá</a>
-        <a class="nav-link" href="#diem-den">Điểm đến</a>
-        <a class="nav-link" href="#cach-hoat-dong">Cách hoạt động</a>
+      <nav class="main-nav" aria-label="Điều hướng chính" data-i18n-aria-label="mainNavigation">
+        <a class="nav-link active" href="#kham-pha" data-i18n="navExplore">Khám phá</a>
+        <a class="nav-link" href="#diem-den" data-i18n="navDestinations">Điểm đến</a>
+        <a class="nav-link" href="#cach-hoat-dong" data-i18n="navHowItWorks">Cách hoạt động</a>
       </nav>
       <div class="header-actions">
         <label class="language-picker" aria-label="Chọn ngôn ngữ" id="language-picker">
@@ -31,15 +31,12 @@
           </select>
           <span class="chevron" aria-hidden="true">⌄</span>
         </label>
-        <button class="avatar-button" id="saved-button" aria-label="Địa điểm yêu thích">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 4.5-8.8 10-8.8 10s-8.8-5.5-8.8-10A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z"/></svg>
-        </button>
       </div>
     </header>
 
     <main>
       <section class="hero" id="kham-pha">
-        <div class="hero-photo" role="img" aria-label="Ảnh minh họa hành trình khám phá Sóc Trăng"></div>
+        <div class="hero-photo" role="img" aria-label="Ảnh minh họa hành trình khám phá Sóc Trăng" data-i18n-aria-label="heroImageAlt"></div>
         <div class="hero-shade"></div>
         <div class="hero-content">
           <div class="eyebrow hero-eyebrow"><span class="eyebrow-dot"></span><span data-i18n="heroEyebrow">HÀNH TRÌNH CỦA RIÊNG BẠN BẮT ĐẦU TỪ ĐÂY</span></div>
@@ -61,9 +58,9 @@
         </div>
       </section>
 
-      <section class="explore page-shell" aria-label="Danh sách địa điểm">
+      <section class="explore page-shell" aria-label="Danh sách địa điểm" data-i18n-aria-label="destinationsListLabel">
         <div class="explore-toolbar">
-          <div class="filter-tabs" role="group" aria-label="Lọc theo chủ đề">
+          <div class="filter-tabs" role="group" aria-label="Lọc theo chủ đề" data-i18n-aria-label="topicFilterLabel">
             <button class="filter-chip selected" data-category="" data-i18n="filterAll">Tất cả <span>06</span></button>
             <button class="filter-chip" data-category="Văn hóa" data-i18n="filterCulture">Văn hóa</button>
             <button class="filter-chip" data-category="Ẩm thực" data-i18n="filterFood">Ẩm thực</button>
@@ -85,7 +82,7 @@
       </section>
 
       <section class="story-banner page-shell" id="cach-hoat-dong">
-        <div class="story-image" role="img" aria-label="Khám phá những con đường di sản"></div>
+        <div class="story-image" role="img" aria-label="Khám phá những con đường di sản" data-i18n-aria-label="storyImageAlt"></div>
         <div class="story-panel">
           <span class="eyebrow light-eyebrow"><span class="eyebrow-dot"></span><span data-i18n="storyLabel">ĐI CHẬM, NGHE SÂU</span></span>
           <h2 data-i18n="storyTitle">Không cần hướng dẫn viên.<br />Câu chuyện luôn bên bạn.</h2>
@@ -96,7 +93,7 @@
     </main>
 
     <footer class="site-footer page-shell">
-      <a class="brand footer-brand" href="/"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5c-4.4 0-8 3.4-8 7.7 0 5.7 8 17.3 8 17.3s8-11.6 8-17.3c0-4.3-3.6-7.7-8-7.7Z"/><circle cx="16" cy="11.2" r="2.8"/></svg></span><span class="brand-name">AudioGuide</span></a>
+      <a class="brand footer-brand" href="/"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3.5c-4.4 0-8 3.4-8 7.7 0 5.7 8 17.3 8 17.3s8-11.6 8-17.3c0-4.3-3.6-7.7-8-7.7Z"/><circle cx="16" cy="11.2" r="2.8"/></svg></span><span class="brand-name">TLT</span></a>
       <span data-i18n="footerNote">Miền Tây Sông Nước</span>
     </footer>
 
@@ -105,7 +102,7 @@
       <div class="player-meta"><span class="player-kicker" data-i18n="nowPlaying">ĐANG THUYẾT MINH</span><strong id="player-title"></strong><span id="player-language"></span></div>
       <div class="player-controls"><span class="audio-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><button id="replay-toggle" class="play-toggle replay-toggle" aria-label="Nghe lại từ đầu" data-i18n-title="replayNarration" title="Nghe lại từ đầu">↺</button><button id="play-toggle" class="play-toggle" aria-label="Tạm dừng">Ⅱ</button><span class="player-time" data-i18n="audioLabel">Âm thanh tự động</span></div>
       <input id="narration-seek" class="narration-seek" type="range" min="0" max="1000" value="0" step="1" data-i18n-aria-label="seekNarration" aria-label="Tua nội dung thuyết minh" />
-      <button class="player-close" id="player-close" aria-label="Đóng trình phát">×</button>
+      <button class="player-close" id="player-close" aria-label="Đóng trình phát" data-i18n-aria-label="closePlayer">×</button>
     </aside>
     <dialog class="gallery-dialog" id="gallery-dialog" aria-labelledby="gallery-title">
       <div class="gallery-header">
@@ -119,9 +116,9 @@
       </div>
       <div class="gallery-grid" id="gallery-grid"></div>
     </dialog>
-    <dialog class="image-view-dialog" id="image-view-dialog" aria-label="Ảnh địa điểm phóng lớn">
+    <dialog class="image-view-dialog" id="image-view-dialog" aria-label="Ảnh địa điểm phóng lớn" data-i18n-aria-label="imageDialogLabel">
       <form method="dialog">
-        <button class="image-view-close" aria-label="Đóng ảnh">×</button>
+        <button class="image-view-close" aria-label="Đóng ảnh" data-i18n-aria-label="closeImage">×</button>
       </form>
       <img id="image-view-large" alt="" />
     </dialog>
@@ -147,7 +144,7 @@
           <button class="gallery-close" data-i18n-aria-label="closeLocation" aria-label="Đóng bản đồ">×</button>
         </form>
       </div>
-      <iframe id="location-map" title="Bản đồ vị trí địa điểm" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      <iframe id="location-map" title="Bản đồ vị trí địa điểm" data-i18n-title="mapFrameTitle" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
       <p id="location-status" class="location-status" role="status" aria-live="polite"></p>
       <div class="location-actions">
         <button id="locate-me" class="view-location-button" type="button" data-i18n="useCurrentLocation">Cập nhật vị trí & tìm đường</button>
@@ -161,20 +158,6 @@
     <!-- ĐÃ XÓA ĐUÔI ?v=21 ĐỂ CHỐNG KẸT CACHE -->
     <script src="/TrangThamQuan.js" defer></script>
     
-    <!-- MỚI THÊM: Script đếm lượt truy cập & thoát web cho Đồ án của bạn -->
-    <script>
-      // 1. Khi vừa mở web -> Báo cộng 1
-      document.addEventListener("DOMContentLoaded", function() {
-          fetch('/api/thongke/tang-truy-cap', { method: 'POST' })
-              .catch(err => console.error(err));
-      });
-
-      // 2. Khi đóng Tab, thoát trình duyệt -> Báo trừ 1
-      window.addEventListener("pagehide", function() {
-          // sendBeacon bắn tín hiệu ngầm cực nhanh kể cả khi tab đã đóng
-          navigator.sendBeacon('/api/thongke/giam-truy-cap');
-      });
-    </script>
     <!-- Đồng bộ cấu hình Giọng đọc (Speed, Pitch, Trạng thái) từ Admin UC16 sang trang User -->
     <script>
         (function () {
@@ -200,7 +183,7 @@
 
                     if (matched) {
                         if (matched.status === 'Bản nháp') {
-                            alert('Âm thanh thuyết minh của địa điểm này hiện đang ở trạng thái Bản nháp (chưa công bố)!');
+                            alert(window.getVisitorText('draftAudioMessage'));
                             window.speechSynthesis.cancel();
                             return;
                         }
@@ -606,7 +589,13 @@
                     const selectEl = document.querySelector('#language-select, select[aria-label*="ngôn ngữ"], .language-select select, select');
                     if (!selectEl) return;
 
-                    const currentSelected = selectEl.value || 'vi';
+                    let savedLanguage = '';
+                    try {
+                        savedLanguage = window.localStorage.getItem('visitor-guide-language') || '';
+                    } catch { }
+                    const savedActiveLanguage = activeLangs.find(l =>
+                        l.code.toLowerCase() === savedLanguage.toLowerCase());
+                    const currentSelected = savedActiveLanguage ? savedActiveLanguage.code : (selectEl.value || 'vi');
                     selectEl.innerHTML = activeLangs.map(l =>
                         `<option value="${l.code}">${l.name}</option>`
                     ).join('');

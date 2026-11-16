@@ -140,12 +140,13 @@
             
             <!-- Khu vực hiện thông báo lỗi -->
             <div id="error-msg" class="alert alert-danger d-none py-2 small rounded-3 mb-4 fw-medium text-start" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-1"></i> Tài khoản hoặc mật khẩu không chính xác!
+                <i class="bi bi-exclamation-triangle-fill me-1"></i><span id="error-text">Tài khoản hoặc mật khẩu không chính xác!</span>
             </div>
             <!-- THÊM MỚI: Khu vực hiện thông báo đăng xuất -->
             <div id="logout-msg" class="alert alert-success d-none py-2 small" role="alert">
                 Đã đăng xuất. Phiên đăng nhập đã hết hạn!
             </div>
+            <div id="demo-login-info" class="alert alert-info d-none py-2 small text-start" role="status" aria-live="polite"></div>
 
             <!-- Thay thẻ <form> bằng <div> để lách cảnh báo lộ mật khẩu của Google Chrome -->
             <div id="loginFormContainer">
@@ -154,7 +155,7 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
                         <!-- Tắt autocomplete để Chrome không nhảy gợi ý linh tinh -->
-                        <input type="text" class="form-control" id="username" placeholder="Nhập admin..." autocomplete="off" spellcheck="false">
+                        <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" autocomplete="username" spellcheck="false">
                     </div>
                 </div>
                 
@@ -162,8 +163,7 @@
                     <label class="form-label fw-semibold small text-secondary ms-1">Mật khẩu</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                        <!-- Đổi id thành pwd_secret và dùng new-password để Chrome không nhận diện đây là mật khẩu yếu -->
-                        <input type="password" class="form-control" id="pwd_secret" placeholder="Nhập 123..." autocomplete="new-password">
+                        <input type="password" class="form-control" id="pwd_secret" placeholder="Nhập mật khẩu" autocomplete="current-password">
                     </div>
                 </div>
                 
@@ -184,42 +184,75 @@
             window.history.replaceState(null, null, window.location.pathname);
         }
         
-        function processLogin() {
+        async function processLogin() {
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('pwd_secret').value;
             const errorBox = document.getElementById('error-msg');
+            const errorText = document.getElementById('error-text');
+            const button = document.getElementById('btnLogin');
 
-            // Reset trạng thái lỗi
             errorBox.classList.add('d-none');
 
-            // Validate rỗng
-            if(user === '' || pass === '') {
-                errorBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Vui lòng nhập đầy đủ thông tin!';
+            if (user === '' || pass === '') {
+                errorText.textContent = 'Vui lòng nhập đầy đủ thông tin!';
                 errorBox.classList.remove('d-none');
                 return;
             }
 
-            // GIẢ LẬP XÁC THỰC (Sau này gọi API xuống C# ở đây)
-            if (user === 'admin' && pass === '123') {
-                // Lưu session đăng nhập
-                sessionStorage.setItem('isAdminLoggedIn', 'true');
-                
-                // Hiển thị hiệu ứng loading trên nút
-                const btn = document.getElementById('btnLogin');
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang vào...';
-                btn.classList.add('disabled');
-                
-                // Chuyển hướng sau nửa giây cho mượt
-                setTimeout(() => {
-                    window.location.href = 'admin_dashboard.html';
-                }, 500);
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang xác thực...';
+            try {
+                const response = await fetch('/api/admin/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
 
-            } else {
-                // Sai tài khoản
-                errorBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Tài khoản hoặc mật khẩu không chính xác!';
+                if (response.status === 503) {
+                    throw new Error('Quản trị viên chưa cấu hình tài khoản trên máy chủ.');
+                }
+                if (!response.ok) {
+                    throw new Error('Tài khoản hoặc mật khẩu không chính xác.');
+                }
+
+                window.location.replace('admin_dashboard.html');
+            } catch (error) {
+                errorText.textContent = error instanceof TypeError
+                    ? 'Không thể kết nối máy chủ. Vui lòng thử lại.'
+                    : error.message;
+                errorBox.classList.remove('d-none');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'ĐĂNG NHẬP';
+            }
+        }
+
+        async function loadLocalDemoCredentials() {
+            try {
+                const response = await fetch('/api/admin/auth/development-demo');
+                if (response.status === 404) {
+                    return;
+                }
+                if (!response.ok) {
+                    throw new Error('Không thể tải thông tin đăng nhập thử nghiệm.');
+                }
+
+                const credentials = await response.json();
+                document.getElementById('username').value = credentials.username;
+                document.getElementById('pwd_secret').value = credentials.password;
+                const info = document.getElementById('demo-login-info');
+                info.textContent = `Tài khoản thử nghiệm trên localhost — Tên đăng nhập: ${credentials.username}; Mật khẩu: ${credentials.password}`;
+                info.classList.remove('d-none');
+            } catch (error) {
+                const errorBox = document.getElementById('error-msg');
+                document.getElementById('error-text').textContent = error instanceof TypeError
+                    ? 'Không thể kết nối máy chủ. Vui lòng thử lại.'
+                    : error.message;
                 errorBox.classList.remove('d-none');
             }
         }
+
+        loadLocalDemoCredentials();
 
         // Bắt sự kiện Click nút
         document.getElementById('btnLogin').addEventListener('click', processLogin);

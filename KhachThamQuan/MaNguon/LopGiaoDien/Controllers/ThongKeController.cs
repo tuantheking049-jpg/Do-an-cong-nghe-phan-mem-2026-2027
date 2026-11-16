@@ -1,14 +1,22 @@
-using Microsoft.AspNetCore.Mvc;
 using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Mvc;
+using VisitorGuide.Api.Services;
+using VisitorGuide.Infrastructure;
 
 namespace VisitorGuide.Controllers;
 
+/// <summary>Identifies a browser and tab for live online tracking.</summary>
+public sealed record OnlineVisitorRequest(Guid VisitorId, Guid? BrowserId = null);
+
+/// <summary>Reports the number of active visitor browser sessions.</summary>
+public sealed record OnlineVisitorResponse(int LuotTruyCap);
+
 [Route("api/thongke")]
 [ApiController]
-public class ThongKeController : ControllerBase
+public class ThongKeController(
+    SqlServerRelationalStore relationalStore,
+    IOnlineVisitorTracker onlineVisitorTracker) : ControllerBase
 {
-    private static int _soLuotTruyCap = 0;
-
     // Lưu số lượt nghe theo từng ID địa điểm (6 địa điểm mặc định tổng = 178)
     public static readonly ConcurrentDictionary<string, int> LuotNgheTheoId = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -25,34 +33,60 @@ public class ThongKeController : ControllerBase
     {
         return Ok(new
         {
-            luotTruyCap = _soLuotTruyCap,
+            luotTruyCap = onlineVisitorTracker.GetOnlineCount(),
             luotNghe = LuotNgheTheoId.Values.Sum(),
             chiTietTheoId = LuotNgheTheoId
         });
     }
 
-    [HttpPost("tang-truy-cap")]
-    public IActionResult TangTruyCap()
+    [HttpPost("online/heartbeat")]
+    [ProducesResponseType(typeof(OnlineVisitorResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public ActionResult<OnlineVisitorResponse> Heartbeat([FromBody] OnlineVisitorRequest request)
     {
-        _soLuotTruyCap++;
-        return Ok(new { luotTruyCap = _soLuotTruyCap });
+        if (request.VisitorId == Guid.Empty || request.BrowserId == Guid.Empty)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Invalid visitor ID",
+                Detail = "VisitorId and BrowserId must be non-empty GUIDs."
+            });
+        }
+
+        var browserId = request.BrowserId ?? request.VisitorId;
+        return Ok(new OnlineVisitorResponse(onlineVisitorTracker.Heartbeat(browserId, request.VisitorId)));
     }
 
-    [HttpPost("giam-truy-cap")]
-    public IActionResult GiamTruyCap()
+    [HttpPost("online/leave")]
+    [ProducesResponseType(typeof(OnlineVisitorResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public ActionResult<OnlineVisitorResponse> Leave([FromBody] OnlineVisitorRequest request)
     {
-        if (_soLuotTruyCap > 0) _soLuotTruyCap--;
-        return Ok();
+        if (request.VisitorId == Guid.Empty || request.BrowserId == Guid.Empty)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Invalid visitor ID",
+                Detail = "VisitorId and BrowserId must be non-empty GUIDs."
+            });
+        }
+
+        var browserId = request.BrowserId ?? request.VisitorId;
+        return Ok(new OnlineVisitorResponse(onlineVisitorTracker.Leave(browserId, request.VisitorId)));
     }
 
     [HttpPost("tang-nghe/{id}")]
-    public IActionResult TangNghe(string id)
+    public async Task<IActionResult> TangNghe(string id, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(id)) return BadRequest();
 
         string key = id.Trim().ToLowerInvariant();
-        LuotNgheTheoId.AddOrUpdate(key, 1, (_, current) => current + 1);
+        var plays = await relationalStore.IncrementPlayCountAsync(key, cancellationToken);
+        if (plays is null) return NotFound();
+        LuotNgheTheoId[key] = plays.Value;
 
-        return Ok(new { id = key, plays = LuotNgheTheoId[key] });
+        return Ok(new { id = key, plays = plays.Value });
     }
 }

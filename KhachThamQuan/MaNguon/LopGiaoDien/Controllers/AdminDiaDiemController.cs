@@ -1,5 +1,11 @@
 using System.Collections.Concurrent;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text.Json;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VisitorGuide.Controllers;
@@ -86,13 +92,21 @@ public sealed class AdminPersistedState
     public List<AdminLanguageItem> Languages { get; set; } = new();
     public int NextLangOrder { get; set; } = 4;
     public Dictionary<string, string> TranslationStatusByKey { get; set; } = new();
+    public Dictionary<string, int> TranslationOrderByKey { get; set; } = new();
+    public List<AdminVoiceItem> Voices { get; set; } = new();
+    public List<string> DeletedVoiceKeys { get; set; } = new();
+    public Dictionary<string, int> PlaysById { get; set; } = new();
+    public int NextTranslationOrder { get; set; } = 1;
+    public int NextVoiceOrder { get; set; } = 1;
 }
 
 [ApiController]
+[Authorize]
 [Route("api/admin/landmarks")]
 public class AdminDiaDiemController : ControllerBase
 {
     private readonly VisitorGuideDbContext _dbContext;
+    private readonly SqlServerRelationalStore _relationalStore;
     private const string EmptyNarrationPlaceholder = "(Chưa có nội dung thuyết minh)";
 
     private const string EmptyTranslationPlaceholder = "(Chưa có bản dịch)";
@@ -123,19 +137,152 @@ public class AdminDiaDiemController : ControllerBase
         LoadStateFromDisk();
     }
 
-    public AdminDiaDiemController(VisitorGuideDbContext dbContext)
+    public AdminDiaDiemController(
+        VisitorGuideDbContext dbContext,
+        SqlServerRelationalStore relationalStore)
     {
         _dbContext = dbContext;
+        _relationalStore = relationalStore;
+    }
+
+    [HttpGet("qr-targets")]
+    public IActionResult GetQrTargets(
+        [FromServices] IServer server,
+        [FromServices] IConfiguration configuration)
+    {
+        var configuredPublicBaseUrl = configuration["PublicBaseUrl"];
+        if (!string.IsNullOrWhiteSpace(configuredPublicBaseUrl))
+        {
+            if (!Uri.TryCreate(configuredPublicBaseUrl, UriKind.Absolute, out var publicUri)
+                || publicUri.Scheme is not ("http" or "https"))
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    detail: "PublicBaseUrl must be an absolute HTTP or HTTPS URL.");
+            }
+
+            var publicUrlBuilder = new UriBuilder(publicUri)
+            {
+                Query = "",
+                Fragment = ""
+            };
+            if (!publicUrlBuilder.Path.EndsWith('/'))
+                publicUrlBuilder.Path += "/";
+
+            return Ok(new
+            {
+                canAccessFromPhone = true,
+                message = "Mã QR dùng URL công khai đã cấu hình.",
+                targets = new[]
+                {
+                    new { label = "URL công khai", url = publicUrlBuilder.Uri.AbsoluteUri }
+                }
+            });
+        }
+
+        var currentUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/";
+        if (!IsLocalRequestHost(Request.Host.Host))
+        {
+            return Ok(new
+            {
+                canAccessFromPhone = true,
+                message = "Mã QR dùng địa chỉ hiện tại.",
+                targets = new[] { new { label = "Địa chỉ hiện tại", url = currentUrl } }
+            });
+        }
+
+        var listeningAddresses = server.Features.Get<IServerAddressesFeature>()?.Addresses ?? [];
+        if (!listeningAddresses.Any(IsLanListenerAddress))
+        {
+            return Ok(new
+            {
+                canAccessFromPhone = false,
+                message = "Máy chủ hiện chỉ nhận kết nối trên máy này. Hãy chạy profile LAN rồi mở trang quản trị tại localhost:5201 để tạo QR dùng được trên điện thoại.",
+                targets = new[] { new { label = "Chỉ dùng được trên máy này", url = currentUrl } }
+            });
+        }
+
+        var lanPort = listeningAddresses
+            .Where(IsLanListenerAddress)
+            .Select(address => new Uri(address).Port)
+            .FirstOrDefault();
+        var port = lanPort > 0
+            ? lanPort
+            : Request.Host.Port ?? (Request.IsHttps ? 443 : 80);
+        var targets = NetworkInterface.GetAllNetworkInterfaces()
+            .Where(networkInterface =>
+                networkInterface.OperationalStatus == OperationalStatus.Up
+                && networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback
+                && networkInterface.NetworkInterfaceType != NetworkInterfaceType.Tunnel)
+            .OrderBy(networkInterface =>
+                networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ? 0 : 1)
+            .SelectMany(networkInterface => networkInterface.GetIPProperties().UnicastAddresses
+                .Where(address => IsUsableLanAddress(address.Address))
+                .Select(address => new
+                {
+                    label = $"{networkInterface.Name} ({address.Address})",
+                    url = new UriBuilder(Request.Scheme, address.Address.ToString(), port)
+                    {
+                        Path = $"{Request.PathBase}/"
+                    }.Uri.AbsoluteUri
+                }))
+            .DistinctBy(target => target.url, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        return Ok(new
+        {
+            canAccessFromPhone = targets.Length > 0,
+            message = targets.Length > 0
+                ? "Chọn địa chỉ thuộc cùng mạng Wi-Fi/LAN với điện thoại để quét."
+                : "Không tìm thấy địa chỉ IPv4 LAN. Kiểm tra kết nối Wi-Fi/Ethernet rồi thử lại.",
+            targets
+        });
+    }
+
+    private static bool IsLocalRequestHost(string host)
+    {
+        if (host.Equals("localhost", StringComparison.OrdinalIgnoreCase)) return true;
+        if (!IPAddress.TryParse(host, out var address)) return false;
+        return IPAddress.IsLoopback(address)
+            || address.Equals(IPAddress.Any)
+            || address.Equals(IPAddress.IPv6Any);
+    }
+
+    private static bool IsLanListenerAddress(string address)
+    {
+        if (!Uri.TryCreate(address, UriKind.Absolute, out var uri)) return false;
+        if (uri.Host is "*" or "+" or "0.0.0.0" or "::") return true;
+        return IPAddress.TryParse(uri.Host, out var ipAddress)
+            && !IPAddress.IsLoopback(ipAddress)
+            && !ipAddress.Equals(IPAddress.Any)
+            && !ipAddress.Equals(IPAddress.IPv6Any);
+    }
+
+    private static bool IsUsableLanAddress(IPAddress address)
+    {
+        if (address.AddressFamily != AddressFamily.InterNetwork || IPAddress.IsLoopback(address))
+            return false;
+
+        var bytes = address.GetAddressBytes();
+        return bytes[0] != 0
+            && bytes[0] < 224
+            && !(bytes[0] == 169 && bytes[1] == 254);
+    }
+
+    private async Task SaveStateToDatabaseAsync(CancellationToken cancellationToken = default)
+    {
+        SaveStateToDisk();
+        await _relationalStore.SaveAdminStateAsync(
+            ExportPersistedState(),
+            cancellationToken: cancellationToken);
     }
 
     private static void LoadStateFromDisk()
     {
-        try
-        {
-            if (!System.IO.File.Exists(StateFilePath)) return;
-            var json = System.IO.File.ReadAllText(StateFilePath);
-            var state = JsonSerializer.Deserialize<AdminPersistedState>(json);
-            if (state == null) return;
+        if (!System.IO.File.Exists(StateFilePath)) return;
+        var json = System.IO.File.ReadAllText(StateFilePath);
+        var state = JsonSerializer.Deserialize<AdminPersistedState>(json)
+            ?? throw new InvalidDataException($"Admin state file is invalid: {StateFilePath}");
 
             foreach (var kv in state.OrderById) _orderById[kv.Key] = kv.Value;
             foreach (var kv in state.StatusById) _statusById[kv.Key] = kv.Value;
@@ -164,39 +311,116 @@ public class AdminDiaDiemController : ControllerBase
                 foreach (var kv in state.TranslationStatusByKey)
                     _translationStatusByKey[kv.Key] = kv.Value;
             }
-        }
-        catch
-        {
-            // Bỏ qua nếu file chưa tồn tại hoặc lỗi đọc
-        }
+            if (state.TranslationOrderByKey != null)
+            {
+                foreach (var kv in state.TranslationOrderByKey)
+                    _translationOrderByKey[kv.Key] = kv.Value;
+            }
+            if (state.Voices != null)
+            {
+                foreach (var voice in state.Voices)
+                    _voicesByKey[voice.Key] = voice;
+            }
+            if (state.DeletedVoiceKeys != null)
+            {
+                foreach (var key in state.DeletedVoiceKeys)
+                    _deletedVoiceKeys[key] = true;
+            }
+            if (state.PlaysById != null)
+            {
+                foreach (var kv in state.PlaysById)
+                    ThongKeController.LuotNgheTheoId[kv.Key] = kv.Value;
+            }
+        if (state.NextTranslationOrder > _nextTranslationOrder) _nextTranslationOrder = state.NextTranslationOrder;
+        if (state.NextVoiceOrder > _nextVoiceOrder) _nextVoiceOrder = state.NextVoiceOrder;
     }
 
     private static void SaveStateToDisk()
     {
-        try
+        lock (StateLock)
         {
-            lock (StateLock)
+            var state = new AdminPersistedState
             {
-                var state = new AdminPersistedState
-                {
-                    OrderById = new Dictionary<string, int>(_orderById, StringComparer.OrdinalIgnoreCase),
-                    StatusById = new Dictionary<string, string>(_statusById, StringComparer.OrdinalIgnoreCase),
-                    NarrationTitleById = new Dictionary<string, string>(_narrationTitleById, StringComparer.OrdinalIgnoreCase),
-                    NarrationPublishStatusById = new Dictionary<string, string>(_narrationPublishStatusById, StringComparer.OrdinalIgnoreCase),
-                    NextOrder = _nextOrder,
-                    Languages = _languagesByCode.Values.OrderBy(x => x.OrderIndex).ToList(),
-                    NextLangOrder = _nextLangOrder,
-                    TranslationStatusByKey = new Dictionary<string, string>(_translationStatusByKey, StringComparer.OrdinalIgnoreCase)
-                };
-                var json = JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
-                System.IO.File.WriteAllText(StateFilePath, json);
-            }
-        }
-        catch
-        {
-            // Không làm gián đoạn request nếu không ghi được file phụ
+                OrderById = new Dictionary<string, int>(_orderById, StringComparer.OrdinalIgnoreCase),
+                StatusById = new Dictionary<string, string>(_statusById, StringComparer.OrdinalIgnoreCase),
+                NarrationTitleById = new Dictionary<string, string>(_narrationTitleById, StringComparer.OrdinalIgnoreCase),
+                NarrationPublishStatusById = new Dictionary<string, string>(_narrationPublishStatusById, StringComparer.OrdinalIgnoreCase),
+                NextOrder = _nextOrder,
+                Languages = _languagesByCode.Values.OrderBy(x => x.OrderIndex).ToList(),
+                NextLangOrder = _nextLangOrder,
+                TranslationStatusByKey = new Dictionary<string, string>(_translationStatusByKey, StringComparer.OrdinalIgnoreCase),
+                TranslationOrderByKey = new Dictionary<string, int>(_translationOrderByKey, StringComparer.OrdinalIgnoreCase),
+                Voices = _voicesByKey.Values.ToList(),
+                DeletedVoiceKeys = _deletedVoiceKeys.Keys.ToList(),
+                PlaysById = new Dictionary<string, int>(ThongKeController.LuotNgheTheoId, StringComparer.OrdinalIgnoreCase),
+                NextTranslationOrder = _nextTranslationOrder,
+                NextVoiceOrder = _nextVoiceOrder
+            };
+            var json = JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
+            System.IO.File.WriteAllText(StateFilePath, json);
         }
     }
+
+    public static string ExportPersistedState() =>
+        JsonSerializer.Serialize(CapturePersistedState(), new JsonSerializerOptions { WriteIndented = true });
+
+    public static void InitializePersistedState(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return;
+        var state = JsonSerializer.Deserialize<AdminPersistedState>(json)
+            ?? throw new InvalidDataException("Admin state in SQL Server is invalid.");
+
+        _orderById.Clear();
+        _statusById.Clear();
+        _narrationTitleById.Clear();
+        _narrationPublishStatusById.Clear();
+        _translationStatusByKey.Clear();
+        _translationOrderByKey.Clear();
+        _voicesByKey.Clear();
+        _deletedVoiceKeys.Clear();
+        ThongKeController.LuotNgheTheoId.Clear();
+        _languagesByCode.Clear();
+
+        foreach (var kv in state.OrderById) _orderById[kv.Key] = kv.Value;
+        foreach (var kv in state.StatusById) _statusById[kv.Key] = kv.Value;
+        foreach (var kv in state.NarrationTitleById) _narrationTitleById[kv.Key] = kv.Value;
+        foreach (var kv in state.NarrationPublishStatusById) _narrationPublishStatusById[kv.Key] = kv.Value;
+        foreach (var kv in state.TranslationStatusByKey) _translationStatusByKey[kv.Key] = kv.Value;
+        foreach (var kv in state.TranslationOrderByKey) _translationOrderByKey[kv.Key] = kv.Value;
+        foreach (var voice in state.Voices) _voicesByKey[voice.Key] = voice;
+        foreach (var key in state.DeletedVoiceKeys) _deletedVoiceKeys[key] = true;
+        foreach (var kv in state.PlaysById) ThongKeController.LuotNgheTheoId[kv.Key] = kv.Value;
+        foreach (var lang in state.Languages)
+        {
+            if (!string.IsNullOrWhiteSpace(lang.Code))
+                _languagesByCode[lang.Code.Trim().ToLowerInvariant()] = lang;
+        }
+
+        if (!_languagesByCode.ContainsKey("vi"))
+            _languagesByCode["vi"] = new AdminLanguageItem { Code = "vi", Name = "Tiếng Việt", VoiceLocale = "vi-VN", OrderIndex = 1 };
+        if (_nextOrder < state.NextOrder) _nextOrder = state.NextOrder;
+        if (_nextLangOrder < state.NextLangOrder) _nextLangOrder = state.NextLangOrder;
+        if (_nextTranslationOrder < state.NextTranslationOrder) _nextTranslationOrder = state.NextTranslationOrder;
+        if (_nextVoiceOrder < state.NextVoiceOrder) _nextVoiceOrder = state.NextVoiceOrder;
+    }
+
+    private static AdminPersistedState CapturePersistedState() => new()
+    {
+            OrderById = new Dictionary<string, int>(_orderById, StringComparer.OrdinalIgnoreCase),
+            StatusById = new Dictionary<string, string>(_statusById, StringComparer.OrdinalIgnoreCase),
+            NarrationTitleById = new Dictionary<string, string>(_narrationTitleById, StringComparer.OrdinalIgnoreCase),
+            NarrationPublishStatusById = new Dictionary<string, string>(_narrationPublishStatusById, StringComparer.OrdinalIgnoreCase),
+            NextOrder = _nextOrder,
+            Languages = _languagesByCode.Values.OrderBy(x => x.OrderIndex).ToList(),
+            NextLangOrder = _nextLangOrder,
+            TranslationStatusByKey = new Dictionary<string, string>(_translationStatusByKey, StringComparer.OrdinalIgnoreCase),
+            TranslationOrderByKey = new Dictionary<string, int>(_translationOrderByKey, StringComparer.OrdinalIgnoreCase),
+            Voices = _voicesByKey.Values.ToList(),
+            DeletedVoiceKeys = _deletedVoiceKeys.Keys.ToList(),
+            PlaysById = new Dictionary<string, int>(ThongKeController.LuotNgheTheoId, StringComparer.OrdinalIgnoreCase),
+            NextTranslationOrder = _nextTranslationOrder,
+        NextVoiceOrder = _nextVoiceOrder
+    };
 
     public static int GetOrderIndex(string id)
     {
@@ -280,8 +504,6 @@ public class AdminDiaDiemController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllForAdmin()
     {
-        await EnsureChildTablesPopulatedAsync();
-
         var rawList = await _dbContext.DiaDiem
             .AsNoTracking()
             .ToListAsync();
@@ -392,7 +614,11 @@ public class AdminDiaDiemController : ControllerBase
         _statusById[id] = status;
         _narrationPublishStatusById[id] = "Bản nháp";
         ThongKeController.LuotNgheTheoId[id] = request.Plays ?? 0;
-        SaveStateToDisk();
+        foreach (var description in descriptionsList)
+        {
+            AddDefaultVoice(id, description.LanguageCode);
+        }
+        await SaveStateToDatabaseAsync();
 
         return Ok(new { message = "Thêm địa điểm mới vào Database thành công!", id = entity.Id });
     }
@@ -416,7 +642,7 @@ public class AdminDiaDiemController : ControllerBase
         }
 
         await _dbContext.SaveChangesAsync();
-        SaveStateToDisk();
+        await SaveStateToDatabaseAsync();
 
         return Ok(new { message = "Cập nhật thông tin vào Database thành công!" });
     }
@@ -430,17 +656,43 @@ public class AdminDiaDiemController : ControllerBase
             return NotFound(new { message = "Không tìm thấy địa điểm cần xóa!" });
         }
 
+        var descriptions = await _dbContext.MoTaDiaDiem
+            .Where(x => x.DiaDiemId == entity.Id)
+            .ToListAsync();
+        var highlights = await _dbContext.DiemNoiBat
+            .Where(x => x.DiaDiemId == entity.Id)
+            .ToListAsync();
+        var galleryPhotos = await _dbContext.AnhDiaDiem
+            .Where(x => x.DiaDiemId == entity.Id)
+            .ToListAsync();
+
+        _dbContext.MoTaDiaDiem.RemoveRange(descriptions);
+        _dbContext.DiemNoiBat.RemoveRange(highlights);
+        _dbContext.AnhDiaDiem.RemoveRange(galleryPhotos);
         _dbContext.DiaDiem.Remove(entity);
         await _dbContext.SaveChangesAsync();
 
-        _statusById.TryRemove(id, out _);
-        _orderById.TryRemove(id, out _);
-        _narrationTitleById.TryRemove(id, out _);
-        _narrationPublishStatusById.TryRemove(id, out _);
-        ThongKeController.LuotNgheTheoId.TryRemove(id, out _);
-        SaveStateToDisk();
+        _statusById.TryRemove(entity.Id, out _);
+        _orderById.TryRemove(entity.Id, out _);
+        _narrationTitleById.TryRemove(entity.Id, out _);
+        _narrationPublishStatusById.TryRemove(entity.Id, out _);
+        RemovePlaceState(_translationStatusByKey, entity.Id);
+        RemovePlaceState(_translationOrderByKey, entity.Id);
+        RemovePlaceState(_voicesByKey, entity.Id);
+        RemovePlaceState(_deletedVoiceKeys, entity.Id);
+        ThongKeController.LuotNgheTheoId.TryRemove(entity.Id, out _);
+        await SaveStateToDatabaseAsync();
 
-        return Ok(new { message = "Đã xóa địa điểm khỏi Database thành công!" });
+        return Ok(new { message = "Đã xóa địa điểm cùng bản dịch và cấu hình giọng đọc liên quan thành công!" });
+    }
+
+    private static void RemovePlaceState<T>(ConcurrentDictionary<string, T> state, string placeId)
+    {
+        string prefix = GetTransKey(placeId, "");
+        foreach (var key in state.Keys.Where(key => key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
+        {
+            state.TryRemove(key, out _);
+        }
     }
 
     // =========================================================================
@@ -450,13 +702,10 @@ public class AdminDiaDiemController : ControllerBase
     [HttpGet("narrations")]
     public async Task<IActionResult> GetAllNarrations()
     {
-        await EnsureChildTablesPopulatedAsync();
-
         var rawList = await _dbContext.DiaDiem
             .AsNoTracking()
             .Include(d => d.Descriptions)
             .Include(d => d.Highlights)
-            .AsSplitQuery()
             .ToListAsync();
 
         foreach (var item in rawList)
@@ -603,7 +852,7 @@ public class AdminDiaDiemController : ControllerBase
         }
 
         await _dbContext.SaveChangesAsync();
-        SaveStateToDisk();
+        await SaveStateToDatabaseAsync();
 
         return Ok(new { message = $"Đã lưu bài thuyết minh \"{cleanTitle}\" ở trạng thái [{pubStatus}] thành công!" });
     }
@@ -628,7 +877,7 @@ public class AdminDiaDiemController : ControllerBase
         }
 
         await _dbContext.SaveChangesAsync();
-        SaveStateToDisk();
+        await SaveStateToDatabaseAsync();
 
         return Ok(new { message = "Đã xóa nội dung và chuyển về trạng thái Bản nháp!" });
     }
@@ -692,6 +941,7 @@ public class AdminDiaDiemController : ControllerBase
     }
 
     [HttpGet("languages")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllLanguages()
     {
         var usageCounts = await _dbContext.MoTaDiaDiem
@@ -713,7 +963,7 @@ public class AdminDiaDiemController : ControllerBase
                 updatedNames = true;
             }
         }
-        if (updatedNames) SaveStateToDisk();
+        if (updatedNames) await SaveStateToDatabaseAsync();
 
         var result = _languagesByCode.Values
             .OrderBy(l => l.OrderIndex)
@@ -768,6 +1018,7 @@ public class AdminDiaDiemController : ControllerBase
         };
 
         _languagesByCode[code] = item;
+        await SaveStateToDatabaseAsync();
 
         var places = await _dbContext.DiaDiem.Include(p => p.Descriptions).ToListAsync();
         foreach (var place in places)
@@ -794,16 +1045,17 @@ public class AdminDiaDiemController : ControllerBase
             string key = GetTransKey(place.Id, code);
             _translationStatusByKey[key] = IsNarrationDraft(place.Id) ? "Bản nháp" : "Đã công bố";
             GetTranslationOrder(place.Id, code);
+            AddDefaultVoice(place.Id, code);
         }
 
         await _dbContext.SaveChangesAsync();
-        SaveStateToDisk();
+        await SaveStateToDatabaseAsync();
 
         return Ok(new { message = $"Đã thêm ngôn ngữ \"{item.Name}\" ({item.Code}) và tự động dịch nội dung thuyết minh!" });
     }
 
     [HttpPut("languages/{code}")]
-    public IActionResult UpdateLanguage(string code, [FromBody] AdminLanguageRequest request)
+    public async Task<IActionResult> UpdateLanguage(string code, [FromBody] AdminLanguageRequest request)
     {
         string key = code.Trim().ToLowerInvariant();
         if (!_languagesByCode.TryGetValue(key, out var existing))
@@ -825,7 +1077,7 @@ public class AdminDiaDiemController : ControllerBase
             ? "Tạm ngưng"
             : "Đang hỗ trợ";
 
-        SaveStateToDisk();
+        await SaveStateToDatabaseAsync();
         return Ok(new { message = $"Đã cập nhật cấu hình ngôn ngữ \"{existing.Name}\" thành công!" });
     }
 
@@ -843,29 +1095,41 @@ public class AdminDiaDiemController : ControllerBase
             return BadRequest(new { message = "Không thể xóa Tiếng Việt (vi) vì đây là ngôn ngữ thuyết minh gốc mặc định của hệ thống (Luồng 6a)!" });
         }
 
-        int usedCount = await _dbContext.MoTaDiaDiem
-            .CountAsync(m => m.LanguageCode.ToLower() == key &&
-                             m.Description != "" &&
-                             m.Description != EmptyNarrationPlaceholder &&
-                             m.Description != EmptyTranslationPlaceholder);
-
-        if (usedCount > 0)
+        var translationRows = await _dbContext.MoTaDiaDiem
+            .Where(m => m.LanguageCode.ToLower() == key)
+            .ToListAsync();
+        if (translationRows.Count > 0)
         {
-            return BadRequest(new
-            {
-                message = $"Từ chối xóa (Luồng 6a): Ngôn ngữ \"{existing.Name}\" ({key}) đang được {usedCount} bản dịch sử dụng! Hãy xóa các bản dịch của ngôn ngữ này ở mục Quản lý bản dịch trước hoặc chuyển trạng thái sang 'Tạm ngưng'."
-            });
-        }
-
-        var dummyRows = await _dbContext.MoTaDiaDiem.Where(m => m.LanguageCode.ToLower() == key).ToListAsync();
-        if (dummyRows.Count > 0)
-        {
-            _dbContext.MoTaDiaDiem.RemoveRange(dummyRows);
+            _dbContext.MoTaDiaDiem.RemoveRange(translationRows);
             await _dbContext.SaveChangesAsync();
         }
 
+        foreach (var translationKey in _translationStatusByKey.Keys
+                     .Where(value => value.EndsWith($":{key}", StringComparison.OrdinalIgnoreCase)))
+        {
+            _translationStatusByKey.TryRemove(translationKey, out _);
+        }
+
+        foreach (var translationKey in _translationOrderByKey.Keys
+                     .Where(value => value.EndsWith($":{key}", StringComparison.OrdinalIgnoreCase)))
+        {
+            _translationOrderByKey.TryRemove(translationKey, out _);
+        }
+
+        foreach (var voiceKey in _voicesByKey.Keys
+                     .Where(value => value.EndsWith($":{key}", StringComparison.OrdinalIgnoreCase)))
+        {
+            _voicesByKey.TryRemove(voiceKey, out _);
+        }
+
+        foreach (var voiceKey in _deletedVoiceKeys.Keys
+                     .Where(value => value.EndsWith($":{key}", StringComparison.OrdinalIgnoreCase)))
+        {
+            _deletedVoiceKeys.TryRemove(voiceKey, out _);
+        }
+
         _languagesByCode.TryRemove(key, out _);
-        SaveStateToDisk();
+        await SaveStateToDatabaseAsync();
 
         return Ok(new { message = $"Đã xóa hoàn toàn ngôn ngữ \"{existing.Name}\" ({key}) khỏi hệ thống!" });
     }
@@ -898,29 +1162,15 @@ public class AdminDiaDiemController : ControllerBase
 
     // 1. GET: Lấy danh sách các bản dịch hiện có (ngoại trừ tiếng Việt gốc)
     [HttpGet("translations")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllTranslations()
     {
-        await EnsureChildTablesPopulatedAsync();
-
         var rawPlaces = await _dbContext.DiaDiem
             .AsNoTracking()
             .Include(d => d.Descriptions)
-            .AsSplitQuery()
             .ToListAsync();
 
         var orderedPlaces = rawPlaces.OrderBy(d => GetOrderIndex(d.Id)).ToList();
-
-        // Khởi tạo thứ tự mặc định cho các bản dịch gốc ban đầu
-        foreach (var p in orderedPlaces)
-        {
-            foreach (var desc in p.Descriptions.Where(x => !x.LanguageCode.Equals("vi", StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.LanguageCode))
-            {
-                if (!string.IsNullOrWhiteSpace(desc.Description) && desc.Description != EmptyTranslationPlaceholder)
-                {
-                    GetTranslationOrder(p.Id, desc.LanguageCode);
-                }
-            }
-        }
 
         var items = new List<object>();
 
@@ -1048,6 +1298,7 @@ public class AdminDiaDiemController : ControllerBase
         if (!alreadyHasContent)
         {
             _translationOrderByKey[key] = _nextTranslationOrder++;
+            AddDefaultVoice(place.Id, langCode);
         }
         else
         {
@@ -1055,7 +1306,7 @@ public class AdminDiaDiemController : ControllerBase
         }
 
         await _dbContext.SaveChangesAsync();
-        SaveStateToDisk();
+        await SaveStateToDatabaseAsync();
 
         return Ok(new
         {
@@ -1078,8 +1329,7 @@ public class AdminDiaDiemController : ControllerBase
             return NotFound(new { message = "Không tìm thấy bản dịch cần xóa!" });
         }
 
-        // Đặt chuỗi đánh dấu đã xóa để hệ thống không tự động tạo lại khi load trang
-        transEntity.Description = EmptyTranslationPlaceholder;
+        _dbContext.MoTaDiaDiem.Remove(transEntity);
 
         string key = GetTransKey(placeId, code);
         _translationStatusByKey.TryRemove(key, out _);
@@ -1087,7 +1337,7 @@ public class AdminDiaDiemController : ControllerBase
         _voicesByKey.TryRemove(key, out _);
 
         await _dbContext.SaveChangesAsync();
-        SaveStateToDisk();
+        await SaveStateToDatabaseAsync();
 
         return Ok(new { message = $"Đã xóa bản dịch ({code}) của địa điểm \"{placeId}\" thành công!" });
     }
@@ -1110,66 +1360,36 @@ public class AdminDiaDiemController : ControllerBase
         _ => $"Google TTS ({langCode})"
     };
 
+    private static void AddDefaultVoice(string placeId, string languageCode)
+    {
+        string key = GetTransKey(placeId, languageCode);
+        if (_voicesByKey.ContainsKey(key) || _deletedVoiceKeys.ContainsKey(key)) return;
+
+        _voicesByKey[key] = new AdminVoiceItem
+        {
+            Key = key,
+            DiaDiemId = placeId,
+            LanguageCode = languageCode.ToLowerInvariant(),
+            SourceType = "TTS",
+            VoiceName = GetDefaultVoiceName(languageCode),
+            SpeechRate = 1.0,
+            Pitch = 1.0,
+            AudioUrl = "",
+            Status = "Đã công bố",
+            OrderIndex = _nextVoiceOrder++
+        };
+    }
+
     // 1. GET: Lấy danh sách âm thanh thuyết minh (Tự động sinh cho TẤT CẢ ngôn ngữ có văn bản)
     [HttpGet("voices")]
     public async Task<IActionResult> GetAllVoices()
     {
-        await EnsureChildTablesPopulatedAsync();
-
         var rawPlaces = await _dbContext.DiaDiem
             .AsNoTracking()
             .Include(d => d.Descriptions)
-            .AsSplitQuery()
             .ToListAsync();
 
         var orderedPlaces = rawPlaces.OrderBy(d => GetOrderIndex(d.Id)).ToList();
-        var orderedLangCodes = _languagesByCode.Values
-            .OrderBy(l => l.OrderIndex)
-            .Select(l => l.Code.ToLowerInvariant())
-            .ToList();
-
-        // Tự động khởi tạo cấu hình TTS mặc định cho TẤT CẢ ngôn ngữ có nội dung chữ
-        foreach (var p in orderedPlaces)
-        {
-            var sortedDescs = p.Descriptions
-                .OrderBy(d =>
-                {
-                    int idx = orderedLangCodes.IndexOf(d.LanguageCode.ToLowerInvariant());
-                    return idx >= 0 ? idx : 999;
-                })
-                .ToList();
-
-            foreach (var desc in sortedDescs)
-            {
-                if (string.IsNullOrWhiteSpace(desc.Description) ||
-                    desc.Description == EmptyNarrationPlaceholder ||
-                    desc.Description == EmptyTranslationPlaceholder)
-                {
-                    continue;
-                }
-
-                string langCode = desc.LanguageCode.ToLowerInvariant();
-                string key = GetTransKey(p.Id, langCode);
-
-                if (!_voicesByKey.ContainsKey(key) && !_deletedVoiceKeys.ContainsKey(key))
-                {
-                    _voicesByKey[key] = new AdminVoiceItem
-                    {
-                        Key = key,
-                        DiaDiemId = p.Id,
-                        LanguageCode = langCode,
-                        SourceType = "TTS",
-                        VoiceName = GetDefaultVoiceName(langCode),
-                        SpeechRate = 1.0,
-                        Pitch = 1.0,
-                        AudioUrl = "",
-                        Status = "Đã công bố",
-                        OrderIndex = _nextVoiceOrder++
-                    };
-                }
-            }
-        }
-
         var placeMap = orderedPlaces.ToDictionary(p => p.Id, p => p, StringComparer.OrdinalIgnoreCase);
         var result = new List<object>();
 
@@ -1306,6 +1526,8 @@ public class AdminDiaDiemController : ControllerBase
             OrderIndex = orderIdx
         };
 
+        await SaveStateToDatabaseAsync();
+
         return Ok(new
         {
             message = $"Đã lưu cấu hình âm thanh thuyết minh ({langCode.ToUpperInvariant()}) cho \"{place.Name}\" thành công!"
@@ -1314,7 +1536,7 @@ public class AdminDiaDiemController : ControllerBase
 
     // 3. DELETE: Xóa âm thanh thuyết minh
     [HttpDelete("voices/{diaDiemId}/{langCode}")]
-    public IActionResult DeleteVoice(string diaDiemId, string langCode)
+    public async Task<IActionResult> DeleteVoice(string diaDiemId, string langCode)
     {
         string key = GetTransKey(diaDiemId, langCode);
         if (!_voicesByKey.TryRemove(key, out _))
@@ -1323,92 +1545,8 @@ public class AdminDiaDiemController : ControllerBase
         }
 
         _deletedVoiceKeys[key] = true;
+        await SaveStateToDatabaseAsync();
         return Ok(new { message = "Đã xóa âm thanh thuyết minh thành công!" });
     }
 
-    private async Task EnsureChildTablesPopulatedAsync()
-    {
-        var places = await _dbContext.DiaDiem
-            .Include(p => p.Descriptions)
-            .Include(p => p.Highlights)
-            .Include(p => p.GalleryPhotos)
-            .AsSplitQuery()
-            .ToListAsync();
-
-        bool hasChanges = false;
-
-        foreach (var place in places)
-        {
-            // 1. Khôi phục nội dung gốc chuẩn cho Chùa La Hán nếu đang bị dính dòng chữ chờ công bố
-            var viRow = place.Descriptions.FirstOrDefault(d => d.LanguageCode.Equals("vi", StringComparison.OrdinalIgnoreCase));
-            if (viRow != null && (viRow.Description.Contains("đang chờ công bố") || viRow.Description == EmptyNarrationPlaceholder))
-            {
-                viRow.Description = place.Id.Equals("chua-la-han", StringComparison.OrdinalIgnoreCase)
-                    ? "Chùa La Hán là ngôi chùa gắn với cộng đồng người Hoa ở Sóc Trăng. Ghé thăm để khám phá những chi tiết kiến trúc nhiều màu sắc, không gian thờ tự trang nghiêm và cảnh quan thanh tịnh."
-                    : $"{place.Name} là điểm tham quan tiêu biểu thuộc nhóm {place.Category} tại {place.Province}.";
-                _narrationPublishStatusById[place.Id] = "Đã công bố";
-                hasChanges = true;
-            }
-
-            var viBaseText = place.Descriptions.FirstOrDefault(d => d.LanguageCode.Equals("vi", StringComparison.OrdinalIgnoreCase))?.Description
-                             ?? $"{place.Name} là điểm tham quan tiêu biểu thuộc nhóm {place.Category} tại {place.Province}.";
-
-            // 2. Tự động dịch nội dung sang các ngôn ngữ đã khai báo trong UC14 (bỏ qua nếu đã xóa)
-            foreach (var lang in _languagesByCode.Values.OrderBy(l => l.OrderIndex))
-            {
-                string code = lang.Code.ToLowerInvariant();
-                var existingDesc = place.Descriptions.FirstOrDefault(d => d.LanguageCode.Equals(code, StringComparison.OrdinalIgnoreCase));
-
-                if (existingDesc == null)
-                {
-                    string translated = code == "vi" ? viBaseText : await TranslateViaGoogleAsync(viBaseText, code);
-                    _dbContext.MoTaDiaDiem.Add(new DiaDiemMoTaEntity
-                    {
-                        DiaDiemId = place.Id,
-                        LanguageCode = code,
-                        Description = translated
-                    });
-                    hasChanges = true;
-                }
-                else if (code != "vi" &&
-                         existingDesc.Description != EmptyTranslationPlaceholder &&
-                         (existingDesc.Description.StartsWith("[") || existingDesc.Description.Contains("is a featured Văn hóa")))
-                {
-                    existingDesc.Description = await TranslateViaGoogleAsync(viBaseText, code);
-                    hasChanges = true;
-                }
-            }
-
-            if (place.Highlights.Count == 0)
-            {
-                _dbContext.DiemNoiBat.Add(new DiaDiemDiemNoiBatEntity
-                {
-                    DiaDiemId = place.Id,
-                    Position = 1,
-                    Text = $"Điểm tham quan {place.Category}"
-                });
-                hasChanges = true;
-            }
-
-            if (place.GalleryPhotos.Count == 0)
-            {
-                _dbContext.AnhDiaDiem.Add(new DiaDiemAnhEntity
-                {
-                    DiaDiemId = place.Id,
-                    Position = 1,
-                    Url = string.IsNullOrWhiteSpace(place.ImageUrl) || place.ImageUrl.Contains("placehold.co")
-                        ? "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng_01.jpg/1280px-Ch%C3%B9a_La_H%C3%A1n_-_S%C3%B3c_Tr%C4%83ng_01.jpg"
-                        : place.ImageUrl,
-                    SourceUrl = "https://soctrang.gov.vn",
-                    Caption = $"Hình ảnh {place.Name}"
-                });
-                hasChanges = true;
-            }
-        }
-
-        if (hasChanges)
-        {
-            await _dbContext.SaveChangesAsync();
-        }
-    }
 }

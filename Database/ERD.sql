@@ -1,78 +1,90 @@
--- Dùng để vẽ ERD trong ssms thôi, hoặc coi ảnh ERD trong ThanhVien2_Tuan1.docx
-CREATE TABLE [Roles] (
-  [RoleID] int PRIMARY KEY,
-  [RoleName] nvarchar
+CREATE TABLE [Admin_Accounts] (
+  [AdminID] int PRIMARY KEY,
+  [Username] nvarchar(50),
+  [FullName] nvarchar(100),
+  [Email] nvarchar(255),
+  [PasswordHash] nvarchar(255),
+  [IsLocked] bit,
+  [CreatedAt] datetime
 )
 GO
 
-CREATE TABLE [Users] (
-  [UserID] int PRIMARY KEY,
-  [RoleID] int,
-  [FullName] nvarchar,
-  [Email] nvarchar(255),
-  [PasswordHash] nvarchar(255)
+CREATE TABLE [Languages] (
+  [LangCode] nvarchar(10) PRIMARY KEY,
+  [LangName] nvarchar(100),
+  [IsEnabled] bit
 )
 GO
 
 CREATE TABLE [POIs] (
   [PoiID] int PRIMARY KEY,
-  [UserID] int,
-  [OriginalName] nvarchar,
-  [OriginalDescription] nvarchar,
+  [Slug] nvarchar(100),
+  [Name] nvarchar(255),
+  [Description] nvarchar(max),
+  [Category] nvarchar(100),
+  [Province] nvarchar(150),
+  [Address] nvarchar(255),
+  [ImageUrl] nvarchar(2048),
   [Latitude] float,
-  [Longitude] float
+  [Longitude] float,
+  [Status] nvarchar(30),
+  [DisplayOrder] int,
+  [DurationMinutes] int,
+  [Rating] float,
+  [ReviewCount] int,
+  [ImageSourceUrl] nvarchar(2048),
+  [ImagePosition] nvarchar(100),
+  [HighlightsJson] nvarchar(max),
+  [GalleryJson] nvarchar(max),
+  [CreatedBy] int
 )
 GO
 
-CREATE TABLE [POI_Images] (
-  [ImageID] int PRIMARY KEY,
+CREATE TABLE [Narrations] (
+  [NarrationID] int PRIMARY KEY,
   [PoiID] int,
-  [ImageURL] nvarchar(255)
+  [SourceLang] nvarchar(10),
+  [Title] nvarchar(255),
+  [Content] nvarchar(max),
+  [PublishStatus] nvarchar(30),
+  [UpdatedBy] int,
+  [UpdatedAt] datetime
 )
 GO
 
-CREATE TABLE [Languages] (
-  [LangCode] nvarchar(255) PRIMARY KEY,
-  [LangName] nvarchar
+CREATE TABLE [Translations] (
+  [TranslationID] int PRIMARY KEY,
+  [NarrationID] int,
+  [LangCode] nvarchar(10),
+  [TranslatedContent] nvarchar(max),
+  [UpdatedAt] datetime
 )
 GO
 
-CREATE TABLE [POI_Localizations] (
-  [LocalizationID] int PRIMARY KEY,
-  [PoiID] int,
-  [LangCode] nvarchar(255),
-  [TranslatedName] nvarchar,
-  [TranslatedDescription] nvarchar,
-  [AudioURL] nvarchar(255)
+CREATE TABLE [Audio_Files] (
+  [AudioID] int PRIMARY KEY,
+  [NarrationID] int,
+  [LangCode] nvarchar(10),
+  [VoiceName] nvarchar(100),
+  [SourceType] nvarchar(10),
+  [AudioURL] nvarchar(500),
+  [CreatedAt] datetime
 )
 GO
 
-CREATE TABLE [Audio_Histories] (
-  [HistoryID] int PRIMARY KEY,
-  [PoiID] int,
-  [LangCode] nvarchar(255),
-  [CreatedDate] datetime,
-  [Status] nvarchar(255)
-)
+ALTER TABLE [POIs] ADD FOREIGN KEY ([CreatedBy]) REFERENCES [Admin_Accounts] ([AdminID])
 GO
-
-ALTER TABLE [Users] ADD FOREIGN KEY ([RoleID]) REFERENCES [Roles] ([RoleID])
+ALTER TABLE [Narrations] ADD FOREIGN KEY ([PoiID]) REFERENCES [POIs] ([PoiID])
 GO
-
-ALTER TABLE [POIs] ADD FOREIGN KEY ([UserID]) REFERENCES [Users] ([UserID])
+ALTER TABLE [Narrations] ADD FOREIGN KEY ([SourceLang]) REFERENCES [Languages] ([LangCode])
 GO
-
-ALTER TABLE [POI_Images] ADD FOREIGN KEY ([PoiID]) REFERENCES [POIs] ([PoiID])
+ALTER TABLE [Narrations] ADD FOREIGN KEY ([UpdatedBy]) REFERENCES [Admin_Accounts] ([AdminID])
 GO
-
-ALTER TABLE [POI_Localizations] ADD FOREIGN KEY ([PoiID]) REFERENCES [POIs] ([PoiID])
+ALTER TABLE [Translations] ADD FOREIGN KEY ([NarrationID]) REFERENCES [Narrations] ([NarrationID])
 GO
-
-ALTER TABLE [POI_Localizations] ADD FOREIGN KEY ([LangCode]) REFERENCES [Languages] ([LangCode])
+ALTER TABLE [Translations] ADD FOREIGN KEY ([LangCode]) REFERENCES [Languages] ([LangCode])
 GO
-
-ALTER TABLE [Audio_Histories] ADD FOREIGN KEY ([PoiID]) REFERENCES [POIs] ([PoiID])
+ALTER TABLE [Audio_Files] ADD FOREIGN KEY ([NarrationID]) REFERENCES [Narrations] ([NarrationID])
 GO
-
-ALTER TABLE [Audio_Histories] ADD FOREIGN KEY ([LangCode]) REFERENCES [Languages] ([LangCode])
+ALTER TABLE [Audio_Files] ADD FOREIGN KEY ([LangCode]) REFERENCES [Languages] ([LangCode])
 GO

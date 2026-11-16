@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using VisitorGuide.Infrastructure.Entities;
-using VisitorGuide.Infrastructure.SeedData;
 
 namespace VisitorGuide.Infrastructure;
 
@@ -11,44 +9,48 @@ public static class DatabaseInitializer
     {
         await using var scope = services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<VisitorGuideDbContext>();
+        var placeFileStore = scope.ServiceProvider.GetRequiredService<JsonPlaceFileStore>();
+        var sqlServerApplicationStore = scope.ServiceProvider.GetService<SqlServerApplicationStore>();
+        var relationalStore = scope.ServiceProvider.GetService<SqlServerRelationalStore>();
 
         await dbContext.Database.EnsureCreatedAsync(cancellationToken);
+
+        if (sqlServerApplicationStore is not null && relationalStore is not null)
+        {
+            await sqlServerApplicationStore.EnsureReadyAsync(cancellationToken);
+            var relationalStateReady = await sqlServerApplicationStore.IsRelationalStateReadyAsync(cancellationToken);
+            var legacyPlaces = relationalStateReady
+                ? null
+                : await sqlServerApplicationStore.LoadSectionAsync("places", cancellationToken);
+
+            List<VisitorGuide.Infrastructure.Entities.DiaDiemEntity> places;
+            if (!string.IsNullOrWhiteSpace(legacyPlaces))
+            {
+                places = placeFileStore.DeserializeEntities(legacyPlaces);
+                await relationalStore.SavePlacesAsync(places, cancellationToken);
+            }
+            else
+            {
+                places = await relationalStore.LoadPlacesAsync(cancellationToken);
+                if (places.Count == 0 && !relationalStateReady)
+                {
+                    places = await placeFileStore.LoadEntitiesAsync(cancellationToken);
+                    await relationalStore.SavePlacesAsync(places, cancellationToken);
+                }
+            }
+
+            await dbContext.ReloadFromSqlAsync(places, cancellationToken);
+            return;
+        }
+
         if (await dbContext.DiaDiem.AnyAsync(cancellationToken))
         {
             return;
         }
 
-        var places = NguonDuLieuKhoiTao.DocDiaDiem();
-        dbContext.DiaDiem.AddRange(places.Select(place => new DiaDiemEntity
-        {
-            Id = place.Id,
-            Name = place.Name,
-            Category = place.Category,
-            Province = place.Province,
-            DurationMinutes = place.DurationMinutes,
-            Rating = place.Rating,
-            ReviewCount = place.ReviewCount,
-            ImageUrl = place.ImageUrl,
-            ImageSourceUrl = place.ImageSourceUrl,
-            ImagePosition = place.ImagePosition,
-            Descriptions = place.Descriptions.Select(description => new DiaDiemMoTaEntity
-            {
-                LanguageCode = description.Key,
-                Description = description.Value
-            }).ToList(),
-            Highlights = place.Highlights.Select((highlight, position) => new DiaDiemDiemNoiBatEntity
-            {
-                Position = position,
-                Text = highlight
-            }).ToList(),
-            GalleryPhotos = place.GalleryPhotos.Select((photo, position) => new DiaDiemAnhEntity
-            {
-                Position = position,
-                Url = photo.Url,
-                SourceUrl = photo.SourceUrl,
-                Caption = photo.Caption
-            }).ToList()
-        }));
+        var seedPlaces = await placeFileStore.LoadEntitiesAsync(cancellationToken);
+
+        dbContext.DiaDiem.AddRange(seedPlaces);
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }
