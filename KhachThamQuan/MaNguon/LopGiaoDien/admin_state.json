@@ -1,0 +1,316 @@
+{
+  "OrderById": {
+    "tan-hue-vien": 6,
+    "chua-phat-hoc-2": 4,
+    "chua-doi": 2,
+    "khu-can-cu-tinh-uy-soc-trang": 5,
+    "chua-la-han": 3,
+    "cho-noi-nga-nam": 1
+  },
+  "StatusById": {
+    "tan-hue-vien": "Ho\u1EA1t \u0111\u1ED9ng",
+    "chua-phat-hoc-2": "Ho\u1EA1t \u0111\u1ED9ng",
+    "chua-doi": "Ho\u1EA1t \u0111\u1ED9ng",
+    "khu-can-cu-tinh-uy-soc-trang": "Ho\u1EA1t \u0111\u1ED9ng",
+    "chua-la-han": "Ho\u1EA1t \u0111\u1ED9ng",
+    "cho-noi-nga-nam": "Ho\u1EA1t \u0111\u1ED9ng"
+  },
+  "NarrationTitleById": {
+    "tan-hue-vien": "Thuy\u1EBFt minh T\u00E2n Hu\u00EA Vi\u00EAn",
+    "chua-phat-hoc-2": "Thuy\u1EBFt minh Ch\u00F9a Ph\u1EADt H\u1ECDc 2",
+    "chua-doi": "Thuy\u1EBFt minh Ch\u00F9a D\u01A1i",
+    "khu-can-cu-tinh-uy-soc-trang": "Thuy\u1EBFt minh Khu c\u0103n c\u1EE9 T\u1EC9nh \u1EE7y S\u00F3c Tr\u0103ng",
+    "chua-la-han": "Thuy\u1EBFt minh Ch\u00F9a La H\u00E1n",
+    "cho-noi-nga-nam": "Thuy\u1EBFt minh Ch\u1EE3 n\u1ED5i Ng\u00E3 N\u0103m"
+  },
+  "NarrationPublishStatusById": {
+    "tan-hue-vien": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-phat-hoc-2": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-doi": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "khu-can-cu-tinh-uy-soc-trang": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-la-han": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "cho-noi-nga-nam": "\u0110\u00E3 c\u00F4ng b\u1ED1"
+  },
+  "NextOrder": 28,
+  "Languages": [
+    {
+      "Code": "vi",
+      "Name": "Ti\u1EBFng Vi\u1EC7t",
+      "VoiceLocale": "vi-VN",
+      "Status": "\u0110ang h\u1ED7 tr\u1EE3",
+      "OrderIndex": 1
+    },
+    {
+      "Code": "en",
+      "Name": "Ti\u1EBFng Anh (English)",
+      "VoiceLocale": "en-US",
+      "Status": "\u0110ang h\u1ED7 tr\u1EE3",
+      "OrderIndex": 2
+    },
+    {
+      "Code": "fr",
+      "Name": "Ti\u1EBFng Ph\u00E1p (Fran\u00E7ais)",
+      "VoiceLocale": "fr-FR",
+      "Status": "\u0110ang h\u1ED7 tr\u1EE3",
+      "OrderIndex": 3
+    }
+  ],
+  "NextLangOrder": 10,
+  "TranslationStatusByKey": {
+    "chua-la-han:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-doi:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "tan-hue-vien:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-phat-hoc-2:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "khu-can-cu-tinh-uy-soc-trang:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "cho-noi-nga-nam:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "tan-hue-vien:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "khu-can-cu-tinh-uy-soc-trang:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-la-han:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-doi:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "cho-noi-nga-nam:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-phat-hoc-2:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1"
+  },
+  "TranslationOrderByKey": {
+    "chua-la-han:en": 0,
+    "chua-doi:fr": 0,
+    "tan-hue-vien:fr": 0,
+    "chua-phat-hoc-2:en": 0,
+    "khu-can-cu-tinh-uy-soc-trang:en": 0,
+    "cho-noi-nga-nam:fr": 0,
+    "tan-hue-vien:en": 0,
+    "khu-can-cu-tinh-uy-soc-trang:fr": 0,
+    "chua-la-han:fr": 0,
+    "chua-doi:en": 0,
+    "cho-noi-nga-nam:en": 0,
+    "chua-phat-hoc-2:fr": 0
+  },
+  "Voices": [
+    {
+      "Key": "chua-la-han:en",
+      "DiaDiemId": "chua-la-han",
+      "LanguageCode": "en",
+      "SourceType": "TTS",
+      "VoiceName": "Google US English (en-US)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 8
+    },
+    {
+      "Key": "chua-doi:fr",
+      "DiaDiemId": "chua-doi",
+      "LanguageCode": "fr",
+      "SourceType": "TTS",
+      "VoiceName": "Google Fran\u00E7ais (fr-FR)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 5
+    },
+    {
+      "Key": "tan-hue-vien:fr",
+      "DiaDiemId": "tan-hue-vien",
+      "LanguageCode": "fr",
+      "SourceType": "TTS",
+      "VoiceName": "Google Fran\u00E7ais (fr-FR)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 18
+    },
+    {
+      "Key": "chua-doi:vi",
+      "DiaDiemId": "chua-doi",
+      "LanguageCode": "vi",
+      "SourceType": "TTS",
+      "VoiceName": "Google Ti\u1EBFng Vi\u1EC7t (vi-VN)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 6
+    },
+    {
+      "Key": "chua-phat-hoc-2:en",
+      "DiaDiemId": "chua-phat-hoc-2",
+      "LanguageCode": "en",
+      "SourceType": "TTS",
+      "VoiceName": "Google US English (en-US)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 11
+    },
+    {
+      "Key": "khu-can-cu-tinh-uy-soc-trang:en",
+      "DiaDiemId": "khu-can-cu-tinh-uy-soc-trang",
+      "LanguageCode": "en",
+      "SourceType": "TTS",
+      "VoiceName": "Google US English (en-US)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 14
+    },
+    {
+      "Key": "cho-noi-nga-nam:vi",
+      "DiaDiemId": "cho-noi-nga-nam",
+      "LanguageCode": "vi",
+      "SourceType": "TTS",
+      "VoiceName": "vi-VN-Standard",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "nganam_vi.mp3",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 0
+    },
+    {
+      "Key": "cho-noi-nga-nam:fr",
+      "DiaDiemId": "cho-noi-nga-nam",
+      "LanguageCode": "fr",
+      "SourceType": "TTS",
+      "VoiceName": "Google Fran\u00E7ais (fr-FR)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 2
+    },
+    {
+      "Key": "chua-phat-hoc-2:vi",
+      "DiaDiemId": "chua-phat-hoc-2",
+      "LanguageCode": "vi",
+      "SourceType": "TTS",
+      "VoiceName": "vi-VN-Standard",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "chuaphathoc2_vi.mp3",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 0
+    },
+    {
+      "Key": "tan-hue-vien:en",
+      "DiaDiemId": "tan-hue-vien",
+      "LanguageCode": "en",
+      "SourceType": "TTS",
+      "VoiceName": "Google US English (en-US)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 17
+    },
+    {
+      "Key": "tan-hue-vien:vi",
+      "DiaDiemId": "tan-hue-vien",
+      "LanguageCode": "vi",
+      "SourceType": "TTS",
+      "VoiceName": "vi-VN-Standard",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "tanhuevien_vi.mp3",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 0
+    },
+    {
+      "Key": "khu-can-cu-tinh-uy-soc-trang:fr",
+      "DiaDiemId": "khu-can-cu-tinh-uy-soc-trang",
+      "LanguageCode": "fr",
+      "SourceType": "TTS",
+      "VoiceName": "Google Fran\u00E7ais (fr-FR)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 15
+    },
+    {
+      "Key": "chua-la-han:fr",
+      "DiaDiemId": "chua-la-han",
+      "LanguageCode": "fr",
+      "SourceType": "TTS",
+      "VoiceName": "Google Fran\u00E7ais (fr-FR)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 9
+    },
+    {
+      "Key": "chua-doi:en",
+      "DiaDiemId": "chua-doi",
+      "LanguageCode": "en",
+      "SourceType": "TTS",
+      "VoiceName": "Google US English (en-US)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 4
+    },
+    {
+      "Key": "cho-noi-nga-nam:en",
+      "DiaDiemId": "cho-noi-nga-nam",
+      "LanguageCode": "en",
+      "SourceType": "TTS",
+      "VoiceName": "Google US English (en-US)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 1
+    },
+    {
+      "Key": "chua-phat-hoc-2:fr",
+      "DiaDiemId": "chua-phat-hoc-2",
+      "LanguageCode": "fr",
+      "SourceType": "TTS",
+      "VoiceName": "Google Fran\u00E7ais (fr-FR)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 12
+    },
+    {
+      "Key": "khu-can-cu-tinh-uy-soc-trang:vi",
+      "DiaDiemId": "khu-can-cu-tinh-uy-soc-trang",
+      "LanguageCode": "vi",
+      "SourceType": "TTS",
+      "VoiceName": "vi-VN-Standard",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "khucancu_vi.mp3",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 0
+    },
+    {
+      "Key": "chua-la-han:vi",
+      "DiaDiemId": "chua-la-han",
+      "LanguageCode": "vi",
+      "SourceType": "TTS",
+      "VoiceName": "vi-VN-Standard",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "chualahan_vi.mp3",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 0
+    }
+  ],
+  "DeletedVoiceKeys": [],
+  "PlaysById": {
+    "tan-hue-vien": 30,
+    "chua-phat-hoc-2": 20,
+    "chua-doi": 31,
+    "khu-can-cu-tinh-uy-soc-trang": 30,
+    "chua-la-han": 35,
+    "cho-noi-nga-nam": 32
+  },
+  "NextTranslationOrder": 1,
+  "NextVoiceOrder": 34
+}

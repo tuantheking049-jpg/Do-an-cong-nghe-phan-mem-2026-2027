@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\MaNguon\LopNghiepVu\LopNghiepVu.csproj" />
     <ProjectReference Include="..\..\MaNguon\LopTruyCapDuLieu\LopTruyCapDuLieu.csproj" />
+    <ProjectReference Include="..\..\MaNguon\LopGiaoDien\ThamQuanSocTrang.Web.csproj" />
   </ItemGroup>
 
 </Project>

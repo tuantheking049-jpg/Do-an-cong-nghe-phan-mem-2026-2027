@@ -1,5 +1,22 @@
 const translations = {
   vi: {
+    pageTitle: "TLT — Khám phá Sóc Trăng",
+    pageDescription: "Khám phá các điểm tham quan Sóc Trăng với thuyết minh tự động đa ngôn ngữ.",
+    homeLinkLabel: "TLT, trang chủ",
+    mainNavigation: "Điều hướng chính",
+    navExplore: "Khám phá",
+    navDestinations: "Điểm đến",
+    navHowItWorks: "Cách hoạt động",
+    heroImageAlt: "Ảnh minh họa hành trình khám phá Sóc Trăng",
+    destinationsListLabel: "Danh sách địa điểm",
+    topicFilterLabel: "Lọc theo chủ đề",
+    storyImageAlt: "Khám phá những con đường di sản",
+    imageDialogLabel: "Ảnh địa điểm phóng lớn",
+    closeImage: "Đóng ảnh",
+    mapFrameTitle: "Bản đồ vị trí địa điểm",
+    closePlayer: "Đóng trình phát",
+    reviewWord: "đánh giá",
+    draftAudioMessage: "Âm thanh thuyết minh của địa điểm này hiện đang ở trạng thái Bản nháp (chưa công bố)!",
     heroEyebrow: "HÀNH TRÌNH CỦA RIÊNG BẠN BẮT ĐẦU TỪ ĐÂY",
     heroTitle: "Khám phá Sóc Trăng<br />qua những <em>câu chuyện.</em>",
     heroCopy: "Lắng nghe chuyện kể về những ngôi chùa Khmer, nhịp sống chợ nổi và nét văn hóa đặc sắc của Sóc Trăng.",
@@ -48,21 +65,32 @@ const translations = {
     footerNote: "Những câu chuyện Sóc Trăng, kể theo cách của bạn.",
     nowPlaying: "ĐANG THUYẾT MINH",
     audioLabel: "Âm thanh tự động",
-    savedOnly: "Địa điểm yêu thích",
-    allPlaces: "Tất cả địa điểm",
     languageLabel: "Chọn ngôn ngữ",
-    savePlace: "Thêm yêu thích",
-    removeSavedPlace: "Bỏ yêu thích",
     loadError: "Không thể tải danh sách địa điểm. Vui lòng thử lại.",
     detailError: "Không thể tải nội dung thuyết minh. Vui lòng thử lại.",
-    saved: "Đã thêm vào địa điểm yêu thích",
-    unsaved: "Đã bỏ khỏi địa điểm yêu thích",
     speechUnavailable: "Trình duyệt này chưa hỗ trợ đọc thuyết minh.",
     speechError: "Không thể phát thuyết minh trên thiết bị này.",
     languageError: "Không thể chọn ngôn ngữ này.",
     languageNames: { vi: "Tiếng Việt", en: "English", fr: "Français" }
   },
   en: {
+    pageTitle: "TLT — Discover Sóc Trăng",
+    pageDescription: "Discover Sóc Trăng's landmarks with multilingual audio narration.",
+    homeLinkLabel: "TLT, home",
+    mainNavigation: "Main navigation",
+    navExplore: "Explore",
+    navDestinations: "Destinations",
+    navHowItWorks: "How it works",
+    heroImageAlt: "Illustration of a journey through Sóc Trăng",
+    destinationsListLabel: "List of destinations",
+    topicFilterLabel: "Filter by topic",
+    storyImageAlt: "Explore heritage routes",
+    imageDialogLabel: "Enlarged landmark image",
+    closeImage: "Close image",
+    mapFrameTitle: "Map showing landmark location",
+    closePlayer: "Close audio player",
+    reviewWord: "reviews",
+    draftAudioMessage: "The narration for this destination is still a draft and has not been published.",
     heroEyebrow: "YOUR OWN JOURNEY STARTS HERE",
     heroTitle: "Discover Sóc Trăng<br />through its <em>stories.</em>",
     heroCopy: "Listen to stories of Khmer pagodas, floating-market life and the distinctive culture of Sóc Trăng.",
@@ -111,21 +139,32 @@ const translations = {
     footerNote: "Stories of Sóc Trăng, told your way.",
     nowPlaying: "NOW PLAYING",
     audioLabel: "Audio guide",
-    savedOnly: "Saved places",
-    allPlaces: "All destinations",
     languageLabel: "Choose language",
-    savePlace: "Save destination",
-    removeSavedPlace: "Remove from saved",
     loadError: "Could not load destinations. Please try again.",
     detailError: "Could not load the audio guide. Please try again.",
-    saved: "Added to saved places",
-    unsaved: "Removed from saved places",
     speechUnavailable: "Audio narration is not supported in this browser.",
     speechError: "Audio narration could not play on this device.",
     languageError: "This language could not be selected.",
     languageNames: { vi: "Vietnamese", en: "English", fr: "French" }
   },
   fr: {
+    pageTitle: "TLT — Découvrir Sóc Trăng",
+    pageDescription: "Découvrez les sites de Sóc Trăng avec des récits audio multilingues.",
+    homeLinkLabel: "TLT, accueil",
+    mainNavigation: "Navigation principale",
+    navExplore: "Explorer",
+    navDestinations: "Destinations",
+    navHowItWorks: "Comment ça marche",
+    heroImageAlt: "Illustration d’un voyage à la découverte de Sóc Trăng",
+    destinationsListLabel: "Liste des lieux",
+    topicFilterLabel: "Filtrer par thème",
+    storyImageAlt: "Découvrez les routes du patrimoine",
+    imageDialogLabel: "Image agrandie du lieu",
+    closeImage: "Fermer l’image",
+    mapFrameTitle: "Carte de l’emplacement du lieu",
+    closePlayer: "Fermer le lecteur audio",
+    reviewWord: "avis",
+    draftAudioMessage: "La narration de ce lieu est encore à l’état de brouillon et n’a pas été publiée.",
     heroEyebrow: "VOTRE VOYAGE COMMENCE ICI",
     heroTitle: "Découvrez Sóc Trăng<br />à travers ses <em>récits.</em>",
     heroCopy: "Écoutez les récits des pagodes khmères, des marchés flottants et de la culture de Sóc Trăng.",
@@ -174,19 +213,74 @@ const translations = {
     footerNote: "Les histoires de Sóc Trăng, à votre façon.",
     nowPlaying: "EN COURS",
     audioLabel: "Guide audio",
-    savedOnly: "Lieux favoris",
-    allPlaces: "Toutes les destinations",
     languageLabel: "Choisir la langue",
-    savePlace: "Ajouter aux favoris",
-    removeSavedPlace: "Retirer des favoris",
     loadError: "Impossible de charger les destinations. Veuillez réessayer.",
     detailError: "Impossible de charger le guide audio. Veuillez réessayer.",
-    saved: "Ajouté aux favoris",
-    unsaved: "Retiré des favoris",
     speechUnavailable: "La narration audio n'est pas prise en charge par ce navigateur.",
     speechError: "La narration audio ne peut pas être lue sur cet appareil.",
     languageError: "Impossible de choisir cette langue.",
     languageNames: { vi: "vietnamien", en: "anglais", fr: "français" }
+  }
+};
+
+const contentTranslations = {
+  en: {
+    "Đặc sản Sóc Trăng": "Sóc Trăng specialties",
+    "Bánh pía": "Bánh pía pastry",
+    "Ẩm thực địa phương": "Local cuisine",
+    "Chợ nổi miền Tây": "Mekong Delta floating market",
+    "Giao thương đường thủy": "River trade",
+    "Bình minh": "Sunrise",
+    "Chùa Khmer": "Khmer pagoda",
+    "Kiến trúc Phật giáo": "Buddhist architecture",
+    "Vườn cây": "Tree garden",
+    "Không gian thanh tịnh": "Peaceful surroundings",
+    "Vườn tượng": "Sculpture garden",
+    "Văn hóa người Hoa": "Chinese culture",
+    "Kiến trúc chùa": "Pagoda architecture",
+    "Di tích lịch sử": "Historical site",
+    "Căn cứ cách mạng": "Revolutionary base",
+    "Rừng Mỹ Phước": "Mỹ Phước Forest",
+    "Điểm tham quan Văn hóa": "Cultural attraction",
+    "Du lịch Sóc Trăng": "Sóc Trăng tourism",
+    "Khu Bảo Tháp Liên Hoa": "Liên Hoa Pagoda Tower Complex",
+    "Ghe thuyền tại chợ nổi Ngã Năm": "Boats at Ngã Năm Floating Market",
+    "Chánh điện chùa Dơi": "Main hall of Chùa Dơi",
+    "Cổng chính chùa Dơi": "Main gate of Chùa Dơi",
+    "Hình ảnh Chùa Phật Học 2": "Photo of Chùa Phật Học 2",
+    "Toàn cảnh chùa La Hán": "Panoramic view of Chùa La Hán",
+    "Hồ sen chùa La Hán": "Lotus pond at Chùa La Hán",
+    "Hình ảnh Khu căn cứ Tỉnh ủy Sóc Trăng": "Photo of Sóc Trăng Provincial Party Committee Base",
+    "Hình ảnh iii": "Photo of iii"
+  },
+  fr: {
+    "Đặc sản Sóc Trăng": "Spécialités de Sóc Trăng",
+    "Bánh pía": "Pâtisserie bánh pía",
+    "Ẩm thực địa phương": "Cuisine locale",
+    "Chợ nổi miền Tây": "Marché flottant du delta du Mékong",
+    "Giao thương đường thủy": "Commerce fluvial",
+    "Bình minh": "Lever du soleil",
+    "Chùa Khmer": "Pagode khmère",
+    "Kiến trúc Phật giáo": "Architecture bouddhiste",
+    "Vườn cây": "Jardin arboré",
+    "Không gian thanh tịnh": "Lieu paisible",
+    "Vườn tượng": "Jardin de sculptures",
+    "Văn hóa người Hoa": "Culture chinoise",
+    "Kiến trúc chùa": "Architecture de pagode",
+    "Di tích lịch sử": "Site historique",
+    "Căn cứ cách mạng": "Base révolutionnaire",
+    "Rừng Mỹ Phước": "Forêt de Mỹ Phước",
+    "Điểm tham quan Văn hóa": "Site culturel",
+    "Du lịch Sóc Trăng": "Tourisme à Sóc Trăng",
+    "Khu Bảo Tháp Liên Hoa": "Complexe de la tour de la pagode Liên Hoa",
+    "Ghe thuyền tại chợ nổi Ngã Năm": "Bateaux au marché flottant de Ngã Năm",
+    "Chánh điện chùa Dơi": "Sanctuaire principal de Chùa Dơi",
+    "Cổng chính chùa Dơi": "Porte principale de Chùa Dơi",
+    "Hình ảnh Chùa Phật Học 2": "Photo de Chùa Phật Học 2",
+    "Toàn cảnh chùa La Hán": "Vue panoramique de Chùa La Hán",
+    "Hồ sen chùa La Hán": "Étang de lotus de Chùa La Hán",
+    "Hình ảnh Khu căn cứ Tỉnh ủy Sóc Trăng": "Photo de la base du Comité provincial de Sóc Trăng",
+    "Hình ảnh iii": "Photo de iii"
   }
 };
 
@@ -206,10 +300,19 @@ const locationDialog = document.querySelector("#location-dialog");
 const locationMap = document.querySelector("#location-map");
 const locationStatus = document.querySelector("#location-status");
 const toast = document.querySelector("#toast");
-const savedPlaces = new Set(JSON.parse(localStorage.getItem("visitor-guide-saved") || "[]"));
+const preferredLanguage = (() => {
+  try {
+    return window.localStorage.getItem("visitor-guide-language");
+  } catch {
+    return null;
+  }
+})();
+if ([...languageSelect.options].some(option => option.value === preferredLanguage)) {
+  languageSelect.value = preferredLanguage;
+}
 let language = languageSelect.value;
+let languageChangeRequestId = 0;
 let activeCategory = "";
-let showSavedOnly = false;
 let currentLandmark = null;
 let currentUtterance = null;
 let currentNarrationText = "";
@@ -224,7 +327,13 @@ let toastTimeout;
 let searchTimeout;
 
 function text(key) {
-  return translations[language][key];
+  return translations[language]?.[key] ?? translations.en[key] ?? key;
+}
+
+window.getVisitorText = text;
+
+function localizedContent(value) {
+  return contentTranslations[language]?.[value] ?? value;
 }
 
 async function fetchJson(url, options = {}) {
@@ -245,12 +354,14 @@ function escapeHtml(value) {
 
 function applyTranslations() {
   document.documentElement.lang = language;
+  document.title = text("pageTitle");
+  document.querySelector('meta[name="description"]').content = text("pageDescription");
   document.querySelector("#language-picker").setAttribute("aria-label", text("languageLabel"));
-  document.querySelector("#saved-button").setAttribute("aria-label", showSavedOnly ? text("savedOnly") : text("allPlaces"));
   document.querySelector("#replay-toggle").setAttribute("aria-label", text("replayNarration"));
   document.querySelector("#replay-toggle").setAttribute("title", text("replayNarration"));
   document.querySelector("#play-toggle").setAttribute("aria-label", text(audioPlayer.classList.contains("paused") ? "resumeNarration" : "pauseNarration"));
   document.querySelectorAll("[data-i18n]").forEach(element => {
+    if (element.classList.contains("filter-chip")) return;
     const value = text(element.dataset.i18n);
     if (value.includes("<")) element.innerHTML = value;
     else element.textContent = value;
@@ -260,6 +371,9 @@ function applyTranslations() {
   });
   document.querySelectorAll("[data-i18n-aria-label]").forEach(element => {
     element.setAttribute("aria-label", text(element.dataset.i18nAriaLabel));
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach(element => {
+    element.setAttribute("title", text(element.dataset.i18nTitle));
   });
   document.querySelectorAll(".filter-chip").forEach(chip => {
     const key = {
@@ -306,6 +420,14 @@ function speakNarrationFromPosition() {
   const narration = new SpeechSynthesisUtterance(currentNarrationText.slice(startIndex));
   currentUtterance = narration;
   narration.lang = currentNarrationLanguage;
+  const requestedLocale = currentNarrationLanguage.toLowerCase().replace(/_/g, "-");
+  const requestedLanguage = requestedLocale.split("-")[0];
+  const availableVoices = window.speechSynthesis.getVoices();
+  const matchingVoice = availableVoices.find(voice =>
+    voice.lang.toLowerCase().replace(/_/g, "-") === requestedLocale)
+    || availableVoices.find(voice =>
+      voice.lang.toLowerCase().replace(/_/g, "-").split("-")[0] === requestedLanguage);
+  if (matchingVoice) narration.voice = matchingVoice;
   narration.onboundary = event => {
     if (currentUtterance !== narration || isSeekingNarration || !Number.isFinite(event.charIndex)) return;
     currentNarrationIndex = Math.min(startIndex + event.charIndex, currentNarrationText.length);
@@ -427,7 +549,7 @@ function categoryLabel(category) {
 
 function cardMarkup(place) {
   const tags = place.highlights.slice(0, 2).map(tag =>
-    `<span class="card-tag">${escapeHtml(tag)}</span>`).join("");
+    `<span class="card-tag">${escapeHtml(localizedContent(tag))}</span>`).join("");
   return `
     <article class="place-card">
       <div class="place-image-wrap">
@@ -437,7 +559,7 @@ function cardMarkup(place) {
         <span class="image-distance"><span></span>${escapeHtml(place.province.toLocaleUpperCase(language))}</span>
       </div>
       <div class="card-content">
-        <div class="card-topline"><span>${place.reviewCount.toLocaleString(language)} ${language === "vi" ? "đánh giá" : language === "fr" ? "avis" : "reviews"}</span><span class="rating"><span>★</span>${place.rating.toFixed(1)}</span></div>
+        <div class="card-topline"><span>${place.reviewCount.toLocaleString(language)} ${text("reviewWord")}</span><span class="rating"><span>★</span>${place.rating.toFixed(1)}</span></div>
         <h3 class="place-title">${escapeHtml(place.name)}</h3>
         <p class="place-description">${escapeHtml(place.description)}</p>
         <div class="card-tags">${tags}</div>
@@ -552,11 +674,11 @@ async function showPlaceGallery(id) {
   document.querySelector("#gallery-title").textContent = place.name;
   galleryGrid.innerHTML = photos.map((photo, index) => `
     <figure class="gallery-photo">
-      <button class="gallery-photo-view" type="button" data-image-url="${escapeHtml(photo.url)}" data-image-alt="${escapeHtml(photo.caption || place.name)}" aria-label="${escapeHtml(photo.caption || place.name)}">
-        <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.caption || place.name)}" loading="${index < 3 ? "eager" : "lazy"}" />
+      <button class="gallery-photo-view" type="button" data-image-url="${escapeHtml(photo.url)}" data-image-alt="${escapeHtml(localizedContent(photo.caption || place.name))}" aria-label="${escapeHtml(localizedContent(photo.caption || place.name))}">
+        <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(localizedContent(photo.caption || place.name))}" loading="${index < 3 ? "eager" : "lazy"}" />
       </button>
       <figcaption>
-        <span>${escapeHtml(photo.caption || place.name)}</span>
+        <span>${escapeHtml(localizedContent(photo.caption || place.name))}</span>
       </figcaption>
     </figure>`).join("");
   galleryDialog.showModal();
@@ -598,9 +720,7 @@ async function loadPlaces() {
   try {
     const response = await fetch(`/api/landmarks?${params}`, { cache: "no-store" });
     if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
-    let places = await response.json();
-    if (showSavedOnly) places = places.filter(place => savedPlaces.has(place.id));
-    renderPlaces(places);
+    renderPlaces(await response.json());
   } catch (error) {
     console.error("Failed to load landmarks.", error);
     placesGrid.hidden = true;
@@ -611,13 +731,22 @@ async function loadPlaces() {
   }
 }
 
-async function startNarration(id) {
+async function startNarration(id, countListen = true) {
   if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
     showToast(text("speechUnavailable"));
     return;
   }
 
   try {
+    if (countListen) {
+      fetch(`/api/thongke/tang-nghe/${encodeURIComponent(id)}`, {
+        method: "POST",
+        keepalive: true
+      }).then(response => {
+        if (!response.ok) throw new Error(`Listen count update failed (${response.status}).`);
+      }).catch(error => console.error(error));
+    }
+
     const narration = await fetchJson(`/api/narration/${encodeURIComponent(id)}?language=${language}`);
     const place = narration.diaDiem;
     cancelNarrationPlayback();
@@ -674,25 +803,37 @@ searchInput.addEventListener("input", () => {
 
 languageSelect.addEventListener("change", async () => {
   const requestedLanguage = languageSelect.value;
+  const previousLanguage = language;
+  const requestId = ++languageChangeRequestId;
+  language = requestedLanguage;
+  applyTranslations();
+  loadPlaces();
+
   try {
     const selectedLanguage = await fetchJson(`/api/languages/${encodeURIComponent(requestedLanguage)}`);
-    language = selectedLanguage.ma;
-  } catch (error) {
-    console.error("Failed to select narration language.", error);
+    if (requestId !== languageChangeRequestId) return;
+    language = String(selectedLanguage.ma ?? selectedLanguage.code ?? selectedLanguage.language ?? requestedLanguage)
+      .trim()
+      .toLowerCase();
     languageSelect.value = language;
+    try {
+      window.localStorage.setItem("visitor-guide-language", language);
+    } catch (error) {
+      console.warn("Could not save the selected narration language.", error);
+    }
+  } catch (error) {
+    if (requestId !== languageChangeRequestId) return;
+    console.error("Failed to select narration language.", error);
+    language = previousLanguage;
+    languageSelect.value = previousLanguage;
+    applyTranslations();
+    loadPlaces();
     showToast(text("languageError"));
     return;
   }
   applyTranslations();
   loadPlaces();
-  if (!audioPlayer.hidden && currentLandmark) startNarration(currentLandmark.id);
-});
-
-document.querySelector("#saved-button").addEventListener("click", event => {
-  showSavedOnly = !showSavedOnly;
-  event.currentTarget.classList.toggle("is-active", showSavedOnly);
-  event.currentTarget.setAttribute("aria-label", showSavedOnly ? text("savedOnly") : text("allPlaces"));
-  loadPlaces();
+  if (!audioPlayer.hidden && currentLandmark) startNarration(currentLandmark.id, false);
 });
 
 document.querySelector("#play-toggle").addEventListener("click", () => {
@@ -760,6 +901,82 @@ document.addEventListener("keydown", event => {
     narrationSeek.value = "0";
   }
 });
+
+const onlineVisitorStorageKey = "visitor-guide-online-tab-id";
+const onlineBrowserStorageKey = "visitor-guide-online-browser-id";
+
+function createOnlineVisitorId() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, character => {
+    const random = Math.floor(Math.random() * 16);
+    return (character === "x" ? random : (random & 0x3) | 0x8).toString(16);
+  });
+}
+
+function getOnlineId(storageName, key) {
+  try {
+    const storage = window[storageName];
+    const existingId = storage.getItem(key);
+    if (existingId) return existingId;
+
+    const visitorId = createOnlineVisitorId();
+    storage.setItem(key, visitorId);
+    return visitorId;
+  } catch {
+    return createOnlineVisitorId();
+  }
+}
+
+const onlineVisitorId = getOnlineId("sessionStorage", onlineVisitorStorageKey);
+const onlineBrowserId = getOnlineId("localStorage", onlineBrowserStorageKey);
+let onlineHeartbeatTimer = null;
+
+async function sendOnlineHeartbeat() {
+  try {
+    const response = await fetch("/api/thongke/online/heartbeat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ visitorId: onlineVisitorId, browserId: onlineBrowserId }),
+      cache: "no-store"
+    });
+    if (!response.ok) throw new Error(`Online heartbeat failed (${response.status}).`);
+  } catch (error) {
+    console.warn("Could not update online visitor status.", error);
+  }
+}
+
+function stopOnlineTracking() {
+  if (onlineHeartbeatTimer !== null) {
+    window.clearInterval(onlineHeartbeatTimer);
+    onlineHeartbeatTimer = null;
+  }
+
+  const payload = JSON.stringify({ visitorId: onlineVisitorId, browserId: onlineBrowserId });
+  const leaveUrl = "/api/thongke/online/leave";
+  const beaconSent = navigator.sendBeacon
+    && navigator.sendBeacon(leaveUrl, new Blob([payload], { type: "application/json" }));
+  if (beaconSent) return;
+
+  fetch(leaveUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: payload,
+    keepalive: true
+  }).catch(error => console.warn("Could not send online visitor leave signal.", error));
+}
+
+function startOnlineTracking() {
+  if (onlineHeartbeatTimer !== null) return;
+  sendOnlineHeartbeat();
+  onlineHeartbeatTimer = window.setInterval(sendOnlineHeartbeat, 15000);
+}
+
+window.addEventListener("pagehide", stopOnlineTracking);
+window.addEventListener("pageshow", startOnlineTracking);
+startOnlineTracking();
 
 applyTranslations();
 loadPlaces();

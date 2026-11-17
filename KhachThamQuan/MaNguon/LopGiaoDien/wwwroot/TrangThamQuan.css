@@ -39,10 +39,6 @@ button { color: inherit; }
 .language-picker svg { width: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; }
 .language-picker select { border: 0; background: transparent; color: inherit; appearance: none; cursor: pointer; padding: 7px 14px 7px 0; outline: 0; }
 .chevron { position: absolute; right: 0; pointer-events: none; font-size: 14px; top: 4px; }
-.avatar-button { display: grid; place-items: center; width: 35px; height: 35px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: transparent; cursor: pointer; }
-.avatar-button svg { width: 16px; fill: none; stroke: #43544a; stroke-width: 1.5; }
-.avatar-button.is-active svg { fill: #c76553; stroke: #c76553; }
-
 .hero { height: 493px; position: relative; overflow: hidden; background: #647365; color: #fff; }
 .hero-photo, .hero-shade { position: absolute; inset: 0; }
 .hero-photo { background: url("https://images.vietnamtourism.gov.vn/vn/images/2014/AnhInternet/chonoinga5.jpg") center 52% / cover no-repeat; transform: scale(1.01); animation: reveal 1.2s ease both; }
@@ -212,7 +208,6 @@ button { color: inherit; }
   .header-actions { gap: 13px; }
   .language-picker { gap: 5px; }
   .language-picker select { max-width: 83px; font-size: 10px; }
-  .avatar-button { width: 31px; height: 31px; }
   .hero { height: 470px; }
   .hero-photo { background-position: 57% center; }
   .hero-content { padding-top: 97px; }
