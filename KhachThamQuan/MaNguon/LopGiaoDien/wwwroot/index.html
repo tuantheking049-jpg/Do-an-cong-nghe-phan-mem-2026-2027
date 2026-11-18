@@ -54,7 +54,7 @@
         </div>
         <div class="intro-aside">
           <p data-i18n="collectionCopy">Từ chợ nổi Ngã Năm đến những ngôi chùa Khmer và Hoa, chọn điểm đến để khám phá câu chuyện vùng đất này.</p>
-          <div class="mini-stat"><span class="stat-number">06</span><span data-i18n="placesLabel">điểm đến được tuyển chọn</span><span class="stat-divider"></span><span class="stat-number">03</span><span data-i18n="languagesLabel">ngôn ngữ thuyết minh</span></div>
+          <div class="mini-stat"><span class="stat-number">06</span><span data-i18n="placesLabel">điểm đến được tuyển chọn</span><span class="stat-divider"></span><span class="stat-number" id="language-count">03</span><span data-i18n="languagesLabel">ngôn ngữ thuyết minh</span></div>
         </div>
       </section>
 
@@ -202,14 +202,46 @@
     <script>
         (function () {
             const textCache = {};
+            const inFlightLangPromises = {};
             let supportedLangsMap = {};
+
+            // Khôi phục cache dịch thuật từ sessionStorage để chuyển ngôn ngữ tức thì
+            try {
+                const cachedRaw = window.sessionStorage.getItem('visitor_guide_i18n_cache_v2');
+                if (cachedRaw) {
+                    const parsed = JSON.parse(cachedRaw);
+                    if (parsed && typeof parsed === 'object') {
+                        Object.assign(textCache, parsed);
+                    }
+                }
+            } catch { }
+
+            function saveTextCache() {
+                try {
+                    window.sessionStorage.setItem('visitor_guide_i18n_cache_v2', JSON.stringify(textCache));
+                } catch { }
+            }
 
             function normalizeGoogleLang(code) {
                 let tl = (code || 'vi').toLowerCase().trim().split('-')[0];
-                if (tl === 'jp') return 'ja';
-                if (tl === 'kr') return 'ko';
-                if (tl === 'cn') return 'zh';
-                return tl;
+                const aliasMap = {
+                    jp: 'ja',
+                    kr: 'ko',
+                    cn: 'zh-CN',
+                    zh: 'zh-CN',
+                    tw: 'zh-TW',
+                    hk: 'zh-TW',
+                    ua: 'uk',
+                    cz: 'cs',
+                    dk: 'da',
+                    se: 'sv',
+                    gr: 'el',
+                    my: 'ms',
+                    ph: 'tl',
+                    in: 'hi',
+                    br: 'pt'
+                };
+                return aliasMap[tl] || tl;
             }
 
             const originalFetch = window.fetch.bind(window);
@@ -219,25 +251,118 @@
                 const tl = normalizeGoogleLang(targetLang);
                 if (tl === 'vi') return text;
 
-                const key = `${tl}::${text}`;
+                const cleanText = text.trim();
+                const key = `${tl}::${cleanText}`;
                 if (textCache[key]) return textCache[key];
 
                 try {
-                    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=${encodeURIComponent(tl)}&dt=t&q=${encodeURIComponent(text)}`;
+                    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=${encodeURIComponent(tl)}&dt=t&q=${encodeURIComponent(cleanText)}`;
                     const res = await originalFetch(url);
+                    if (!res.ok) return text;
                     const data = await res.json();
                     const result = (data[0] || []).map(seg => seg[0]).join('').trim();
-                    if (result) textCache[key] = result;
+                    if (result) {
+                        textCache[key] = result;
+                        saveTextCache();
+                    }
                     return result || text;
                 } catch {
                     return text;
                 }
             }
 
-            // Dịch chuẩn xác từng khóa trong từ điển `translations` của TrangThamQuan.js (không dùng ||| tránh lệch mảng)
+            // Dịch gộp nhiều câu trong 1 request duy nhất để không bị nghẽn mạng hay bị Google chặn (rate-limit)
+            async function gTranslateBatch(texts, targetLang) {
+                if (!Array.isArray(texts) || texts.length === 0) return [];
+                const tl = normalizeGoogleLang(targetLang);
+                if (tl === 'vi') return texts.slice();
+
+                const results = new Array(texts.length);
+                const missingIndices = [];
+                const missingTexts = [];
+
+                texts.forEach((raw, idx) => {
+                    const clean = (raw || '').replace(/\r?\n/g, ' ').trim();
+                    if (!clean) {
+                        results[idx] = raw || '';
+                        return;
+                    }
+                    const cacheKey = `${tl}::${clean}`;
+                    if (textCache[cacheKey]) {
+                        results[idx] = textCache[cacheKey];
+                    } else {
+                        missingIndices.push(idx);
+                        missingTexts.push(clean);
+                    }
+                });
+
+                if (missingTexts.length === 0) return results;
+
+                // Chia thành các cụm tối đa ~1800 ký tự để gửi 1-2 request gộp thay vì hàng chục request lẻ
+                const chunks = [];
+                let currentChunkIdx = [];
+                let currentChunkTxt = [];
+                let currentLen = 0;
+
+                for (let i = 0; i < missingTexts.length; i++) {
+                    const t = missingTexts[i];
+                    if (currentChunkTxt.length > 0 && currentLen + t.length > 1800) {
+                        chunks.push({ indices: currentChunkIdx, texts: currentChunkTxt });
+                        currentChunkIdx = [];
+                        currentChunkTxt = [];
+                        currentLen = 0;
+                    }
+                    currentChunkIdx.push(missingIndices[i]);
+                    currentChunkTxt.push(t);
+                    currentLen += t.length + 1;
+                }
+                if (currentChunkTxt.length > 0) {
+                    chunks.push({ indices: currentChunkIdx, texts: currentChunkTxt });
+                }
+
+                for (const chunk of chunks) {
+                    let batchSucceeded = false;
+                    try {
+                        const joined = chunk.texts.join('\n');
+                        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=${encodeURIComponent(tl)}&dt=t&q=${encodeURIComponent(joined)}`;
+                        const res = await originalFetch(url);
+                        if (res.ok) {
+                            const data = await res.json();
+                            const fullTranslated = (data[0] || []).map(seg => seg[0]).join('');
+                            const splitLines = fullTranslated.split('\n').map(s => s.trim());
+                            if (splitLines.length === chunk.texts.length) {
+                                for (let j = 0; j < chunk.texts.length; j++) {
+                                    const tr = splitLines[j] || chunk.texts[j];
+                                    const orig = chunk.texts[j];
+                                    results[chunk.indices[j]] = tr;
+                                    textCache[`${tl}::${orig}`] = tr;
+                                }
+                                batchSucceeded = true;
+                                saveTextCache();
+                            }
+                        }
+                    } catch { }
+
+                    if (!batchSucceeded) {
+                        // Fallback dịch từng cụm nhỏ 4 câu nếu tách dòng không khớp
+                        for (let j = 0; j < chunk.texts.length; j += 4) {
+                            const sliceTxt = chunk.texts.slice(j, j + 4);
+                            const sliceIdx = chunk.indices.slice(j, j + 4);
+                            const translatedSlice = await Promise.all(sliceTxt.map(t => gTranslate(t, targetLang)));
+                            translatedSlice.forEach((tr, k) => {
+                                results[sliceIdx[k]] = tr;
+                            });
+                        }
+                    }
+                }
+
+                return results;
+            }
+
+            // Dịch toàn bộ từ điển `translations` của TrangThamQuan.js chỉ bằng 1-2 request gộp, có khóa chống gọi trùng
             async function ensureTranslationsObjectForLanguage(langCode) {
                 if (typeof translations !== 'object' || !translations.vi) return;
-                const code = (langCode || '').toLowerCase();
+                const code = (langCode || '').toLowerCase().trim();
                 if (!code || ['vi', 'en', 'fr'].includes(code)) return;
 
                 if (!translations[code]) {
@@ -254,37 +379,73 @@
                 });
 
                 if (translations[code]._isFullyTranslated) return;
+                if (inFlightLangPromises[code]) {
+                    return inFlightLangPromises[code];
+                }
 
-                const viDict = translations.vi;
-                const keys = Object.keys(viDict).filter(k => typeof viDict[k] === 'string' && !viDict[k].includes('{latitude}'));
+                inFlightLangPromises[code] = (async () => {
+                    try {
+                        const viDict = translations.vi;
+                        const keys = Object.keys(viDict).filter(k => typeof viDict[k] === 'string' && !viDict[k].includes('{latitude}'));
 
-                await Promise.all(keys.map(async k => {
-                    // Phân biệt rõ "Xem địa điểm" (Xem ảnh) và "Xem vị trí" (Xem bản đồ) để không bị dịch trùng chữ
-                    let sourceText = viDict[k].replace(/<[^>]+>/g, ' ');
-                    if (k === 'viewLocation') sourceText = 'Xem bản đồ vị trí';
-                    if (k === 'viewPlace') sourceText = 'Xem hình ảnh địa điểm';
+                        const sourceTexts = keys.map(k => {
+                            if (k === 'viewLocation') return 'Xem bản đồ vị trí';
+                            if (k === 'viewPlace') return 'Xem hình ảnh địa điểm';
+                            return viDict[k].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+                        });
 
-                    translations[code][k] = await gTranslate(sourceText, code);
-                }));
+                        // Thêm từ "đánh giá" vào cuối mảng batch
+                        sourceTexts.push('đánh giá');
 
-                // Dịch thêm từ "đánh giá" (reviews) để dùng cho thẻ địa điểm
-                translations[code]._reviewsWord = await gTranslate('đánh giá', code);
-                translations[code]._isFullyTranslated = true;
+                        const translatedList = await gTranslateBatch(sourceTexts, code);
+                        let translatedCount = 0;
+
+                        keys.forEach((k, idx) => {
+                            const tr = translatedList[idx];
+                            if (tr) {
+                                translations[code][k] = tr;
+                                if (tr.trim().toLowerCase() !== sourceTexts[idx].trim().toLowerCase()) {
+                                    translatedCount++;
+                                }
+                            }
+                        });
+
+                        const reviewsTr = translatedList[keys.length] || 'reviews';
+                        translations[code]._reviewsWord = reviewsTr;
+                        translations[code].reviewWord = reviewsTr;
+
+                        // Chỉ đánh dấu hoàn tất nếu thực sự dịch thành công (tránh kẹt tiếng Việt khi rớt mạng tạm thời)
+                        if (translatedCount > 0) {
+                            translations[code]._isFullyTranslated = true;
+                        }
+                    } finally {
+                        delete inFlightLangPromises[code];
+                    }
+                })();
+
+                return inFlightLangPromises[code];
             }
 
             // Cập nhật giao diện & các nhãn phụ trên thẻ mà KHÔNG ghi đè phá hỏng cấu trúc <button> của TrangThamQuan.js
             async function refreshCustomLanguageUI(langCode) {
-                const code = (langCode || '').toLowerCase();
+                const code = (langCode || '').toLowerCase().trim();
                 if (!code || ['vi', 'en', 'fr'].includes(code)) return;
 
                 await ensureTranslationsObjectForLanguage(code);
                 if (typeof translations !== 'object' || !translations[code]) return;
                 const dict = translations[code];
 
-                // 1. Cập nhật tất cả phần tử có data-i18n
+                // 1. Cập nhật tất cả phần tử có data-i18n (bao gồm 3 chữ đầu trang: Khám phá, Điểm đến, Cách hoạt động)
                 document.querySelectorAll('[data-i18n]').forEach(el => {
                     const key = el.getAttribute('data-i18n');
-                    if (key && dict[key]) el.innerHTML = dict[key];
+                    if (!key || !dict[key]) return;
+                    if (el.classList.contains('filter-chip')) {
+                        const countSpan = el.querySelector('span');
+                        const countHtml = countSpan ? ` ${countSpan.outerHTML}` : '';
+                        el.innerHTML = `${dict[key]}${countHtml}`;
+                    } else {
+                        el.innerHTML = dict[key];
+                    }
                 });
 
                 // 2. Cập nhật ô tìm kiếm
@@ -293,8 +454,8 @@
                     searchInput.placeholder = dict.searchPlaceholder;
                 }
 
-                // 3. Cập nhật bộ đếm "07 địa điểm" -> "07 <locations>" và "280 đánh giá" -> "280 <reviews>"
-                const reviewsWord = dict._reviewsWord || 'reviews';
+                // 3. Cập nhật bộ đếm "06 địa điểm" -> "06 <locations>" và "280 đánh giá" -> "280 <reviews>"
+                const reviewsWord = dict.reviewWord || dict._reviewsWord || 'reviews';
                 const locationsWord = dict.locations || 'places';
 
                 document.querySelectorAll('span, p, div, small').forEach(el => {
@@ -302,7 +463,7 @@
                     const txt = (el.innerText || '').trim();
                     if (!txt) return;
 
-                    // Khớp "07 địa điểm" / "07 places" / "07 lieux"
+                    // Khớp "06 địa điểm" / "06 places" / "06 lieux"
                     const locMatch = txt.match(/^(\d+)\s+(địa điểm|places|lieux)$/i);
                     if (locMatch) {
                         el.innerText = `${locMatch[1]} ${locationsWord}`;
@@ -323,7 +484,7 @@
                     else if (txt === 'Lịch sử' && dict.filterHistory) el.innerText = dict.filterHistory;
                 });
 
-                // 4. Cập nhật nhãn trên 4 nút hành động của thẻ địa điểm (chỉ đổi text node cuối, giữ nguyên <span> icon & sự kiện click)
+                // 4. Cập nhật nhãn trên 4 nút hành động của thẻ địa điểm (chỉ đổi text node cuối, giữ nguyên <span>/<svg> icon & sự kiện click)
                 const btnMap = {
                     'Xem địa điểm': dict.viewPlace,
                     'View place': dict.viewPlace,
@@ -351,13 +512,28 @@
                             if (node.nodeType === Node.TEXT_NODE) {
                                 const clean = (node.nodeValue || '').trim();
                                 if (btnMap[clean]) node.nodeValue = ` ${btnMap[clean]}`;
-                            } else if (node.nodeType === Node.ELEMENT_NODE && node.children.length === 0) {
+                            } else if (node.nodeType === Node.ELEMENT_NODE && node.children.length === 0 && node.tagName !== 'SPAN') {
                                 const clean = (node.innerText || '').trim();
                                 if (btnMap[clean]) node.innerText = btnMap[clean];
                             }
                         });
                     }
                 });
+            }
+
+            window.ensureTranslationsObjectForLanguage = ensureTranslationsObjectForLanguage;
+            window.refreshCustomLanguageUI = refreshCustomLanguageUI;
+
+            // Kiểm tra xem bản dịch lưu trong DB có bị trùng y hệt bản gốc Tiếng Việt không (do lỗi mạng lúc tạo ngôn ngữ)
+            function hasValidTranslatedText(foundT, viReferenceText) {
+                if (!foundT || !foundT.translatedContent) return false;
+                const tr = foundT.translatedContent.trim();
+                if (!tr || tr === '(Chưa có bản dịch)' || tr === '(Chưa có nội dung thuyết minh)') return false;
+                const viRef = (viReferenceText || '').trim();
+                const origVi = (foundT.originalContentVi || '').trim();
+                if (viRef && tr === viRef) return false;
+                if (origVi && tr === origVi) return false;
+                return true;
             }
 
             // Bắt mọi kiểu input của window.fetch (string, new URL(...), Request)
@@ -376,32 +552,29 @@
                 try {
                     const u = new URL(urlStr, window.location.origin);
                     const path = u.pathname;
-                    const queryLang = (u.searchParams.get('language') || '').toLowerCase();
+                    const queryLang = (u.searchParams.get('language') || '').toLowerCase().trim();
 
                     // 1. API chọn ngôn ngữ: /api/languages/{code}
                     if (path.startsWith('/api/languages/')) {
-                        const code = decodeURIComponent(path.split('/').pop() || '').toLowerCase();
+                        const code = decodeURIComponent(path.split('/').pop() || '').toLowerCase().trim();
                         if (code && !['vi', 'en', 'fr'].includes(code)) {
                             await ensureTranslationsObjectForLanguage(code);
-                            const viRes = await originalFetch('/api/languages/vi');
-                            const baseObj = viRes.ok ? await viRes.json() : {};
                             const info = supportedLangsMap[code] || {
                                 code,
                                 name: code.toUpperCase(),
                                 voiceLocale: `${normalizeGoogleLang(code)}-${code.toUpperCase()}`
                             };
 
-                            const cloned = Object.assign({}, baseObj);
-                            Object.keys(cloned).forEach(k => {
-                                if (cloned[k] === 'vi') cloned[k] = info.code;
-                                else if (cloned[k] === 'Tiếng Việt') cloned[k] = info.name;
-                                else if (cloned[k] === 'vi-VN') cloned[k] = info.voiceLocale;
-                            });
-                            cloned.code = info.code;
-                            cloned.language = info.code;
-                            cloned.name = info.name;
-                            cloned.displayName = info.name;
-                            cloned.voiceLocale = info.voiceLocale;
+                            const cloned = {
+                                ma: info.code,
+                                ten: info.name,
+                                maGiongDoc: info.voiceLocale,
+                                code: info.code,
+                                language: info.code,
+                                name: info.name,
+                                displayName: info.name,
+                                voiceLocale: info.voiceLocale
+                            };
 
                             return new Response(JSON.stringify(cloned), {
                                 status: 200,
@@ -412,11 +585,11 @@
 
                     // 2. API lấy danh sách địa điểm: /api/landmarks?language={code}
                     if (path === '/api/landmarks' && queryLang && !['vi', 'en', 'fr'].includes(queryLang)) {
-                        await ensureTranslationsObjectForLanguage(queryLang);
                         const viUrl = new URL(u.toString());
                         viUrl.searchParams.set('language', 'vi');
 
-                        const [viRes, transRes] = await Promise.all([
+                        const [, viRes, transRes] = await Promise.all([
+                            ensureTranslationsObjectForLanguage(queryLang),
                             originalFetch(viUrl.toString(), init),
                             originalFetch('/api/admin/landmarks/translations')
                         ]);
@@ -425,39 +598,65 @@
                             const places = await viRes.json();
                             const allTrans = transRes.ok ? await transRes.json() : [];
 
-                            const updatedPlaces = await Promise.all(places.map(async p => {
+                            // Gom tất cả mô tả (chưa có bản dịch hoặc bản dịch bị dính tiếng Việt) và highlights để dịch gộp 1 lần
+                            const descToTranslate = [];
+                            const descPlaceIndices = [];
+                            const allHighlightsToTranslate = [];
+
+                            const placeDraftFlags = new Array(places.length).fill(false);
+                            const placeDescriptions = new Array(places.length).fill('');
+
+                            places.forEach((p, idx) => {
                                 const foundT = allTrans.find(t =>
                                     t.diaDiemId.toLowerCase() === p.id.toLowerCase() &&
                                     t.languageCode.toLowerCase() === queryLang
                                 );
 
-                                let desc = p.description;
-                                if (p.description !== '(Nội dung thuyết minh đang chờ công bố)') {
-                                    if (foundT && foundT.translatedContent) {
-                                        desc = foundT.status === 'Bản nháp'
-                                            ? '(Nội dung thuyết minh đang chờ công bố)'
-                                            : foundT.translatedContent;
-                                    } else {
-                                        desc = await gTranslate(p.description, queryLang);
-                                    }
+                                if (p.description === '(Nội dung thuyết minh đang chờ công bố)' || (foundT && foundT.status === 'Bản nháp')) {
+                                    placeDraftFlags[idx] = true;
+                                    placeDescriptions[idx] = '(Nội dung thuyết minh đang chờ công bố)';
+                                } else if (hasValidTranslatedText(foundT, p.description)) {
+                                    placeDescriptions[idx] = foundT.translatedContent.trim();
+                                } else {
+                                    descPlaceIndices.push(idx);
+                                    descToTranslate.push(p.description || '');
                                 }
 
-                                // Dịch luôn danh sách điểm nổi bật (Highlights) trên thẻ địa điểm
-                                let translatedHighlights = p.highlights;
-                                if (Array.isArray(p.highlights) && p.highlights.length > 0) {
-                                    translatedHighlights = await Promise.all(
-                                        p.highlights.map(h => gTranslate(h, queryLang))
-                                    );
+                                if (Array.isArray(p.highlights)) {
+                                    p.highlights.forEach(h => {
+                                        if (h && !allHighlightsToTranslate.includes(h)) {
+                                            allHighlightsToTranslate.push(h);
+                                        }
+                                    });
                                 }
+                            });
+
+                            const [translatedDescs, translatedHighlightList] = await Promise.all([
+                                gTranslateBatch(descToTranslate, queryLang),
+                                gTranslateBatch(allHighlightsToTranslate, queryLang)
+                            ]);
+
+                            descPlaceIndices.forEach((placeIdx, i) => {
+                                placeDescriptions[placeIdx] = translatedDescs[i] || places[placeIdx].description;
+                            });
+
+                            const highlightMap = {};
+                            allHighlightsToTranslate.forEach((h, i) => {
+                                highlightMap[h] = translatedHighlightList[i] || h;
+                            });
+
+                            const updatedPlaces = places.map((p, idx) => {
+                                const translatedHighlights = Array.isArray(p.highlights)
+                                    ? p.highlights.map(h => highlightMap[h] || h)
+                                    : p.highlights;
 
                                 return Object.assign({}, p, {
-                                    description: desc,
+                                    description: placeDescriptions[idx],
                                     highlights: translatedHighlights
                                 });
-                            }));
+                            });
 
                             setTimeout(() => refreshCustomLanguageUI(queryLang), 50);
-                            setTimeout(() => refreshCustomLanguageUI(queryLang), 250);
 
                             return new Response(JSON.stringify(updatedPlaces), {
                                 status: 200,
@@ -466,38 +665,7 @@
                         }
                     }
 
-                    // 3. API xem chi tiết địa điểm (Nút "Xem địa điểm" / "Xem chi tiết nội dung")
-                    if (path.startsWith('/api/landmarks/') && !path.includes('/admin/') && queryLang && !['vi', 'en', 'fr'].includes(queryLang)) {
-                        const parts = path.split('/');
-                        const placeId = decodeURIComponent(parts[parts.indexOf('landmarks') + 1] || '');
-
-                        // 3a. Nút "Xem chi tiết nội dung": /api/landmarks/{id}/details
-                        if (path.endsWith('/details')) {
-                            const [viRes, transRes] = await Promise.all([
-                                originalFetch(`/api/landmarks/${encodeURIComponent(placeId)}/details?language=vi`, init),
-                                originalFetch('/api/admin/landmarks/translations')
-                            ]);
-                            if (viRes.ok) {
-                                const detailObj = await viRes.json();
-                                const allTrans = transRes.ok ? await transRes.json() : [];
-                                const foundT = allTrans.find(t =>
-                                    t.diaDiemId.toLowerCase() === placeId.toLowerCase() &&
-                                    t.languageCode.toLowerCase() === queryLang
-                                );
-                                if (detailObj.noiDung !== '(Nội dung thuyết minh đang chờ công bố)') {
-                                    detailObj.noiDung = (foundT && foundT.translatedContent)
-                                        ? (foundT.status === 'Bản nháp' ? '(Nội dung thuyết minh đang chờ công bố)' : foundT.translatedContent)
-                                        : await gTranslate(detailObj.noiDung || '', queryLang);
-                                }
-                                setTimeout(() => refreshCustomLanguageUI(queryLang), 50);
-                                return new Response(JSON.stringify(detailObj), {
-                                    status: 200,
-                                    headers: { 'Content-Type': 'application/json' }
-                                });
-                            }
-                        }
-
-                        // 2b. API phát giọng đọc thuyết minh (Nút "Nghe nội dung"): /api/narration/{id}?language={code}
+                    // 3. API phát giọng đọc thuyết minh (Nút "Nghe nội dung"): /api/narration/{id}?language={code}
                     if (path.startsWith('/api/narration/') && !path.endsWith('/pause') && !path.endsWith('/replay') && queryLang && !['vi', 'en', 'fr'].includes(queryLang)) {
                         const placeId = decodeURIComponent(path.split('/').pop() || '');
                         const [viNarrRes, transRes] = await Promise.all([
@@ -514,9 +682,16 @@
                             );
 
                             const origText = (baseObj.diaDiem && baseObj.diaDiem.description) || '';
-                            const translatedContent = (foundT && foundT.translatedContent)
-                                ? (foundT.status === 'Bản nháp' ? '(Nội dung thuyết minh đang chờ công bố)' : foundT.translatedContent)
-                                : await gTranslate(origText, queryLang);
+                            let translatedContent = origText;
+                            if (origText !== '(Nội dung thuyết minh đang chờ công bố)') {
+                                if (foundT && foundT.status === 'Bản nháp') {
+                                    translatedContent = '(Nội dung thuyết minh đang chờ công bố)';
+                                } else if (hasValidTranslatedText(foundT, origText)) {
+                                    translatedContent = foundT.translatedContent.trim();
+                                } else {
+                                    translatedContent = await gTranslate(origText, queryLang);
+                                }
+                            }
 
                             const isoLang = normalizeGoogleLang(queryLang);
                             const langInfo = supportedLangsMap[queryLang];
@@ -538,7 +713,42 @@
                         }
                     }
 
-                        // 3c. Nút "Xem địa điểm" (nếu gọi /api/landmarks/{id}?language={code})
+                    // 4. API xem chi tiết địa điểm (Nút "Xem địa điểm" / "Xem chi tiết nội dung")
+                    if (path.startsWith('/api/landmarks/') && !path.includes('/admin/') && queryLang && !['vi', 'en', 'fr'].includes(queryLang)) {
+                        const parts = path.split('/');
+                        const placeId = decodeURIComponent(parts[parts.indexOf('landmarks') + 1] || '');
+
+                        // 4a. Nút "Xem chi tiết nội dung": /api/landmarks/{id}/details
+                        if (path.endsWith('/details')) {
+                            const [viRes, transRes] = await Promise.all([
+                                originalFetch(`/api/landmarks/${encodeURIComponent(placeId)}/details?language=vi`, init),
+                                originalFetch('/api/admin/landmarks/translations')
+                            ]);
+                            if (viRes.ok) {
+                                const detailObj = await viRes.json();
+                                const allTrans = transRes.ok ? await transRes.json() : [];
+                                const foundT = allTrans.find(t =>
+                                    t.diaDiemId.toLowerCase() === placeId.toLowerCase() &&
+                                    t.languageCode.toLowerCase() === queryLang
+                                );
+                                if (detailObj.noiDung !== '(Nội dung thuyết minh đang chờ công bố)') {
+                                    if (foundT && foundT.status === 'Bản nháp') {
+                                        detailObj.noiDung = '(Nội dung thuyết minh đang chờ công bố)';
+                                    } else if (hasValidTranslatedText(foundT, detailObj.noiDung)) {
+                                        detailObj.noiDung = foundT.translatedContent.trim();
+                                    } else {
+                                        detailObj.noiDung = await gTranslate(detailObj.noiDung || '', queryLang);
+                                    }
+                                }
+                                setTimeout(() => refreshCustomLanguageUI(queryLang), 50);
+                                return new Response(JSON.stringify(detailObj), {
+                                    status: 200,
+                                    headers: { 'Content-Type': 'application/json' }
+                                });
+                            }
+                        }
+
+                        // 4b. Nút "Xem địa điểm" (nếu gọi /api/landmarks/{id}?language={code})
                         if (!path.endsWith('/details') && !path.endsWith('/narration') && !path.endsWith('/location')) {
                             const viUrl = new URL(u.toString());
                             viUrl.searchParams.set('language', 'vi');
@@ -553,10 +763,14 @@
                                     t.diaDiemId.toLowerCase() === placeId.toLowerCase() &&
                                     t.languageCode.toLowerCase() === queryLang
                                 );
-                                if (foundT && foundT.translatedContent && placeObj.description !== '(Nội dung thuyết minh đang chờ công bố)') {
-                                    placeObj.description = foundT.status === 'Bản nháp'
-                                        ? '(Nội dung thuyết minh đang chờ công bố)'
-                                        : foundT.translatedContent;
+                                if (placeObj.description !== '(Nội dung thuyết minh đang chờ công bố)') {
+                                    if (foundT && foundT.status === 'Bản nháp') {
+                                        placeObj.description = '(Nội dung thuyết minh đang chờ công bố)';
+                                    } else if (hasValidTranslatedText(foundT, placeObj.description)) {
+                                        placeObj.description = foundT.translatedContent.trim();
+                                    } else {
+                                        placeObj.description = await gTranslate(placeObj.description || '', queryLang);
+                                    }
                                 }
                                 setTimeout(() => refreshCustomLanguageUI(queryLang), 50);
                                 return new Response(JSON.stringify(placeObj), {
@@ -584,24 +798,17 @@
                         supportedLangsMap[l.code.toLowerCase()] = l;
                     });
 
-                    await Promise.all(activeLangs.map(l => ensureTranslationsObjectForLanguage(l.code)));
-
                     const selectEl = document.querySelector('#language-select, select[aria-label*="ngôn ngữ"], .language-select select, select');
                     if (!selectEl) return;
 
-                    let savedLanguage = '';
-                    try {
-                        savedLanguage = window.localStorage.getItem('visitor-guide-language') || '';
-                    } catch { }
-                    const savedActiveLanguage = activeLangs.find(l =>
-                        l.code.toLowerCase() === savedLanguage.toLowerCase());
-                    const currentSelected = savedActiveLanguage ? savedActiveLanguage.code : (selectEl.value || 'vi');
+                    const currentSelected = (selectEl.value || 'vi').toLowerCase();
                     selectEl.innerHTML = activeLangs.map(l =>
                         `<option value="${l.code}">${l.name}</option>`
                     ).join('');
 
-                    if (activeLangs.some(l => l.code === currentSelected)) {
-                        selectEl.value = currentSelected;
+                    const matchedActive = activeLangs.find(l => l.code.toLowerCase() === currentSelected);
+                    if (matchedActive) {
+                        selectEl.value = matchedActive.code;
                     } else if (activeLangs.length > 0) {
                         selectEl.value = activeLangs[0].code;
                         selectEl.dispatchEvent(new Event('change', { bubbles: true }));
@@ -620,6 +827,13 @@
                             setTimeout(() => refreshCustomLanguageUI(chosen), 350);
                         });
                     }
+
+                    // Dịch ngầm từ điển giao diện cho các ngôn ngữ mới mà không làm nghẽn dropdown
+                    activeLangs.forEach(l => {
+                        if (!['vi', 'en', 'fr'].includes(l.code.toLowerCase())) {
+                            ensureTranslationsObjectForLanguage(l.code);
+                        }
+                    });
                 } catch { }
             }
 

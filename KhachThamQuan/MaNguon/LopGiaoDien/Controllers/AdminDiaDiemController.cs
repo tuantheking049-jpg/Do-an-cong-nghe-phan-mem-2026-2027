@@ -473,9 +473,21 @@ public class AdminDiaDiemController : ControllerBase
     public static async Task<string> TranslateViaGoogleAsync(string textVi, string targetLang)
     {
         if (string.IsNullOrWhiteSpace(textVi)) return "";
-        string tl = targetLang.Trim().ToLowerInvariant();
+        string tl = targetLang.Trim().ToLowerInvariant().Split('-')[0];
         if (tl == "vi") return textVi;
-        if (tl == "jp") tl = "ja"; // Chuẩn mã ISO của tiếng Nhật trên Google Translate là 'ja'
+        tl = tl switch
+        {
+            "jp" => "ja",
+            "kr" => "ko",
+            "cn" or "zh" => "zh-CN",
+            "tw" or "hk" => "zh-TW",
+            "ua" => "uk",
+            "cz" => "cs",
+            "dk" => "da",
+            "se" => "sv",
+            "gr" => "el",
+            _ => tl
+        };
 
         try
         {
@@ -1382,6 +1394,7 @@ public class AdminDiaDiemController : ControllerBase
 
     // 1. GET: Lấy danh sách âm thanh thuyết minh (Tự động sinh cho TẤT CẢ ngôn ngữ có văn bản)
     [HttpGet("voices")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllVoices()
     {
         var rawPlaces = await _dbContext.DiaDiem

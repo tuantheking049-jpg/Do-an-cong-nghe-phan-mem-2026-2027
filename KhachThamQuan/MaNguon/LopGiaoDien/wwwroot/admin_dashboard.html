@@ -1044,33 +1044,30 @@
         </div>
     </div>
 
-    <!-- Modal Hiển thị Mã QR Chung -->
+    <!-- Modal Hiển thị Mã QR Chung & Cấu hình Link Ngrok -->
     <div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow text-center">
-                <div class="modal-header bg-light">
+                <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold"><i class="bi bi-qr-code me-2 text-primary"></i>Mã QR Cổng Du Lịch Sóc Trăng</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div id="qrCodeContainer" class="d-inline-block p-3 border rounded-3 bg-white shadow-sm mb-3" hidden>
-                        <img id="qrImage" alt="QR Code" class="img-fluid" width="220" hidden>
+                    <p class="text-muted small mb-3">Quét mã QR này bằng điện thoại để truy cập trang Khách tham quan (Định vị GPS & Nghe thuyết minh)</p>
+                    <div class="d-inline-block p-3 border rounded-3 bg-white shadow-sm mb-3">
+                        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https://scrimmage-container-gumminess.ngrok-free.dev/index.html" alt="QR Code" class="img-fluid" width="220">
                     </div>
-                    <a id="qrOpenLink" class="btn btn-outline-primary btn-sm mb-3" href="/" target="_blank" rel="noopener">Mở trang khách tham quan trên máy tính</a>
                     <div class="text-start mt-2">
-                        <label for="qrUrlInput" class="form-label small fw-medium text-secondary">Đường dẫn trang Khách tham quan:</label>
+                        <label class="form-label small fw-medium text-secondary">Đường dẫn trang Khách tham quan (Dán link Ngrok vào đây):</label>
                         <div class="input-group">
-                            <input type="url" id="qrUrlInput" class="form-control" placeholder="https://ten-mien-hoac-dia-chi-mang">
+                            <input type="text" id="qrUrlInput" class="form-control" value="https://scrimmage-container-gumminess.ngrok-free.dev/index.html" placeholder="https://xxxx.ngrok-free.app">
                             <button class="btn btn-primary" type="button" onclick="updateQRCode()">Cập nhật QR</button>
                         </div>
-                        <div id="qrAddressConfiguration" class="mt-2" hidden>
-                            <label for="qrAddressSelect" class="form-label small fw-medium text-secondary mb-1">Cấu hình địa chỉ truy cập:</label>
-                            <select id="qrAddressSelect" class="form-select form-select-sm" aria-label="Chọn địa chỉ truy cập"></select>
-                        </div>
-                        <div id="qrStatus" class="small mt-2" role="status" aria-live="polite"></div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 
@@ -2634,126 +2631,11 @@
         // =========================================================================
         // 8. CÁC TÍNH NĂNG PHỤ (MÃ QR, ĐIỀU HƯỚNG MENU, ĐĂNG XUẤT)
         // =========================================================================
-        const qrUrlInput = document.getElementById('qrUrlInput');
-        const qrCodeContainer = document.getElementById('qrCodeContainer');
-        const qrImage = document.getElementById('qrImage');
-        const qrStatus = document.getElementById('qrStatus');
-        const qrOpenLink = document.getElementById('qrOpenLink');
-        const qrAddressSelect = document.getElementById('qrAddressSelect');
-        const qrAddressConfiguration = document.getElementById('qrAddressConfiguration');
-        const qrModal = document.getElementById('qrModal');
-        const initialQrUrl = `${window.location.origin}/`;
-        qrUrlInput.value = initialQrUrl;
-        qrOpenLink.href = initialQrUrl;
-        let qrUrlEdited = false;
-        let qrCanAccessFromPhone = false;
-        let qrNetworkMessage = "";
-
-        function setQrStatus(message, type = "muted") {
-            qrStatus.className = `small mt-2 text-${type}`;
-            qrStatus.textContent = message;
-        }
-
-        qrUrlInput.addEventListener('input', () => {
-            qrUrlEdited = true;
-        });
-
-        qrAddressSelect.addEventListener('change', () => {
-            if (!qrAddressSelect.value) return;
-            qrUrlEdited = false;
-            qrUrlInput.value = qrAddressSelect.value;
-            updateQRCode();
-        });
-
-        qrImage.addEventListener('error', () => {
-            qrCodeContainer.hidden = true;
-            qrImage.hidden = true;
-            setQrStatus("Không tải được ảnh QR. Kiểm tra kết nối Internet rồi thử cập nhật lại mã.", "danger");
-        });
-
-        async function initializeQRCode() {
-            try {
-                const response = await fetch(`${API_LANDMARKS_URL}/qr-targets`, { cache: "no-store" });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const configuration = await response.json();
-                const targets = (Array.isArray(configuration.targets) ? configuration.targets : [])
-                    .map(target => target.label === "Địa chỉ hiện tại"
-                        ? { ...target, url: new URL('/', window.location.origin).href }
-                        : target);
-
-                qrAddressSelect.replaceChildren();
-                for (const target of targets) {
-                    const option = document.createElement('option');
-                    option.value = target.url;
-                    option.textContent = target.label;
-                    qrAddressSelect.appendChild(option);
-                }
-                if (targets.length > 0) {
-                    qrAddressConfiguration.hidden = false;
-                } else {
-                    qrAddressConfiguration.hidden = true;
-                }
-
-                qrCanAccessFromPhone = configuration.canAccessFromPhone === true;
-                qrNetworkMessage = configuration.message || "";
-                if (qrUrlEdited) {
-                    qrOpenLink.href = qrUrlInput.value;
-                    return;
-                }
-
-                if (qrCanAccessFromPhone && targets.length > 0) {
-                    qrUrlInput.value = targets[0].url;
-                    updateQRCode();
-                } else {
-                    qrUrlInput.value = initialQrUrl;
-                    qrOpenLink.href = initialQrUrl;
-                    qrImage.removeAttribute('src');
-                    qrImage.hidden = true;
-                    qrCodeContainer.hidden = true;
-                    setQrStatus(qrNetworkMessage, qrCanAccessFromPhone ? "success" : "warning");
-                }
-            } catch (error) {
-                console.error("Không thể kiểm tra địa chỉ dùng cho mã QR:", error);
-                qrCanAccessFromPhone = false;
-                qrNetworkMessage = "Không kiểm tra được địa chỉ mạng. Hãy nhập URL mà điện thoại có thể truy cập.";
-                qrImage.removeAttribute('src');
-                qrImage.hidden = true;
-                qrCodeContainer.hidden = true;
-                setQrStatus(qrNetworkMessage, "warning");
-            }
-        }
-
-        qrModal.addEventListener('shown.bs.modal', initializeQRCode);
-
         function updateQRCode() {
             const url = document.getElementById('qrUrlInput').value.trim();
-            let parsedUrl;
-            try {
-                parsedUrl = new URL(url);
-            } catch {
-                return alert("Vui lòng nhập đường dẫn hợp lệ bắt đầu bằng http:// hoặc https://");
-            }
-            if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-                return alert("Vui lòng dùng đường dẫn bắt đầu bằng http:// hoặc https://");
-            }
-
-            qrOpenLink.href = parsedUrl.href;
-            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(parsedUrl.href)}`;
-            qrImage.hidden = false;
-            qrCodeContainer.hidden = false;
-            if (qrUrlEdited) {
-                const host = parsedUrl.hostname.toLowerCase();
-                const isLocalHost = ["localhost", "127.0.0.1", "0.0.0.0", "::1", "[::1]"].includes(host);
-                setQrStatus(
-                    isLocalHost
-                        ? "Địa chỉ này chỉ truy cập được trên máy chạy ứng dụng; hãy dùng IP LAN hoặc domain công khai."
-                        : "Đã cập nhật QR. Đảm bảo máy chủ có thể truy cập qua URL này.",
-                    isLocalHost ? "warning" : "muted");
-            } else {
-                setQrStatus(
-                    qrNetworkMessage || "Đã cập nhật mã QR. Điện thoại cần truy cập được URL bên trên.",
-                    qrCanAccessFromPhone ? "success" : "warning");
-            }
+            if (!url) return alert("Vui lòng nhập đường dẫn hợp lệ!");
+            document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}`;
+            alert("Đã tạo mã QR mới cho đường dẫn: " + url);
         }
 
         document.getElementById('sidebarCollapse').addEventListener('click', function () {

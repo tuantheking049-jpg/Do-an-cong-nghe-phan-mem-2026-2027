@@ -42,47 +42,66 @@
     },
     {
       "Code": "en",
-      "Name": "Ti\u1EBFng Anh (English)",
+      "Name": "English (English)",
       "VoiceLocale": "en-US",
       "Status": "\u0110ang h\u1ED7 tr\u1EE3",
       "OrderIndex": 2
     },
     {
       "Code": "fr",
-      "Name": "Ti\u1EBFng Ph\u00E1p (Fran\u00E7ais)",
+      "Name": "Fran\u00E7ais (Fran\u00E7ais)",
       "VoiceLocale": "fr-FR",
       "Status": "\u0110ang h\u1ED7 tr\u1EE3",
       "OrderIndex": 3
+    },
+    {
+      "Code": "ja",
+      "Name": "Ti\u1EBFng Nh\u1EADt (\u65E5\u672C\u8A9E)",
+      "VoiceLocale": "ja-JP",
+      "Status": "\u0110ang h\u1ED7 tr\u1EE3",
+      "OrderIndex": 11
     }
   ],
-  "NextLangOrder": 10,
+  "NextLangOrder": 12,
   "TranslationStatusByKey": {
-    "chua-la-han:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-    "chua-doi:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-    "tan-hue-vien:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
     "chua-phat-hoc-2:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-    "khu-can-cu-tinh-uy-soc-trang:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-    "cho-noi-nga-nam:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-    "tan-hue-vien:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-    "khu-can-cu-tinh-uy-soc-trang:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-    "chua-la-han:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-    "chua-doi:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "khu-can-cu-tinh-uy-soc-trang:ja": "\u0110\u00E3 c\u00F4ng b\u1ED1",
     "cho-noi-nga-nam:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-    "chua-phat-hoc-2:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1"
+    "tan-hue-vien:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "tan-hue-vien:ja": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-la-han:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-la-han:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "cho-noi-nga-nam:ja": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-doi:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-doi:ja": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "cho-noi-nga-nam:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-la-han:ja": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-phat-hoc-2:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "khu-can-cu-tinh-uy-soc-trang:fr": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "khu-can-cu-tinh-uy-soc-trang:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "tan-hue-vien:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-doi:en": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+    "chua-phat-hoc-2:ja": "\u0110\u00E3 c\u00F4ng b\u1ED1"
   },
   "TranslationOrderByKey": {
-    "chua-la-han:en": 0,
-    "chua-doi:fr": 0,
-    "tan-hue-vien:fr": 0,
     "chua-phat-hoc-2:en": 0,
-    "khu-can-cu-tinh-uy-soc-trang:en": 0,
-    "cho-noi-nga-nam:fr": 0,
-    "tan-hue-vien:en": 0,
-    "khu-can-cu-tinh-uy-soc-trang:fr": 0,
-    "chua-la-han:fr": 0,
-    "chua-doi:en": 0,
+    "khu-can-cu-tinh-uy-soc-trang:ja": 11,
     "cho-noi-nga-nam:en": 0,
-    "chua-phat-hoc-2:fr": 0
+    "tan-hue-vien:fr": 0,
+    "tan-hue-vien:ja": 12,
+    "chua-la-han:en": 0,
+    "chua-la-han:fr": 0,
+    "cho-noi-nga-nam:ja": 7,
+    "chua-doi:fr": 0,
+    "chua-doi:ja": 8,
+    "cho-noi-nga-nam:fr": 0,
+    "chua-la-han:ja": 9,
+    "chua-phat-hoc-2:fr": 0,
+    "khu-can-cu-tinh-uy-soc-trang:fr": 0,
+    "khu-can-cu-tinh-uy-soc-trang:en": 0,
+    "tan-hue-vien:en": 0,
+    "chua-doi:en": 0,
+    "chua-phat-hoc-2:ja": 10
   },
   "Voices": [
     {
@@ -95,7 +114,19 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 8
+      "OrderIndex": 6
+    },
+    {
+      "Key": "tan-hue-vien:ja",
+      "DiaDiemId": "tan-hue-vien",
+      "LanguageCode": "ja",
+      "SourceType": "TTS",
+      "VoiceName": "Google \u65E5\u672C\u8A9E (ja-JP)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 45
     },
     {
       "Key": "chua-doi:fr",
@@ -107,7 +138,7 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 5
+      "OrderIndex": 4
     },
     {
       "Key": "tan-hue-vien:fr",
@@ -119,7 +150,7 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 18
+      "OrderIndex": 13
     },
     {
       "Key": "chua-doi:vi",
@@ -131,7 +162,7 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 6
+      "OrderIndex": 5
     },
     {
       "Key": "chua-phat-hoc-2:en",
@@ -143,7 +174,7 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 11
+      "OrderIndex": 8
     },
     {
       "Key": "khu-can-cu-tinh-uy-soc-trang:en",
@@ -155,7 +186,7 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 14
+      "OrderIndex": 10
     },
     {
       "Key": "cho-noi-nga-nam:vi",
@@ -194,6 +225,18 @@
       "OrderIndex": 0
     },
     {
+      "Key": "chua-phat-hoc-2:ja",
+      "DiaDiemId": "chua-phat-hoc-2",
+      "LanguageCode": "ja",
+      "SourceType": "TTS",
+      "VoiceName": "Google \u65E5\u672C\u8A9E (ja-JP)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 43
+    },
+    {
       "Key": "tan-hue-vien:en",
       "DiaDiemId": "tan-hue-vien",
       "LanguageCode": "en",
@@ -203,7 +246,7 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 17
+      "OrderIndex": 12
     },
     {
       "Key": "tan-hue-vien:vi",
@@ -218,6 +261,18 @@
       "OrderIndex": 0
     },
     {
+      "Key": "chua-doi:ja",
+      "DiaDiemId": "chua-doi",
+      "LanguageCode": "ja",
+      "SourceType": "TTS",
+      "VoiceName": "Google \u65E5\u672C\u8A9E (ja-JP)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 41
+    },
+    {
       "Key": "khu-can-cu-tinh-uy-soc-trang:fr",
       "DiaDiemId": "khu-can-cu-tinh-uy-soc-trang",
       "LanguageCode": "fr",
@@ -227,7 +282,7 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 15
+      "OrderIndex": 11
     },
     {
       "Key": "chua-la-han:fr",
@@ -239,7 +294,7 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 9
+      "OrderIndex": 7
     },
     {
       "Key": "chua-doi:en",
@@ -251,7 +306,31 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 4
+      "OrderIndex": 3
+    },
+    {
+      "Key": "chua-la-han:ja",
+      "DiaDiemId": "chua-la-han",
+      "LanguageCode": "ja",
+      "SourceType": "TTS",
+      "VoiceName": "Google \u65E5\u672C\u8A9E (ja-JP)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 42
+    },
+    {
+      "Key": "cho-noi-nga-nam:ja",
+      "DiaDiemId": "cho-noi-nga-nam",
+      "LanguageCode": "ja",
+      "SourceType": "TTS",
+      "VoiceName": "Google \u65E5\u672C\u8A9E (ja-JP)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 40
     },
     {
       "Key": "cho-noi-nga-nam:en",
@@ -275,7 +354,19 @@
       "Pitch": 1,
       "AudioUrl": "",
       "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
-      "OrderIndex": 12
+      "OrderIndex": 9
+    },
+    {
+      "Key": "khu-can-cu-tinh-uy-soc-trang:ja",
+      "DiaDiemId": "khu-can-cu-tinh-uy-soc-trang",
+      "LanguageCode": "ja",
+      "SourceType": "TTS",
+      "VoiceName": "Google \u65E5\u672C\u8A9E (ja-JP)",
+      "SpeechRate": 1,
+      "Pitch": 1,
+      "AudioUrl": "",
+      "Status": "\u0110\u00E3 c\u00F4ng b\u1ED1",
+      "OrderIndex": 44
     },
     {
       "Key": "khu-can-cu-tinh-uy-soc-trang:vi",
@@ -304,13 +395,13 @@
   ],
   "DeletedVoiceKeys": [],
   "PlaysById": {
-    "tan-hue-vien": 30,
-    "chua-phat-hoc-2": 20,
-    "chua-doi": 31,
-    "khu-can-cu-tinh-uy-soc-trang": 30,
-    "chua-la-han": 35,
-    "cho-noi-nga-nam": 32
+    "tan-hue-vien": 26,
+    "chua-phat-hoc-2": 21,
+    "chua-doi": 33,
+    "khu-can-cu-tinh-uy-soc-trang": 29,
+    "chua-la-han": 36,
+    "cho-noi-nga-nam": 39
   },
-  "NextTranslationOrder": 1,
-  "NextVoiceOrder": 34
+  "NextTranslationOrder": 13,
+  "NextVoiceOrder": 46
 }

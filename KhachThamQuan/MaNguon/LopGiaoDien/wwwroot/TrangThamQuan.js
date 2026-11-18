@@ -300,18 +300,12 @@ const locationDialog = document.querySelector("#location-dialog");
 const locationMap = document.querySelector("#location-map");
 const locationStatus = document.querySelector("#location-status");
 const toast = document.querySelector("#toast");
-const preferredLanguage = (() => {
-  try {
-    return window.localStorage.getItem("visitor-guide-language");
-  } catch {
-    return null;
-  }
-})();
-if ([...languageSelect.options].some(option => option.value === preferredLanguage)) {
-  languageSelect.value = preferredLanguage;
-}
-let language = languageSelect.value;
+try {
+  window.localStorage.removeItem("visitor-guide-language");
+} catch {}
+let language = languageSelect.value || "vi";
 let languageChangeRequestId = 0;
+let loadPlacesRequestId = 0;
 let activeCategory = "";
 let currentLandmark = null;
 let currentUtterance = null;
@@ -582,6 +576,9 @@ function renderPlaces(places) {
   placesGrid.hidden = places.length === 0;
   emptyState.hidden = places.length !== 0;
   resultsCount.textContent = `${String(places.length).padStart(2, "0")} ${text("locations")}`;
+  if (typeof window.refreshCustomLanguageUI === "function" && !["vi", "en", "fr"].includes(language)) {
+    window.refreshCustomLanguageUI(language);
+  }
 }
 
 async function showPlaceLocation(id) {
@@ -713,15 +710,20 @@ async function showPlaceDetails(id) {
 }
 
 async function loadPlaces() {
-  const params = new URLSearchParams({ language });
+  const currentLoadId = ++loadPlacesRequestId;
+  const targetLang = language;
+  const params = new URLSearchParams({ language: targetLang });
   if (activeCategory) params.set("category", activeCategory);
   if (searchInput.value.trim()) params.set("search", searchInput.value.trim());
 
   try {
     const response = await fetch(`/api/landmarks?${params}`, { cache: "no-store" });
     if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
-    renderPlaces(await response.json());
+    const data = await response.json();
+    if (currentLoadId !== loadPlacesRequestId) return;
+    renderPlaces(data);
   } catch (error) {
+    if (currentLoadId !== loadPlacesRequestId) return;
     console.error("Failed to load landmarks.", error);
     placesGrid.hidden = true;
     emptyState.hidden = false;
@@ -802,37 +804,34 @@ searchInput.addEventListener("input", () => {
 });
 
 languageSelect.addEventListener("change", async () => {
-  const requestedLanguage = languageSelect.value;
+  const requestedLanguage = (languageSelect.value || "vi").trim().toLowerCase();
   const previousLanguage = language;
   const requestId = ++languageChangeRequestId;
-  language = requestedLanguage;
-  applyTranslations();
-  loadPlaces();
 
   try {
+    if (typeof window.ensureTranslationsObjectForLanguage === "function" && !["vi", "en", "fr"].includes(requestedLanguage)) {
+      await window.ensureTranslationsObjectForLanguage(requestedLanguage);
+    }
     const selectedLanguage = await fetchJson(`/api/languages/${encodeURIComponent(requestedLanguage)}`);
     if (requestId !== languageChangeRequestId) return;
     language = String(selectedLanguage.ma ?? selectedLanguage.code ?? selectedLanguage.language ?? requestedLanguage)
       .trim()
       .toLowerCase();
     languageSelect.value = language;
-    try {
-      window.localStorage.setItem("visitor-guide-language", language);
-    } catch (error) {
-      console.warn("Could not save the selected narration language.", error);
-    }
   } catch (error) {
     if (requestId !== languageChangeRequestId) return;
     console.error("Failed to select narration language.", error);
     language = previousLanguage;
     languageSelect.value = previousLanguage;
-    applyTranslations();
-    loadPlaces();
     showToast(text("languageError"));
     return;
   }
+
   applyTranslations();
-  loadPlaces();
+  await loadPlaces();
+  if (typeof window.refreshCustomLanguageUI === "function" && !["vi", "en", "fr"].includes(language)) {
+    await window.refreshCustomLanguageUI(language);
+  }
   if (!audioPlayer.hidden && currentLandmark) startNarration(currentLandmark.id, false);
 });
 
